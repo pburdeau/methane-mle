@@ -1,0 +1,454 @@
+==============================================================
+  BASELINE COMPARISON (Hybrid Observation Model)
+==============================================================
+  T=1000, p_snap=0.0015, p_cont=0.015, T_cont=50
+  p_off_nudge=1.0000
+  n_reps=500, n_outer=25  (total=12500)
+  pi_on=0.2, tau_emit=20.0
+  => p_on=0.012500, p_off=0.050000
+  mu_emit=50.0, size_mu=3.787, size_sigma=0.5
+  True mu = pi_on * mu_emit = 10.0000
+  Snap: threshold=50.0, slope=2.0, sigma=0.05
+  Cont: threshold=15.0, slope=3.0, sigma=0.2, fp=0.0
+
+
+==============================================================
+  OUTER BATCH 1/25
+==============================================================
+  rep   50/500  elapsed=14.6s  eta=131.2s
+  rep  100/500  elapsed=27.7s  eta=110.9s
+  rep  150/500  elapsed=41.3s  eta=96.4s
+  rep  200/500  elapsed=55.0s  eta=82.5s
+  rep  250/500  elapsed=68.6s  eta=68.6s
+  rep  300/500  elapsed=82.7s  eta=55.1s
+  rep  350/500  elapsed=95.6s  eta=41.0s
+  rep  400/500  elapsed=106.8s  eta=26.7s
+  rep  450/500  elapsed=118.0s  eta=13.1s
+  rep  500/500  elapsed=129.0s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 2/25
+==============================================================
+  rep   50/500  elapsed=10.9s  eta=98.2s
+  rep  100/500  elapsed=21.8s  eta=87.1s
+  rep  150/500  elapsed=32.2s  eta=75.0s
+  rep  200/500  elapsed=43.9s  eta=65.8s
+  rep  250/500  elapsed=56.0s  eta=56.0s
+  rep  300/500  elapsed=68.9s  eta=45.9s
+  rep  350/500  elapsed=79.6s  eta=34.1s
+  rep  400/500  elapsed=90.5s  eta=22.6s
+  rep  450/500  elapsed=101.4s  eta=11.3s
+  rep  500/500  elapsed=115.1s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 3/25
+==============================================================
+  rep   50/500  elapsed=10.7s  eta=96.1s
+  rep  100/500  elapsed=21.5s  eta=85.9s
+  rep  150/500  elapsed=33.3s  eta=77.8s
+  rep  200/500  elapsed=44.6s  eta=66.9s
+  rep  250/500  elapsed=54.7s  eta=54.7s
+  rep  300/500  elapsed=64.6s  eta=43.1s
+  rep  350/500  elapsed=75.3s  eta=32.3s
+  rep  400/500  elapsed=84.8s  eta=21.2s
+  rep  450/500  elapsed=95.4s  eta=10.6s
+  rep  500/500  elapsed=105.3s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 4/25
+==============================================================
+  rep   50/500  elapsed=9.9s  eta=89.1s
+  rep  100/500  elapsed=19.9s  eta=79.8s
+  rep  150/500  elapsed=30.7s  eta=71.6s
+  rep  200/500  elapsed=42.1s  eta=63.1s
+  rep  250/500  elapsed=52.8s  eta=52.8s
+  rep  300/500  elapsed=63.9s  eta=42.6s
+  rep  350/500  elapsed=74.3s  eta=31.8s
+  rep  400/500  elapsed=85.2s  eta=21.3s
+  rep  450/500  elapsed=96.3s  eta=10.7s
+  rep  500/500  elapsed=107.3s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 5/25
+==============================================================
+  rep   50/500  elapsed=9.6s  eta=86.3s
+  rep  100/500  elapsed=19.8s  eta=79.3s
+  rep  150/500  elapsed=29.6s  eta=69.0s
+  rep  200/500  elapsed=40.8s  eta=61.2s
+  rep  250/500  elapsed=52.1s  eta=52.1s
+  rep  300/500  elapsed=62.3s  eta=41.5s
+  rep  350/500  elapsed=72.1s  eta=30.9s
+  rep  400/500  elapsed=81.6s  eta=20.4s
+  rep  450/500  elapsed=90.6s  eta=10.1s
+  rep  500/500  elapsed=100.0s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 6/25
+==============================================================
+  rep   50/500  elapsed=9.1s  eta=81.7s
+  rep  100/500  elapsed=18.2s  eta=72.9s
+  rep  150/500  elapsed=28.9s  eta=67.5s
+  rep  200/500  elapsed=39.1s  eta=58.6s
+  rep  250/500  elapsed=48.1s  eta=48.1s
+  rep  300/500  elapsed=57.0s  eta=38.0s
+  rep  350/500  elapsed=66.6s  eta=28.5s
+  rep  400/500  elapsed=76.0s  eta=19.0s
+  rep  450/500  elapsed=85.2s  eta=9.5s
+  rep  500/500  elapsed=94.3s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 7/25
+==============================================================
+  rep   50/500  elapsed=8.2s  eta=74.2s
+  rep  100/500  elapsed=18.3s  eta=73.3s
+  rep  150/500  elapsed=28.5s  eta=66.5s
+  rep  200/500  elapsed=37.7s  eta=56.5s
+  rep  250/500  elapsed=47.2s  eta=47.2s
+  rep  300/500  elapsed=56.3s  eta=37.6s
+  rep  350/500  elapsed=65.3s  eta=28.0s
+  rep  400/500  elapsed=75.6s  eta=18.9s
+  rep  450/500  elapsed=84.8s  eta=9.4s
+  rep  500/500  elapsed=94.4s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 8/25
+==============================================================
+  rep   50/500  elapsed=9.1s  eta=81.5s
+  rep  100/500  elapsed=19.2s  eta=76.7s
+  rep  150/500  elapsed=28.1s  eta=65.6s
+  rep  200/500  elapsed=38.1s  eta=57.1s
+  rep  250/500  elapsed=48.8s  eta=48.8s
+  rep  300/500  elapsed=58.0s  eta=38.7s
+  rep  350/500  elapsed=68.1s  eta=29.2s
+  rep  400/500  elapsed=78.0s  eta=19.5s
+  rep  450/500  elapsed=87.7s  eta=9.7s
+  rep  500/500  elapsed=97.1s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 9/25
+==============================================================
+  rep   50/500  elapsed=9.8s  eta=87.8s
+  rep  100/500  elapsed=21.0s  eta=84.0s
+  rep  150/500  elapsed=30.5s  eta=71.1s
+  rep  200/500  elapsed=40.7s  eta=61.0s
+  rep  250/500  elapsed=50.7s  eta=50.7s
+  rep  300/500  elapsed=60.3s  eta=40.2s
+  rep  350/500  elapsed=71.4s  eta=30.6s
+  rep  400/500  elapsed=81.4s  eta=20.4s
+  rep  450/500  elapsed=91.3s  eta=10.1s
+  rep  500/500  elapsed=101.4s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 10/25
+==============================================================
+  rep   50/500  elapsed=10.1s  eta=91.0s
+  rep  100/500  elapsed=19.6s  eta=78.4s
+  rep  150/500  elapsed=29.3s  eta=68.4s
+  rep  200/500  elapsed=38.6s  eta=57.8s
+  rep  250/500  elapsed=50.0s  eta=50.0s
+  rep  300/500  elapsed=60.6s  eta=40.4s
+  rep  350/500  elapsed=69.9s  eta=30.0s
+  rep  400/500  elapsed=79.7s  eta=19.9s
+  rep  450/500  elapsed=89.1s  eta=9.9s
+  rep  500/500  elapsed=98.7s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 11/25
+==============================================================
+  rep   50/500  elapsed=9.6s  eta=86.7s
+  rep  100/500  elapsed=19.6s  eta=78.4s
+  rep  150/500  elapsed=28.5s  eta=66.6s
+  rep  200/500  elapsed=39.0s  eta=58.5s
+  rep  250/500  elapsed=48.8s  eta=48.8s
+  rep  300/500  elapsed=59.4s  eta=39.6s
+  rep  350/500  elapsed=68.9s  eta=29.5s
+  rep  400/500  elapsed=79.3s  eta=19.8s
+  rep  450/500  elapsed=89.1s  eta=9.9s
+  rep  500/500  elapsed=100.0s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 12/25
+==============================================================
+  rep   50/500  elapsed=9.1s  eta=82.1s
+  rep  100/500  elapsed=18.6s  eta=74.5s
+  rep  150/500  elapsed=28.2s  eta=65.7s
+  rep  200/500  elapsed=38.1s  eta=57.1s
+  rep  250/500  elapsed=48.2s  eta=48.2s
+  rep  300/500  elapsed=57.7s  eta=38.5s
+  rep  350/500  elapsed=67.5s  eta=28.9s
+  rep  400/500  elapsed=78.8s  eta=19.7s
+  rep  450/500  elapsed=88.7s  eta=9.9s
+  rep  500/500  elapsed=100.0s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 13/25
+==============================================================
+  rep   50/500  elapsed=9.1s  eta=82.3s
+  rep  100/500  elapsed=18.7s  eta=74.6s
+  rep  150/500  elapsed=29.0s  eta=67.6s
+  rep  200/500  elapsed=40.0s  eta=59.9s
+  rep  250/500  elapsed=50.3s  eta=50.3s
+  rep  300/500  elapsed=59.6s  eta=39.8s
+  rep  350/500  elapsed=68.8s  eta=29.5s
+  rep  400/500  elapsed=77.7s  eta=19.4s
+  rep  450/500  elapsed=87.5s  eta=9.7s
+  rep  500/500  elapsed=97.2s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 14/25
+==============================================================
+  rep   50/500  elapsed=9.5s  eta=85.5s
+  rep  100/500  elapsed=18.5s  eta=74.1s
+  rep  150/500  elapsed=28.6s  eta=66.6s
+  rep  200/500  elapsed=41.3s  eta=61.9s
+  rep  250/500  elapsed=54.9s  eta=54.9s
+  rep  300/500  elapsed=65.9s  eta=43.9s
+  rep  350/500  elapsed=76.7s  eta=32.9s
+  rep  400/500  elapsed=88.4s  eta=22.1s
+  rep  450/500  elapsed=99.1s  eta=11.0s
+  rep  500/500  elapsed=110.3s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 15/25
+==============================================================
+  rep   50/500  elapsed=10.2s  eta=91.8s
+  rep  100/500  elapsed=20.8s  eta=83.1s
+  rep  150/500  elapsed=31.4s  eta=73.2s
+  rep  200/500  elapsed=41.5s  eta=62.2s
+  rep  250/500  elapsed=52.9s  eta=52.9s
+  rep  300/500  elapsed=62.9s  eta=41.9s
+  rep  350/500  elapsed=72.7s  eta=31.2s
+  rep  400/500  elapsed=83.2s  eta=20.8s
+  rep  450/500  elapsed=93.1s  eta=10.3s
+  rep  500/500  elapsed=103.2s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 16/25
+==============================================================
+  rep   50/500  elapsed=11.0s  eta=98.8s
+  rep  100/500  elapsed=22.1s  eta=88.5s
+  rep  150/500  elapsed=33.1s  eta=77.3s
+  rep  200/500  elapsed=45.5s  eta=68.2s
+  rep  250/500  elapsed=54.9s  eta=54.9s
+  rep  300/500  elapsed=66.4s  eta=44.3s
+  rep  350/500  elapsed=77.6s  eta=33.2s
+  rep  400/500  elapsed=89.0s  eta=22.2s
+  rep  450/500  elapsed=99.3s  eta=11.0s
+  rep  500/500  elapsed=110.6s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 17/25
+==============================================================
+  rep   50/500  elapsed=14.7s  eta=132.6s
+  rep  100/500  elapsed=29.2s  eta=116.9s
+  rep  150/500  elapsed=40.2s  eta=93.8s
+  rep  200/500  elapsed=50.5s  eta=75.8s
+  rep  250/500  elapsed=60.5s  eta=60.5s
+  rep  300/500  elapsed=70.3s  eta=46.8s
+  rep  350/500  elapsed=79.6s  eta=34.1s
+  rep  400/500  elapsed=89.1s  eta=22.3s
+  rep  450/500  elapsed=99.1s  eta=11.0s
+  rep  500/500  elapsed=109.0s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 18/25
+==============================================================
+  rep   50/500  elapsed=9.0s  eta=81.4s
+  rep  100/500  elapsed=18.3s  eta=73.1s
+  rep  150/500  elapsed=29.0s  eta=67.6s
+  rep  200/500  elapsed=38.5s  eta=57.8s
+  rep  250/500  elapsed=48.1s  eta=48.1s
+  rep  300/500  elapsed=57.8s  eta=38.5s
+  rep  350/500  elapsed=68.7s  eta=29.4s
+  rep  400/500  elapsed=80.0s  eta=20.0s
+  rep  450/500  elapsed=89.7s  eta=10.0s
+  rep  500/500  elapsed=99.1s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 19/25
+==============================================================
+  rep   50/500  elapsed=9.7s  eta=86.9s
+  rep  100/500  elapsed=18.9s  eta=75.5s
+  rep  150/500  elapsed=28.5s  eta=66.5s
+  rep  200/500  elapsed=38.6s  eta=57.9s
+  rep  250/500  elapsed=50.6s  eta=50.6s
+  rep  300/500  elapsed=63.0s  eta=42.0s
+  rep  350/500  elapsed=73.7s  eta=31.6s
+  rep  400/500  elapsed=84.2s  eta=21.1s
+  rep  450/500  elapsed=94.3s  eta=10.5s
+  rep  500/500  elapsed=106.0s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 20/25
+==============================================================
+  rep   50/500  elapsed=10.2s  eta=92.2s
+  rep  100/500  elapsed=21.7s  eta=86.9s
+  rep  150/500  elapsed=33.9s  eta=79.1s
+  rep  200/500  elapsed=43.9s  eta=65.9s
+  rep  250/500  elapsed=55.0s  eta=55.0s
+  rep  300/500  elapsed=64.1s  eta=42.8s
+  rep  350/500  elapsed=74.0s  eta=31.7s
+  rep  400/500  elapsed=83.8s  eta=20.9s
+  rep  450/500  elapsed=93.2s  eta=10.4s
+  rep  500/500  elapsed=102.9s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 21/25
+==============================================================
+  rep   50/500  elapsed=9.4s  eta=84.5s
+  rep  100/500  elapsed=18.5s  eta=74.1s
+  rep  150/500  elapsed=27.6s  eta=64.4s
+  rep  200/500  elapsed=37.9s  eta=56.9s
+  rep  250/500  elapsed=46.9s  eta=46.9s
+  rep  300/500  elapsed=58.1s  eta=38.7s
+  rep  350/500  elapsed=67.6s  eta=29.0s
+  rep  400/500  elapsed=76.8s  eta=19.2s
+  rep  450/500  elapsed=86.2s  eta=9.6s
+  rep  500/500  elapsed=95.4s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 22/25
+==============================================================
+  rep   50/500  elapsed=9.1s  eta=81.5s
+  rep  100/500  elapsed=19.7s  eta=78.9s
+  rep  150/500  elapsed=29.2s  eta=68.1s
+  rep  200/500  elapsed=39.0s  eta=58.5s
+  rep  250/500  elapsed=48.8s  eta=48.8s
+  rep  300/500  elapsed=58.9s  eta=39.3s
+  rep  350/500  elapsed=68.6s  eta=29.4s
+  rep  400/500  elapsed=79.0s  eta=19.7s
+  rep  450/500  elapsed=88.6s  eta=9.8s
+  rep  500/500  elapsed=99.1s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 23/25
+==============================================================
+  rep   50/500  elapsed=10.4s  eta=93.5s
+  rep  100/500  elapsed=19.9s  eta=79.7s
+  rep  150/500  elapsed=29.7s  eta=69.2s
+  rep  200/500  elapsed=39.1s  eta=58.6s
+  rep  250/500  elapsed=48.1s  eta=48.1s
+  rep  300/500  elapsed=57.4s  eta=38.3s
+  rep  350/500  elapsed=67.4s  eta=28.9s
+  rep  400/500  elapsed=78.5s  eta=19.6s
+  rep  450/500  elapsed=88.4s  eta=9.8s
+  rep  500/500  elapsed=97.6s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 24/25
+==============================================================
+  rep   50/500  elapsed=9.3s  eta=84.1s
+  rep  100/500  elapsed=19.1s  eta=76.5s
+  rep  150/500  elapsed=30.6s  eta=71.5s
+  rep  200/500  elapsed=40.6s  eta=60.9s
+  rep  250/500  elapsed=49.9s  eta=49.9s
+  rep  300/500  elapsed=60.2s  eta=40.1s
+  rep  350/500  elapsed=69.8s  eta=29.9s
+  rep  400/500  elapsed=78.9s  eta=19.7s
+  rep  450/500  elapsed=88.3s  eta=9.8s
+  rep  500/500  elapsed=97.4s  eta=0.0s
+
+==============================================================
+  OUTER BATCH 25/25
+==============================================================
+  rep   50/500  elapsed=10.2s  eta=91.5s
+  rep  100/500  elapsed=19.5s  eta=78.0s
+  rep  150/500  elapsed=29.1s  eta=67.9s
+  rep  200/500  elapsed=39.3s  eta=59.0s
+  rep  250/500  elapsed=49.1s  eta=49.1s
+  rep  300/500  elapsed=58.0s  eta=38.6s
+  rep  350/500  elapsed=67.1s  eta=28.7s
+  rep  400/500  elapsed=75.8s  eta=19.0s
+  rep  450/500  elapsed=84.8s  eta=9.4s
+  rep  500/500  elapsed=94.2s  eta=0.0s
+
+==============================================================
+  RESULTS  (2569.7s, 12500 reps = 25 outer x 500 inner)
+==============================================================
+
+  Observation counts (per site, T=1000):
+    Snap obs:  mean=1.5  (expected 1.5)
+    Cont obs:  mean=425.1
+    Both obs:  mean=0.7
+  Naive             mean=  9.5494  bias= -0.4506  95%CI=+/-0.0827  var=   30.9271  rmse=  5.5794
+  POD-weighted      mean= 10.0727  bias= +0.0727  95%CI=+/-0.0846  var=   31.9857  rmse=  5.6561
+  MLE-ungrouped     mean=  9.9115  bias= -0.0885  95%CI=+/-0.0719  var=   27.5173  rmse=  5.2464
+  MLE               mean= 10.0323  bias= +0.0323  95%CI=+/-0.0736  var=   25.3583  rmse=  5.0358
+
+  95% CI from 25 outer batches:
+    Naive                 bias=-0.451 +/- 0.083  var=30.88 +/- 1.06
+    POD-weighted          bias=+0.073 +/- 0.085  var=31.94 +/- 1.08
+    MLE-ungrouped         bias=-0.089 +/- 0.072  var=27.48 +/- 0.94
+    MLE                   bias=+0.032 +/- 0.074  var=25.32 +/- 0.74
+
+  MLE sub-parameters (n_valid=12471/12500):
+          p_on: mean=0.0136  true=0.0125  bias=+0.0011  95%CI=+/-0.0001  var=0.000037
+         p_off: mean=0.0594  true=0.0500  bias=+0.0094  95%CI=+/-0.0005  var=0.000730
+       mu_emit: mean=49.9736  true=50.0000  bias=-0.0264  95%CI=+/-0.1651  var=177.840992
+
+  MLE-ungrouped sub-parameters (n_valid=12471/12500):
+          p_on: mean=0.0133  true=0.0125  bias=+0.0008  95%CI=+/-0.0001  var=0.000035
+         p_off: mean=0.0581  true=0.0500  bias=+0.0081  95%CI=+/-0.0004  var=0.000704
+       mu_emit: mean=49.1296  true=50.0000  bias=-0.8704  95%CI=+/-0.1734  var=234.089428
+
+==============================================================
+  SAVING DATA
+==============================================================
+  Saved: revision-very-sparse-pcont0015/results/data_parameters.csv
+  Saved: revision-very-sparse-pcont0015/results/data_replications.csv
+  Saved: revision-very-sparse-pcont0015/results/data_summary.csv
+  Saved: revision-very-sparse-pcont0015/results/data_pod_curves.csv
+
+==============================================================
+  GENERATING FIGURES
+==============================================================
+  Saved: revision-very-sparse-pcont0015/figures/figure_pod_curves.pdf
+  Saved: revision-very-sparse-pcont0015/figures/figure_pod_curves.png
+  Saved: revision-very-sparse-pcont0015/figures/figure_baseline_violin.pdf
+  Saved: revision-very-sparse-pcont0015/figures/figure_baseline_violin.png
+
+  ── Test 1: Unbiasedness (one-sample t-test on 25 outer batches, H₀: E[μ̂]=μ_true) ──
+  Naive                 t=  -10.67  p<0.001       sig.  (n=25 batches)
+  POD-weighted          t=   +1.68  p=0.1053      n.s.  (n=25 batches)
+  MLE-ungrouped         t=   -2.41  p=0.0238      sig.  (n=25 batches)
+  MLE                   t=   +0.86  p=0.3981      n.s.  (n=25 batches)
+
+  ── Test 2: |Bias| difference (paired t-test on 25 outer batches, H₀: |bias|_A = |bias|_B) ──
+  Naive vs POD-weighted           t=   +4.52  p<0.001       sig.
+  Naive vs MLE-ungrouped          t=   +8.64  p<0.001       sig.
+  Naive vs MLE                    t=   +5.97  p<0.001       sig.
+  POD-weighted vs MLE-ungrouped   t=   +0.78  p=0.4431      n.s.
+  POD-weighted vs MLE             t=   +1.21  p=0.2389      n.s.
+  MLE-ungrouped vs MLE            t=   +0.13  p=0.8999      n.s.
+
+  ── Test 3: Variance difference (paired t-test on 25 outer batches, H₀: Var_A = Var_B) ──
+  Naive vs POD-weighted           t=  -29.71  p<0.001       sig.
+  Naive vs MLE-ungrouped          t=  +13.11  p<0.001       sig.
+  Naive vs MLE                    t=  +11.31  p<0.001       sig.
+  POD-weighted vs MLE-ungrouped   t=  +16.08  p<0.001       sig.
+  POD-weighted vs MLE             t=  +13.18  p<0.001       sig.
+  MLE-ungrouped vs MLE            t=   +6.75  p<0.001       sig.
+
+/Users/pburdeau/Desktop/mle_methane/mle_methane_clean_simultaneous/experiments/run_baseline.py:658: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  fig_a.tight_layout()
+  Saved: revision-very-sparse-pcont0015/figures/figure_baseline_violin_v2_wide.pdf
+  Saved: revision-very-sparse-pcont0015/figures/figure_baseline_violin_v2_wide.png
+/Users/pburdeau/Desktop/mle_methane/mle_methane_clean_simultaneous/experiments/run_baseline.py:676: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  fig_b.tight_layout()
+  Saved: revision-very-sparse-pcont0015/figures/figure_baseline_violin_v2_stacked.pdf
+  Saved: revision-very-sparse-pcont0015/figures/figure_baseline_violin_v2_stacked.png
+  Saved: revision-very-sparse-pcont0015/figures/figure_baseline_params.pdf
+  Saved: revision-very-sparse-pcont0015/figures/figure_baseline_params.png
+  Saved: revision-very-sparse-pcont0015/figures/figure_size_distribution.pdf
+  Saved: revision-very-sparse-pcont0015/figures/figure_size_distribution.png
+  Saved: revision-very-sparse-pcont0015/figures/figure_realizations.pdf
+  Saved: revision-very-sparse-pcont0015/figures/figure_realizations.png
+  Saved: revision-very-sparse-pcont0015/results/data_realization_rep1581.csv
+  Saved: revision-very-sparse-pcont0015/results/data_realization_rep819.csv
+  Saved: revision-very-sparse-pcont0015/results/data_realization_rep1835.csv
+
+  Skipping paper sync (custom output-dir: revision-very-sparse-pcont0015)
+
+==============================================================
+  DONE
+==============================================================

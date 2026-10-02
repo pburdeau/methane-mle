@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "Please cite the accompanying manuscript when using this code."
+type: software
+title: "Methane MLE paper reproduction"
+authors:
+  - family-names: Burdeau
+    given-names: Philippine
+  - family-names: Sherwin
+    given-names: Evan
+  - family-names: Brandt
+    given-names: Adam

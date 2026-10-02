@@ -1,0 +1,2 @@
+T,pi_on,tau_emit,p_on,p_off,mu_emit,mu_true,size_mu,size_sigma,p_snap,p_cont,T_cont,snap_threshold,snap_slope,snap_sigma,cont_threshold,cont_slope,cont_sigma,cont_fp_rate,cont_fp_scale,max_gap,decision_threshold,p_grid_res,p_geom_factor,seed,n_reps,n_outer
+1000,0.2,20.0,0.012500000000000002,0.05,50.0,10.0,3.787,0.5,0.0015,0.015,50,50.0,2.0,0.05,15.0,3.0,0.2,0.0,4.0,3,0.5,11,1.2,2602,500,25

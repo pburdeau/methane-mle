@@ -1,0 +1,72 @@
+[
+  {
+    "figure": "figure0",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure_baseline_violin_v2_wide",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure1_histograms",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure4_composite",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure5_precision",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure_pod_curves",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure_size_distribution",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure_realizations",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure_baseline_violin_v2_wide_sparse",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure1_composite",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure_sweeps_cont",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure_grid_robustness",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  },
+  {
+    "figure": "figure_threshold_sweep",
+    "same_dimensions": true,
+    "pixel_mae": 0.00015246015246015245
+  },
+  {
+    "figure": "figure_misspec_thetas_mse",
+    "same_dimensions": true,
+    "pixel_mae": 0.0
+  }
+]
