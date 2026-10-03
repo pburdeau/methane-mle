@@ -1,0 +1,44 @@
+{
+  "provided_separately_from_repository": true,
+  "artifacts": [
+    {
+      "name": "methane_paper_and_si_persistent_IPW_overleaf.zip",
+      "sha256": "76c534c7dc297e97168f13ccfaa7449dad17136c6facc19c59e0fd891c5231ed",
+      "bytes": 939698
+    },
+    {
+      "name": "methane_main_figures_persistent_IPW.zip",
+      "sha256": "a67255998248763d822d7edf273440a12918d6c5c8fc22ae8ff78149bd335285",
+      "bytes": 547430
+    },
+    {
+      "name": "methane_main_paper_persistent_IPW.pdf",
+      "sha256": "156b9700cc638ba75cdb4282b8d9176577055cab66dfd935e4760270460c6425",
+      "bytes": 746309
+    },
+    {
+      "name": "methane_SI_persistent_IPW.pdf",
+      "sha256": "34bc59e7211d063d80a4c8ef7376ca9fbb1778e352f90b3f9b5ef6a8e93343e5",
+      "bytes": 523569
+    },
+    {
+      "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.docx",
+      "sha256": "476b85479761cba52359de91bdb60e0cb72b645603ea741c6860ea4fc9caa24c",
+      "bytes": 1483030
+    },
+    {
+      "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.pdf",
+      "sha256": "9de43eccc6405e5806811e5a9bf74771bebf80beb15310d102c4f2c212081721",
+      "bytes": 1290986
+    }
+  ],
+  "word_pages": 37,
+  "word_native_math_nodes": 304,
+  "word_numbered_equations": 11,
+  "word_editable_tables": 2,
+  "word_figures": 6,
+  "full_captions": true,
+  "continuous_line_numbers": true,
+  "body_justified": true,
+  "visual_review": "All 37 Word pages and rendered manuscript PDFs reviewed. Final Word acknowledgement edit changes only page 33, re-reviewed."
+}

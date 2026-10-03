@@ -103,24 +103,26 @@ def _sensor_sigma(spec: TechnologySpec) -> float:
 def mle_simple(
     obs: SiteObservations,
     tech_specs: Sequence[TechnologySpec],
-    transition_bounds: tuple = (0.01, 0.95),
+    transition_bounds: tuple = (1e-5, 1-1e-6),
     eps: float = 1e-10,
     p_on_grid: Optional[np.ndarray] = None,
     p_off_grid: Optional[np.ndarray] = None,
-    p_off_nudge: float = 1.03,
+    p_off_nudge: float = 1.0,
 ) -> dict:
-    """One-shot MLE: per-detection IPW for mu_emit/kappas, then forward algorithm.
+    """Ungrouped plug-in comparator: per-detection IPW, persistent likelihood.
 
     Steps:
       1. Per-detection IPW (Hajek estimator) to get mu_emit, kappa_s,
          kappa_c, kappa_sc.  Simultaneous detections are combined into
          a single record via inverse-variance weighting in log-space.
-      2. Forward algorithm + grid search over (p_on, p_off) using the
-         kappas from step 1.
+      2. Persistent-size forward likelihood conditional on the weighted
+         per-detection size distribution, with fixed-bound optimization.
       3. mu_hat = pi_on_hat * mu_emit_hat.
 
     Returns dict with keys: mean, p_on, p_off, mu_emit.
     """
+    if p_off_nudge != 1.0:
+        raise ValueError("No likelihood nudge is supported; use 1.0.")
     sigma_s = _sensor_sigma(tech_specs[0])
     sigma_c = _sensor_sigma(tech_specs[1])
     inv_var_s = 1.0 / sigma_s ** 2
@@ -166,8 +168,10 @@ def mle_simple(
         det_qs.append(qs)
         det_qc.append(qc)
 
-    if len(det_E) < 2:
-        return dict(mean=np.nan, p_on=np.nan, p_off=np.nan, mu_emit=np.nan)
+    if len(det_E) == 0:
+        return dict(mean=0.0 if obs.n_total_observations() else np.nan,
+                    p_on=np.nan, p_off=np.nan, mu_emit=np.nan,
+                    optimizer_success=False, has_detections=False)
 
     sizes = np.array(det_E)
     weights = np.array(det_w)
@@ -182,116 +186,20 @@ def mle_simple(
         np.sum(weights * qs_arr * qc_arr) / w_sum, eps, 1 - eps))
     kappa_sc = min(kappa_sc, kappa_s, kappa_c)
 
-    # ── Step 2: forward algorithm + grid search ───────────────────
-    observed_times = obs.observed_times()
-    if len(observed_times) < 2:
-        return dict(mean=np.nan, p_on=np.nan, p_off=np.nan, mu_emit=mu_emit)
-
-    n_obs_t = len(observed_times)
-    emit_on = np.ones(n_obs_t)
-    emit_off = np.ones(n_obs_t)
-
-    f_s = tech_specs[0].false_positive_rate
-    f_c = tech_specs[1].false_positive_rate
-
-    for j, t in enumerate(observed_times):
-        has_snap = bool(obs.snap_mask[t])
-        has_cont = bool(obs.cont_mask[t])
-        det_s = bool(obs.snap_detected[t]) if has_snap else False
-        det_c = bool(obs.cont_detected[t]) if has_cont else False
-
-        if has_snap and has_cont:
-            if det_s and det_c:
-                emit_on[j] = kappa_sc
-                emit_off[j] = f_s * f_c
-            elif det_s:
-                emit_on[j] = kappa_s - kappa_sc
-                emit_off[j] = f_s * (1 - f_c)
-            elif det_c:
-                emit_on[j] = kappa_c - kappa_sc
-                emit_off[j] = (1 - f_s) * f_c
-            else:
-                emit_on[j] = 1 - kappa_s - kappa_c + kappa_sc
-                emit_off[j] = (1 - f_s) * (1 - f_c)
-        elif has_snap:
-            if det_s:
-                emit_on[j] = kappa_s
-                emit_off[j] = f_s
-            else:
-                emit_on[j] = 1 - kappa_s
-                emit_off[j] = 1 - f_s
-        elif has_cont:
-            if det_c:
-                emit_on[j] = kappa_c
-                emit_off[j] = f_c
-            else:
-                emit_on[j] = 1 - kappa_c
-                emit_off[j] = 1 - f_c
-
-        emit_on[j] = max(emit_on[j], eps)
-        emit_off[j] = max(emit_off[j], eps)
-
-    deltas = np.diff(observed_times).astype(float)
-
-    best_ll = -np.inf
-    best_p_on = 0.025
-    best_p_off = 0.10
-    _p_on_g = p_on_grid if p_on_grid is not None else np.arange(0.0125, 0.2, 0.0125)
-    _p_off_g = p_off_grid if p_off_grid is not None else np.arange(0.0125, 0.2, 0.0125)
-    _eff_lb = min(transition_bounds[0],
-                  float(_p_on_g.min()), float(_p_off_g.min()))
-
-    for p_on_c in _p_on_g:
-        for p_off_c in _p_off_g:
-            p_off_c_eff = p_off_c * p_off_nudge
-            if not (_eff_lb <= p_on_c <= transition_bounds[1]):
-                continue
-            if not (_eff_lb <= p_off_c_eff <= transition_bounds[1]):
-                continue
-            denom = p_on_c + p_off_c_eff
-            if denom < eps:
-                continue
-            pi0 = p_off_c_eff / denom
-            pi1 = p_on_c / denom
-            r = 1.0 - p_on_c - p_off_c_eff
-
-            a0 = pi0 * emit_off[0]
-            a1 = pi1 * emit_on[0]
-            s = a0 + a1
-            if s <= eps:
-                continue
-            a0 /= s
-            a1 /= s
-            ll = np.log(s)
-
-            bad = False
-            for k in range(len(deltas)):
-                rn = r ** deltas[k]
-                pred_0 = a0 * (pi0 + pi1 * rn) + a1 * (pi0 - pi0 * rn)
-                pred_1 = a0 * (pi1 - pi1 * rn) + a1 * (pi1 + pi0 * rn)
-                a0 = emit_off[k + 1] * pred_0
-                a1 = emit_on[k + 1] * pred_1
-                s = a0 + a1
-                if s <= eps:
-                    bad = True
-                    break
-                a0 /= s
-                a1 /= s
-                ll += np.log(s)
-
-            if bad:
-                continue
-            if ll > best_ll:
-                best_ll = ll
-                best_p_on = p_on_c
-                best_p_off = p_off_c
+    # Same persistent-size likelihood as the grouped estimator, with the
+    # original per-detection IPW support instead of linked event sizes.
+    from .persistent import detection_inputs, fit_transitions
+    (best_p_on, best_p_off), loglik, success = fit_transitions(
+        weights, detection_inputs(obs, tech_specs, sizes), bounds=transition_bounds,
+        coarse=True, p_on_grid=p_on_grid, p_off_grid=p_off_grid)
 
     # ── Step 3: combine ───────────────────────────────────────────
     pi_on = best_p_on / (best_p_on + best_p_off)
     mu_hat = pi_on * mu_emit
 
     return dict(mean=mu_hat, p_on=best_p_on, p_off=best_p_off,
-                mu_emit=mu_emit)
+                mu_emit=mu_emit, optimizer_success=success, has_detections=True,
+                log_likelihood=loglik)
 
 
 # ═══════════════════════════════════════════════════════════════════

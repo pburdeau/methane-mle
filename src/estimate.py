@@ -1,24 +1,10 @@
-"""
-Loop Empirical Estimator (MLE) with IPW correction.
+"""Iterative plug-in estimation with linked plumes and event-level IPW.
 
-Adapted for the joint observation model where snapshot and continuous
-technologies observe independently at each time step.
-
-Key mathematical properties implemented correctly:
-  - κ_sc = E[q_s(Q)·q_c(Q)] computed as its own integral (NOT κ_s·κ_c).
-  - Forward algorithm uses four-way dispatch for dual-deployment steps:
-      both detect → κ_sc,  snap only → κ_s − κ_sc, etc.
-  - IPW weight = 1/P(plume detected at ≥1 time step across its span).
-  - Plume sizes combined via inverse-variance weighted average in log-space.
-
-Steps per iteration:
-  1. Identify plumes via Bayesian posterior linking (combine dual-channel
-     measurements before computing Bayes factor).
-  2. IPW-corrected empirical size distribution and expected POD
-     (κ_s, κ_c, κ_sc).
-  3. Grid search over (p_on, p_off) maximising the HMM forward-algorithm
-     log-likelihood with joint emission probabilities.
-  4. Repeat until convergence.
+Steps 1 and 2 retain the original linking, measurement combination, and IPW.
+Step 3 maximizes a persistent-size detection likelihood conditional on the
+weighted empirical event-size distribution. Sizes persist across ON steps;
+new events draw new sizes. This is not joint MLE or exact EM. No likelihood
+nudge is applied. Fixed optimization bounds do not depend on generating truth.
 """
 
 from __future__ import annotations
@@ -29,6 +15,7 @@ from typing import List, Optional, Sequence
 import numpy as np
 
 from .utils import SiteObservations, TechnologySpec
+from .persistent import detection_inputs, fit_transitions, event_detection_probability
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -159,7 +146,8 @@ def identify_plumes(
         log_BF = (0.5 * np.log(V_diff / V_same)
                   - (d ** 2 / 2.0) * (1.0 / V_same - 1.0 / V_diff))
         exp_term = np.exp(-delta_t / tau)
-        log_PO = np.log(exp_term) - np.log(1.0 - exp_term + 1e-12)
+        with np.errstate(divide="ignore"):  # underflow denotes negligible linking odds
+            log_PO = np.log(exp_term) - np.log(1.0 - exp_term + 1e-12)
         log_odds = log_PO + log_BF
 
         if log_odds > 20:
@@ -188,7 +176,7 @@ def identify_plumes(
 
 
 # ═══════════════════════════════════════════════════════════════════
-# Single EM iteration (joint observation model)
+# One plug-in iteration (persistent event sizes)
 # ═══════════════════════════════════════════════════════════════════
 
 def _run_one_step(
@@ -198,20 +186,18 @@ def _run_one_step(
     p_off_in: float,
     max_gap: int = 3,
     decision_threshold: float = 0.5,
-    transition_bounds: tuple = (0.01, 0.95),
+    transition_bounds: tuple = (1e-5, 1-1e-6),
     eps: float = 1e-10,
     noise_override: Optional[dict] = None,
     p_on_grid: Optional[np.ndarray] = None,
     p_off_grid: Optional[np.ndarray] = None,
-    p_off_nudge: float = 1.03,
+    p_off_nudge: float = 1.0,
+    coarse_search: bool = False,
+    optimizer_tolerance: float = 1e-11,
 ) -> dict:
-    """One iteration: plumes → IPW distribution → grid MLE with joint likelihood.
-
-    Key differences from single-tech version:
-      - κ_sc computed from IPW sample (NOT κ_s · κ_c).
-      - Forward algorithm dispatches on deployment config at each time step.
-      - IPW weights = 1/P(plume detected across its span).
-    """
+    """One iteration: plume linking, original event-IPW, conditional likelihood."""
+    if p_off_nudge != 1.0:
+        raise ValueError("The persistent-size estimator has no likelihood nudge; use 1.0.")
     plumes = identify_plumes(
         obs, tech_specs, p_off=p_off_in, max_gap=max_gap,
         decision_threshold=decision_threshold, noise_override=noise_override,
@@ -265,13 +251,7 @@ def _run_one_step(
     p_miss_2d = (1.0 - snap_2d * q_s_grid[np.newaxis, :]) * \
                 (1.0 - cont_2d * q_c_grid[np.newaxis, :])
 
-    alpha = np.ones(n_grid)
-    total_alpha = np.zeros(n_grid)
-    for t in range(obs.T - 1, -1, -1):
-        alpha = p_miss_2d[t] * (p_off_in + (1.0 - p_off_in) * alpha)
-        total_alpha += alpha
-
-    p_det_grid = np.clip(1.0 - total_alpha / obs.T, eps, 1.0)
+    p_det_grid = np.clip(event_detection_probability(p_off_in, p_miss_2d), eps, 1.0)
 
     plume_det_probs = np.empty(len(plumes))
     for m, _p in enumerate(plumes):
@@ -302,130 +282,20 @@ def _run_one_step(
 
     kappa_values = [kappa_s, kappa_c]
 
-    # ── Forward algorithm with correct joint emission probs ──────
-    observed_times = obs.observed_times()
-    if len(observed_times) < 2:
-        return dict(
-            p_on_new=p_on_in, p_off_new=p_off_in,
-            plumes=plumes, plume_sizes=plume_sizes.tolist(),
-            ipw_weights=weights.tolist(), weighted_mean=mu_when_emitting,
-            kappa_values=kappa_values, kappa_sc=kappa_sc,
-            log_likelihood=-np.inf,
-        )
-
-    f_s = tech_specs[0].false_positive_rate
-    f_c = tech_specs[1].false_positive_rate
-
-    # ── Grid search over (p_on, p_off) ───────────────────────────
-    deltas = np.diff(observed_times).astype(float)
-
-    if p_on_grid is None:
-        p_on_grid = np.arange(0.0125, 0.2, 0.0125)
-    if p_off_grid is None:
-        p_off_grid = np.arange(0.0125, 0.2, 0.0125)
-
-    eff_lb = min(transition_bounds[0],
-                 float(p_on_grid.min()), float(p_off_grid.min()))
-    eff_ub = transition_bounds[1]
-
-    emit_on = np.ones(len(observed_times))
-    emit_off = np.ones(len(observed_times))
-
-    for j, t in enumerate(observed_times):
-        has_snap = bool(obs.snap_mask[t])
-        has_cont = bool(obs.cont_mask[t])
-        d_s = bool(obs.snap_detected[t]) if has_snap else False
-        d_c = bool(obs.cont_detected[t]) if has_cont else False
-
-        if has_snap and has_cont:
-            if d_s and d_c:
-                emit_on[j] = kappa_sc
-                emit_off[j] = f_s * f_c
-            elif d_s and not d_c:
-                emit_on[j] = kappa_s - kappa_sc
-                emit_off[j] = f_s * (1 - f_c)
-            elif not d_s and d_c:
-                emit_on[j] = kappa_c - kappa_sc
-                emit_off[j] = (1 - f_s) * f_c
-            else:
-                emit_on[j] = 1 - kappa_s - kappa_c + kappa_sc
-                emit_off[j] = (1 - f_s) * (1 - f_c)
-        elif has_snap:
-            if d_s:
-                emit_on[j] = kappa_s
-                emit_off[j] = f_s
-            else:
-                emit_on[j] = 1 - kappa_s
-                emit_off[j] = 1 - f_s
-        elif has_cont:
-            if d_c:
-                emit_on[j] = kappa_c
-                emit_off[j] = f_c
-            else:
-                emit_on[j] = 1 - kappa_c
-                emit_off[j] = 1 - f_c
-
-        emit_on[j] = max(emit_on[j], eps)
-        emit_off[j] = max(emit_off[j], eps)
-
-    def _ll(p_on_t: float, p_off_t: float) -> float:
-        if not (eff_lb <= p_on_t <= eff_ub):
-            return -np.inf
-        if not (eff_lb <= p_off_t <= eff_ub):
-            return -np.inf
-        denom = p_on_t + p_off_t
-        if denom < eps:
-            return -np.inf
-        pi0 = p_off_t / denom
-        pi1 = p_on_t / denom
-        r = 1.0 - p_on_t - p_off_t
-
-        alpha_0 = pi0 * emit_off[0]
-        alpha_1 = pi1 * emit_on[0]
-        s = alpha_0 + alpha_1
-        if s <= eps:
-            return -np.inf
-        alpha_0 /= s
-        alpha_1 /= s
-        ll = np.log(s)
-
-        for k in range(len(deltas)):
-            rn = r ** deltas[k]
-            t00 = pi0 + pi1 * rn
-            t01 = pi1 - pi1 * rn
-            t10 = pi0 - pi0 * rn
-            t11 = pi1 + pi0 * rn
-
-            pred_0 = alpha_0 * t00 + alpha_1 * t10
-            pred_1 = alpha_0 * t01 + alpha_1 * t11
-
-            a0 = emit_off[k + 1] * pred_0
-            a1 = emit_on[k + 1] * pred_1
-            s = a0 + a1
-            if s <= eps:
-                return -np.inf
-            alpha_0 = a0 / s
-            alpha_1 = a1 / s
-            ll += np.log(s)
-        return float(ll)
-
-    best_ll = -np.inf
-    best_p_on = p_on_in
-    best_p_off = p_off_in
-    for p_on_c in p_on_grid:
-        for p_off_c in p_off_grid:
-            ll = _ll(p_on_c, p_off_c * p_off_nudge)
-            if ll > best_ll:
-                best_ll = ll
-                best_p_on = p_on_c
-                best_p_off = p_off_c
+    # Retain the entire weighted empirical law, including persistent size.
+    inputs = detection_inputs(obs, tech_specs, plume_sizes)
+    (best_p_on, best_p_off), best_ll, optimizer_success = fit_transitions(
+        weights, inputs, (p_on_in, p_off_in), transition_bounds,
+        coarse=coarse_search, p_on_grid=p_on_grid, p_off_grid=p_off_grid,
+        optimizer_tolerance=optimizer_tolerance,
+    )
 
     return dict(
         p_on_new=best_p_on, p_off_new=best_p_off,
         plumes=plumes, plume_sizes=plume_sizes.tolist(),
         ipw_weights=weights.tolist(), weighted_mean=mu_when_emitting,
         kappa_values=kappa_values, kappa_sc=kappa_sc,
-        log_likelihood=best_ll,
+        log_likelihood=best_ll, optimizer_success=optimizer_success,
     )
 
 
@@ -440,16 +310,17 @@ def loop_empirical(
     max_gap: int = 3,
     init_p_on: float = 0.025,
     init_p_off: float = 0.10,
-    max_iter: int = 20,
-    tol: float = 1e-4,
+    max_iter: int = 30,
+    tol: float = 1e-5,
     mean_tol: Optional[float] = None,
-    transition_bounds: tuple = (0.01, 0.95),
+    transition_bounds: tuple = (1e-5, 1-1e-6),
     eps: float = 1e-10,
     noise_override: Optional[dict] = None,
     decision_threshold: float = 0.5,
     p_on_grid: Optional[np.ndarray] = None,
     p_off_grid: Optional[np.ndarray] = None,
-    p_off_nudge: float = 1.03,
+    p_off_nudge: float = 1.0,
+    optimizer_tolerance: float = 1e-11,
 ) -> dict:
     """
     Run the self-consistent loop estimator on dual-channel observations.
@@ -457,11 +328,23 @@ def loop_empirical(
     Returns dict with keys: mean, p_on, p_off, mu_emit,
     empirical_distribution, converged, n_iterations.
     """
+    if p_off_nudge != 1.0:
+        raise ValueError("The persistent-size estimator has no likelihood nudge; use 1.0.")
+    if T != obs.T:
+        raise ValueError("T must match the observation campaign length.")
+    if obs.n_total_detections() == 0:
+        # Keep zero-detection campaigns in mean-performance summaries. Activity
+        # and event size are unidentified; do not report fabricated parameters.
+        return dict(mean=0.0 if obs.n_total_observations() else np.nan,
+                    p_on=np.nan, p_off=np.nan, mu_emit=np.nan,
+                    empirical_distribution=np.array([]), empirical_weights=np.array([]),
+                    converged=False, n_iterations=0, optimizer_success=False,
+                    has_detections=False, boundary=False, log_likelihood=np.nan)
     p_on, p_off = init_p_on, init_p_off
     converged = False
     n_iterations = 0
     prev_mean = None
-    mean_tol_val = mean_tol if mean_tol is not None else tol
+    mean_tol_val = mean_tol if mean_tol is not None else 1e-4
     plume_sizes = np.array([])
     mu_emit = 0.0
 
@@ -472,7 +355,8 @@ def loop_empirical(
             transition_bounds=transition_bounds, eps=eps,
             noise_override=noise_override,
             p_on_grid=p_on_grid, p_off_grid=p_off_grid,
-            p_off_nudge=p_off_nudge,
+            p_off_nudge=p_off_nudge, coarse_search=iteration == 0,
+            optimizer_tolerance=optimizer_tolerance,
         )
 
         p_on_new = step["p_on_new"]
@@ -489,7 +373,7 @@ def loop_empirical(
 
         if converged:
             p_on, p_off = p_on_new, p_off_new
-            n_iterations = iteration
+            n_iterations = iteration + 1
             break
 
         n_iterations = iteration + 1
@@ -508,6 +392,12 @@ def loop_empirical(
         "p_off": p_off,
         "mu_emit": mu_emit,
         "empirical_distribution": plume_sizes,
+        "empirical_weights": np.array(step["ipw_weights"]),
+        "optimizer_success": step["optimizer_success"],
+        "has_detections": True,
+        "boundary": bool(min(p_on,p_off) <= transition_bounds[0]*1.001 or
+                         max(p_on,p_off) >= transition_bounds[1]*.9999),
+        "log_likelihood": step["log_likelihood"],
         "converged": converged,
         "n_iterations": n_iterations,
     }

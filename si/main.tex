@@ -8,6 +8,11 @@
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{siunitx}
+% Read line-number records left in Overleaf's output.aux by the main paper.
+% Loading lineno alone does not enable line numbering in the SI.
+\usepackage{lineno}
+% Use hyperlink-compatible labels for references imported by the OUP paper.
+\usepackage[hidelinks]{hyperref}
 
 % \newcommand{\new}[1]{{\color{blue}#1}}
 % \newcommand{\edit}[1]{{\color{magenta}#1}}
@@ -19,15 +24,25 @@
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Var}{\mathrm{Var}}
 \newcommand{\ind}{\mathbf{1}}
+\setlength{\emergencystretch}{2em}
+\makeatletter
+\renewcommand{\l@section}{\@dottedtocline{1}{0em}{3.2em}}
+\renewcommand{\l@subsection}{\@dottedtocline{2}{1.5em}{4em}}
+\renewcommand{\l@subsubsection}{\@dottedtocline{3}{3.8em}{5em}}
+\makeatother
 
 \title{Supplementary Information:\\Maximum Likelihood Estimation of Intermittent Methane Emissions}
 \author{}
 \date{}
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\theequation}{S\arabic{equation}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
 
 \begin{document}
 \maketitle
 
-\tableofcontents
+{\small\tableofcontents}
 \newpage
 
 %==============================================================================
@@ -42,23 +57,23 @@
 \begin{equation}
     \Var(\bar x) = \frac{1}{N^2} \mathbf{1}^\top \mathbf{C}\, \mathbf{1}.
 \end{equation}
-When $\mathbf{C} = \sigma^2 \mathbf{I}$ this reduces to the familiar $\sigma^2/N$. For general $\mathbf{C}$ with positive off-diagonal entries, $\mathbf{1}^\top \mathbf{C}\, \mathbf{1} > N \sigma^2$, so $\Var(\bar x)$ exceeds $\sigma^2/N$ by an amount that grows with the off-diagonal mass of $\mathbf{C}$.}
+When $\mathbf{C} = \sigma^2 \mathbf{I}$ this reduces to the familiar $\sigma^2/N$. If the diagonal entries remain $\sigma^2$ and the off-diagonal entries have positive total sum, $\mathbf{1}^\top \mathbf{C}\, \mathbf{1} > N \sigma^2$, so $\Var(\bar x)$ exceeds $\sigma^2/N$ by an amount that grows with the off-diagonal mass of $\mathbf{C}$.}
 
-\new{Among all linear unbiased estimators of $\mu$ — that is, all estimators of the form $\mathbf{w}^\top \mathbf{x}$ with $\mathbf{w}^\top \mathbf{1} = 1$ — the one with minimum variance is the inverse-covariance-weighted mean
+\new{Assuming $\mathbf C$ is positive definite, among all linear unbiased estimators of $\mu$ — that is, all estimators of the form $\mathbf{w}^\top \mathbf{x}$ with $\mathbf{w}^\top \mathbf{1} = 1$ — the one with minimum variance is the inverse-covariance-weighted mean
 \begin{equation}
-    \hat\mu_\star 
+    \hat\mu_\star
     = \frac{\mathbf{1}^\top \mathbf{C}^{-1} \mathbf{x}}{\mathbf{1}^\top \mathbf{C}^{-1} \mathbf{1}},
     \qquad
     \Var(\hat\mu_\star) = \frac{1}{\mathbf{1}^\top \mathbf{C}^{-1} \mathbf{1}}.
     \label{eq:gls_SI}
 \end{equation}
-This follows from Lagrangian minimisation of $\mathbf{w}^\top \mathbf{C}\, \mathbf{w}$ subject to $\mathbf{w}^\top \mathbf{1} = 1$. The empirical mean achieves this minimum only when $\mathbf{C} \propto \mathbf{I}$; otherwise it is strictly sub-optimal, and the gap $\Var(\bar x) - \Var(\hat\mu_\star)$ measures the information that the empirical mean discards by treating the samples as exchangeable.}
+This follows from Lagrangian minimisation of $\mathbf{w}^\top \mathbf{C}\, \mathbf{w}$ subject to $\mathbf{w}^\top \mathbf{1} = 1$. The empirical mean achieves this minimum whenever $\mathbf C\mathbf 1=c\mathbf 1$ for a constant $c$, that is, when the covariance matrix has equal row sums. This includes independent observations with equal variances and correlated observations with compound symmetry. When row sums differ, unequal weighting can improve linear-estimator precision. The nonnegative gap $\Var(\bar x)-\Var(\hat\mu_\star)$ quantifies that improvement.}
 
 \new{As a simple illustration, consider the compound-symmetry structure in which $\mathbf{C}$ has equal diagonal entries $\sigma^2$ and equal off-diagonal entries $\rho \sigma^2$. Then
 \begin{equation}
     \Var(\bar x) = \frac{\sigma^2}{N}\bigl[1 + (N-1)\rho\bigr],
 \end{equation}
-so that doubling $N$ does not halve the variance when $\rho > 0$: the benefit of additional samples is attenuated by the correlation. In the limit $\rho \to 1$, $\Var(\bar x) \to \sigma^2$ regardless of $N$, since the $N$ samples carry the information of a single draw.}
+so that doubling $N$ does not halve the variance when $\rho > 0$: the benefit of additional samples is attenuated by the correlation. In the limit $\rho \to 1$, $\Var(\bar x) \to \sigma^2$ regardless of $N$, since the $N$ samples carry the information of a single draw. The empirical mean remains the optimal linear unbiased estimator under this compound-symmetry structure: covariance-driven variance inflation relative to independent data does not by itself imply that equal weighting is inefficient. The precision gains of the proposed nonlinear plug-in estimator are evaluated separately by simulation.}
 
 \new{In the methane-monitoring context, the correlation structure is richer than compound symmetry: samples within a single emission event are highly correlated, while samples across distinct events are approximately independent. The effective correlation $\bar\rho$ therefore depends on the fraction of revisits that fall within the same event, which in turn depends on the emission-duration distribution and the sampling cadence. The POD-weighted estimator of Section~3.1.3 of the main text is essentially an empirical mean over weighted detections and so inherits the variance inflation described above. By contrast, the MLE models the latent state sequence explicitly: events are identified as such, within-event observations are combined into a single estimated emission size, and the resulting per-event sample behaves more like an independent draw from the emission distribution. This is the mechanism by which the MLE recovers (in part) the information that the empirical mean discards.}
 
@@ -135,7 +150,7 @@ In oil and gas contexts, $p_{\text{on}}$ reflects how frequently new emission ev
 
 \paragraph{Emission rate.} When $Z_t = 1$, the source emits at rate $E_t > 0$; when $Z_t = 0$, we define $E_t = 0$. The emission rate evolves according to
 \begin{equation}
-    E_t \mid Z_t, Z_{t-1}, E_{t-1} = 
+    E_t \mid Z_t, Z_{t-1}, E_{t-1} =
     \begin{cases}
         0 & \text{if } Z_t = 0 \\
         E_{t-1} & \text{if } Z_t = 1 \text{ and } Z_{t-1} = 1 \\
@@ -145,20 +160,20 @@ In oil and gas contexts, $p_{\text{on}}$ reflects how frequently new emission ev
 That is, a new rate is drawn from a distribution $f(\cdot)$ whenever an emission event begins, and the rate persists until the event ends. This reflects the physics of equipment malfunctions, which typically emit at a characteristic rate determined by the failure mode until it stops.
 
 \paragraph{Choice of emission-rate distribution.}
-We model $f$ as log-normal: $\log E \sim \mathcal{N}(\mu_{\log}, \sigma_{\log}^2)$ given a new emission event. This is consistent with the heavy-tailed distributions observed empirically for oil and gas emissions~\citep{Brandt2016, ZavalaAraiza2015}, where a small fraction of sources accounts for the majority of total emissions. With $\mu_{\log} = 3.787$ and $\sigma_{\log} = 0.5$ (the baseline configuration used in the simulations), the median emission rate is approximately $44$~kg/h with overall mean $50$~kg/h, and the distribution spans roughly $23$ to $84$~kg/h between the 10th and 90th percentiles. In the single-site interpretation, this means that successive emission events at a given facility vary substantially in magnitude: most events are moderate, but occasional large releases occur with non-negligible probability. The log-normal form captures this right-skewed, positive-support behavior while remaining analytically tractable. Importantly, however, the estimation procedure itself is largely agnostic to the parametric form of $f$. In the IPW correction (Step~2), the reweighting is computed from the empirical distribution of detected emission rates and the detection-probability curve, without assuming a parametric form. The forward algorithm (Step~3) depends on $f$ only through the scalar $\kappa$, which can itself be estimated empirically. We use the log-normal in our simulations to generate synthetic data and to verify the method, but alternative specifications, including heavy-tailed or nonparametric forms, can be accommodated without modifying the algorithm.
+We model $f$ as log-normal: $\log E \sim \mathcal{N}(\mu_{\log}, \sigma_{\log}^2)$ given a new emission event. This is consistent with the heavy-tailed distributions observed empirically for oil and gas emissions~\citep{Brandt2016, ZavalaAraiza2015}, where a small fraction of sources accounts for the majority of total emissions. With $\mu_{\log} = 3.787$ and $\sigma_{\log} = 0.5$ (the baseline configuration used in the simulations), the median emission rate is approximately $44$~kg/h with overall mean $50$~kg/h, and the distribution spans roughly $23$ to $84$~kg/h between the 10th and 90th percentiles. In the single-site interpretation, this means that successive emission events at a given facility vary substantially in magnitude: most events are moderate, but occasional large releases occur with non-negligible probability. The log-normal form captures this right-skewed, positive-support behavior while remaining analytically tractable. Importantly, however, the estimation procedure itself is largely agnostic to the parametric form of $f$. In the IPW correction (Step~2), the reweighting is computed from the empirical distribution of detected emission rates and the detection-probability curve, without assuming a parametric form. The forward algorithm (Step~3) retains the entire weighted empirical event-size distribution. An event keeps its size while it remains ON, preserving dependence across time as well as between technologies. We use the log-normal in our simulations to generate synthetic data and to verify the method, but alternative specifications, including heavy-tailed or nonparametric forms, can be accommodated without modifying the algorithm.
 
 An important distinction arises between the distribution of emission rates \emph{across sites} and the distribution of emission rates \emph{at a single site over time}. Much of the literature on heavy-tailed methane emissions concerns the cross-site distribution: \citet{Sherwin2024Nature} show that site-level emission rates across a basin exhibit roughly log-normal behavior at small sizes but transition to approximate power-law behavior above 10 to 100~kg/h, with a log-normal fit underestimating or overestimating basin-level mean emissions by up to 58 to 170\% depending on the region. However, this cross-site heterogeneity reflects differences in equipment types, operational practices, and geology across facilities. Our distribution $f$ describes a different object: the rates of successive emission events at a \emph{single} facility, which are driven by the specific failure modes present at that site and are likely to exhibit less extreme tail behavior. The heavy-tailed cross-site distribution emerges not from $f$ itself but from the variation in facility-level estimates $\hat{\mu}$ when aggregated across sites. Indeed, a mixture of site-specific log-normals with different means can produce power-law-like tails at the population level, even if no individual site has a power-law distribution.
 
 This distinction relates to the question of ergodicity in basin-scale estimation. Some approaches treat a single comprehensive snapshot across many sites as equivalent to repeated observations of one site over time, assuming that the cross-sectional distribution equals the temporal distribution. \citet{Chen2022EST} address this carefully in their basin-wide aerial survey of the New Mexico Permian: they show that summing persistence-weighted, source-level averages over a near-complete census ($>$90\% of assets) yields an unbiased estimate of basin-total emissions under three conditions: (i) coverage decisions are independent of emission status, (ii) sampled assets are representative of the population, and (iii) the emission distribution is stationary over time. Crucially, this argument does not require that all sites share the same emission parameters. It is an unbiased-sampling result, not an ergodic equivalence between time and ensemble averages. The authors acknowledge that for any single intermittent source, a small number of observations cannot fully characterize its temporal variation.
 
-Our framework addresses this limitation and operates at whatever level of aggregation the analyst specifies. Given a collection of observations, whether from a single site over time, a group of operationally similar facilities, or an entire sub-basin, the self-consistent loop jointly corrects for intermittency and detection bias under the assumed emission and measurement model. The only structural requirement is that the pooled observations plausibly share the emission and activity parameters. Although we use a single-source, two-state Markov chain for intermittency in this paper, the framework accommodates richer latent-state models without modifying the overall algorithmic structure. For instance, a site with multiple independent emission sources (e.g., a well pad with both a compressor and a tank battery) could be modeled with a multi-source Markov chain, where each component has its own on/off dynamics and the observed site-level emission is the superposition. Similarly, semi-Markov processes with duration-dependent transition probabilities or multi-state models distinguishing between different emission regimes could be substituted. In the single-site case with dense temporal coverage, the estimate $\hat{\mu}_i$ converges to the true time-averaged rate; when observations are sparse, the parametric model provides regularization that a simple detection-to-overflight ratio cannot. Basin-level estimation then proceeds by aggregating estimates across groups, without requiring that all sites in the basin share the same parameters.
+The implementation studied here fits one source observed over time. Aggregating facility estimates can support regional totals, with appropriate propagation of uncertainty. Pooling records from different facilities would require separate latent histories and defensible shared-parameter assumptions; simply concatenating records is not the single-source model evaluated here. Richer latent-state models are possible extensions of the framework; they require their own transition and observation calculations and validation. For instance, a site with multiple independent emission sources (e.g., a well pad with both a compressor and a tank battery) could be modeled with a multi-source Markov chain, where each component has its own on/off dynamics and the observed site-level emission is the superposition. Similarly, semi-Markov processes with duration-dependent transition probabilities or multi-state models distinguishing between different emission regimes could be substituted. Denser temporal coverage supplies more information for single-site estimation, but consistency of this iterative plug-in procedure is not established by the present simulations. Basin-level estimation then proceeds by aggregating estimates across groups, without requiring that all sites in the basin share the same parameters.
 
 \paragraph{Measurement process.} The two monitoring technologies have different deployment physics. At each time step $t$, a snapshot observation occurs independently with probability $p_{\text{snap}}$. Continuous monitors follow a renewal process: at each unmonitored step, a Bernoulli draw with probability $p_{\text{cont}}$ triggers deployment of a monitor that runs for $T_{\text{cont}}$ contiguous steps; during an active window no new draw is made. Let $\mathcal{J}_t \subseteq \{\text{snap}, \text{cont}\}$ denote the set of active technologies at time $t$; a given time step may have $|\mathcal{J}_t| = 0, 1,$ or $2$.
 
 Detection probability depends on the emission rate through a probability-of-detection (POD) curve:
 \begin{equation}
     q_j(e)
-    \doteq p(Y^j_t=1\mid Z_t=1,E_t=e) 
+    \doteq p(Y^j_t=1\mid Z_t=1,E_t=e)
     = \frac{1}{1+(\theta_j/e)^k_j},
 \end{equation}
 where $\theta_j$ is the 50\% detection threshold and $k_j$ controls the steepness of the transition from non-detection to reliable detection.
@@ -190,79 +205,55 @@ Consider first the simplest setting: we observe the emission state directly ($Y_
 \begin{equation}
     \mathcal{L}(p_{\text{on}}, p_{\text{off}}) = \pi_{Z_{t_1}} \prod_{k=1}^{N-1} [\mathbf{T}^{\Delta_k}]_{Z_{t_k}, Z_{t_{k+1}}},
 \end{equation}
-where $\Delta_k = t_{k+1} - t_k$ is the gap between observations and $\mathbf{T}^{\Delta}$ is the $\Delta$-step transition matrix and $\pi=(\pi_\text{off}, \pi_\text{on})^T$. We can count transitions directly and the problem is entirely tractable.
+where $\Delta_k = t_{k+1} - t_k$ is the gap between observations and $\mathbf{T}^{\Delta}$ is the $\Delta$-step transition matrix and $\pi=(\pi_\text{off}, \pi_\text{on})^T$. Direct transition counts suffice when observations are consecutive. With gaps, numerical maximization of this two-state likelihood remains tractable.
 
 \subsection{Case 2: Perfect detection with emission rates}
 
-Now suppose we observe both the emission state and the emission rate (with measurement noise). Because we observe the states directly, we can identify exactly which time steps belong to which emission events. Consecutive ON states with no intervening OFF state share the same underlying rate; an ON state following an OFF state begins a new event with a fresh draw from $f$. The likelihood can be written down explicitly and maximized jointly over all parameters. No marginalization over latent variables is required.
+Now suppose we observe both the emission state and the emission rate (with measurement noise). Because we observe the states directly, we can identify events within continuously observed ON/OFF sequences. Gaps can still conceal an OFF period and a new event. Consecutive ON states with no intervening OFF state share the same underlying rate; an ON state following an OFF state begins a new event with a fresh draw from $f$. The likelihood can be written down explicitly and maximized jointly over all parameters. With noisy size measurements, latent true rates must still be integrated out; gaps can also require summing over hidden transitions.
 
 \subsection{Case 3: Imperfect detection}
 
 Now we confront the realistic setting: detection depends on emission rate, so large emissions are detected reliably while small emissions may be missed. A non-detection ($Y_t = 0$) is ambiguous: it could mean the source was OFF ($Z_t = 0$), or that the source was ON but the emission was too small to detect ($Z_t = 1$ with small $E_t$). The likelihood must marginalize over both the unobserved states and the unobserved emission rates:
 \begin{equation}
-    \mathcal{L} = \sum_{\mathbf{Z}} \int P(\mathbf{Z}) \, P(\mathbf{E} \mid \mathbf{Z}) \, P(\mathbf{Y} \mid \mathbf{Z}, \mathbf{E}) \, P(\mathbf{D} \mid \mathbf{E}, \mathbf{Y}) \, d\mathbf{E}.
+    \mathcal L=\sum_{\mathbf Z\in\{0,1\}^T}P(\mathbf Z)
+    \int P(\mathbf Y,\mathbf D\mid\mathbf Z,\mathbf E)
+    \,\mathrm dF_f(\mathbf E\mid\mathbf Z).
     \label{eq:full_likelihood_SI}
 \end{equation}
 
-This high-dimensional integral has no closed form because the continuous emission rates $E_t$ appear nonlinearly inside the POD function $q(E_t)$. Moreover, rate persistence within emission events couples the integrands across time steps. Direct maximization is therefore intractable.
+The full paths contain all $T$ time steps, including unobserved gaps. The conditional distribution $F_f$ puts rates at zero while OFF and retains a single shared rate throughout each ON event; it need not have a joint density with respect to ordinary Lebesgue measure. This high-dimensional integral has no general closed form because the continuous emission rates $E_t$ appear nonlinearly inside the POD function $q(E_t)$. Moreover, rate persistence within emission events couples the integrands across time steps. Brute-force evaluation is impractical. Numerical likelihood evaluation is nevertheless tractable by discretizing emission size and exploiting the Markov structure; the absence of a closed form does not preclude numerical MLE \citep{LangrockKing2013}.
 
-\subsection{A tractable relaxation}
+\subsection{A tractable plug-in approximation}
 
-The key insight enabling our approach is that we can work with the \emph{marginalized detection probability}:
-\begin{equation}
-    \kappa_j
-    \doteq p(Y_{t}^j=1\mid Z_t=1)
-    = \int q_j(e)\,f(e)\,\mathrm{d}e
-    =\E[q_j(E_t) \mid Z_t = 1].
-\end{equation}
+Marginal detection probabilities $\kappa_j=\E[q_j(E)]$ are useful summaries, but they do not characterize the joint detection sequence when size persists within an event. Conditional on two observations sharing an event, their joint snapshot detection probability is $\E[q_s(E)^2]$, whereas replacing size by a single average POD would give $\E[q_s(E)]^2$. The latter corresponds to discarding temporal dependence through the shared rate.
 
-If we treat $\kappa$ as known, the observation model simplifies dramatically: this is a standard two-state HMM with known emission probabilities, and the likelihood can be computed in $O(N)$ time using the forward algorithm (see Section~\ref{sec:forward}).
-
-The remaining difficulty is that $\kappa$ depends on $f$, which we must estimate from the size-biased sample of detected emissions. Our algorithm addresses this through iteration: we alternate between estimating $f$ (correcting for detection bias given current state estimates) and estimating the transition probabilities (using the current estimate of $\kappa$).
+We retain the original plume-identification and event-IPW steps, representing their output as $\hat f=\sum_{m=1}^M\tilde w_m\delta_{\hat e_m}$. The transition likelihood then uses OFF plus $M$ persistent-size ON states. It is exact for the discrete law $\hat f$, but this law is estimated from noisy, linked detections rather than known true sizes. Our procedure is an iterative plug-in estimator with conditional maximum-likelihood updates, not joint maximization of equation~\eqref{eq:full_likelihood_SI} or an exact EM algorithm. Increasing the number of detected events enriches the empirical support; no arbitrary fixed grid of size bins is required in this transition step.
 
 %==============================================================================
 \section{Alternative Estimation Approaches}
 \label{sec:alternatives}
 %==============================================================================
 
-Before developing our approach, we considered several standard methods for hidden Markov model inference.
+Several likelihood-based approaches are possible. Discretizing continuous rates and fitting an expanded-state HMM is a standard numerical route \citep{LangrockKing2013}. Irregular integer observation gaps can be handled exactly within that finite-state model using transition-matrix powers; interpolation is unnecessary. Baum--Welch can estimate discrete size weights, while direct numerical optimization can impose a parametric size distribution. Parametric projection after an unconstrained update changes the optimization target and requires separate justification.
 
-\subsection{Standard Baum--Welch algorithm}
+Continuous-time models provide another route, using $\exp(\mathbf Q\Delta)$ for arbitrary time gaps. Their computational cost depends on the state representation and numerical integration scheme; it is not inherently prohibitive. In the discrete-time model studied here, the persistent-size transition structure permits an $O(NM)$ forward recursion conditional on $M$ weighted size points.
 
-The Baum--Welch algorithm is the canonical method for parameter estimation in hidden Markov models. To apply it here, one could discretize the emission-rate distribution into $K$ bins and define an HMM with $K+1$ states: one OFF state and $K$ ON states corresponding to different emission-rate ranges.
-
-This approach has two fundamental limitations. First, standard Baum--Welch assumes observations at regular time intervals. Methane monitoring data are inherently irregular: satellites have revisit times of days to weeks; aircraft campaigns occur sporadically; continuous monitors have maintenance gaps. While one can interpolate the transition matrix or treat gaps as missing data, these workarounds introduce approximation errors.
-
-Second, the M-step yields unconstrained probabilities for each emission-rate bin. There is no guarantee that the resulting distribution corresponds to a parametric family (e.g., log-normal) or even forms a smooth distribution. This is problematic because parametric structure enables extrapolation to emission rates below detection thresholds, which is critical since a significant fraction of total emissions may come from undetectable sources.
-
-\subsection{Baum--Welch with parametric projection}
-
-A natural modification is to run Baum--Welch and then project the resulting bin probabilities onto a parametric family. This preserves some structure but introduces approximation error: the projected distribution is not the true maximum likelihood estimate, and the two-stage procedure lacks theoretical guarantees on convergence or consistency.
-
-\subsection{Continuous-time Markov chain formulation}
-
-Formulating the emission process as a continuous-time Markov chain handles irregular gaps naturally: the transition matrix over any interval $\Delta$ is $\exp(\mathbf{Q}\Delta)$. However, exact inference requires numerical integration over emission rates at each observation time---computationally expensive when rates span several orders of magnitude. The resulting cost is prohibitive for applications involving hundreds to thousands of facilities.
-
-\subsection{Comparison}
-
-Table~\ref{tab:comparison} summarizes the tradeoffs. Our self-consistent loop combines the strengths of each while avoiding their limitations.
+Our choice retains interpretable plume estimates and the event-level IPW correction. It trades joint likelihood optimization for an empirical distribution update and hard event assignments. These approximations can introduce residual bias and do not come with a general convergence or efficiency guarantee.
 
 \begin{table}[h]
 \centering
-\caption{Comparison of estimation approaches for intermittent methane emissions with imperfect detection.}
+\caption{Alternative inference strategies for persistent emission sizes. All can account for imperfect detection and irregular observations with an appropriate state model.}
 \label{tab:comparison}
-\begin{tabular}{lccccc}
+\begin{tabular}{lll}
 \toprule
-Method & \shortstack{Irregular\\gaps} & \shortstack{Non-\\detections} & \shortstack{Parametric\\structure} & \shortstack{Comput.\\cost} & \shortstack{Interpret-\\ability} \\
+Approach & Size-distribution update & Event assignment \\
 \midrule
-Baum--Welch (discretized) & $\times^a$ & \checkmark & $\times$ & Low & Medium \\
-Baum--Welch + projection & $\times^a$ & \checkmark & $\triangle^b$ & Medium & Medium \\
-Continuous-time MC & \checkmark & \checkmark & \checkmark & High & High \\
-Self-consistent loop & \checkmark & \checkmark & \checkmark & Medium & High \\
+Expanded HMM with EM & Estimated discrete weights & Probabilistic \\
+Numerical joint MLE & Joint fitted rate law & Probabilistic \\
+Continuous-time formulation & Depends on fitting procedure & Probabilistic \\
+Self-consistent plug-in loop & Event-level IPW & Hard plume linking \\
 \bottomrule
 \end{tabular}
-\vspace{0.5em}
-{\footnotesize $^a$Requires interpolation or missing-data treatment for gaps. $^b$Parametric form imposed by projection, not by MLE.}
 \end{table}
 
 %==============================================================================
@@ -272,16 +263,16 @@ Self-consistent loop & \checkmark & \checkmark & \checkmark & Medium & High \\
 
 \subsection{Step 1: Event identification}
 
-Consecutive detections may represent the same emission event observed multiple times, or distinct events separated by a period of inactivity. Distinguishing these cases matters: treating repeated observations of the same emission as independent will yield an under-estimated $\pi_\text{on}$; incorrectly merging distinct events over-estimates it.
+Consecutive detections may represent the same emission event observed multiple times, or distinct events separated by a period of inactivity. Distinguishing these cases matters because event assignments affect both estimated sizes and event-level detection weights. Incorrect splitting or merging can bias the resulting estimates; the direction depends on the observation record.
 
-We use a Bayesian linking model that combines temporal proximity with measurement similarity. For detections at times $t_i$ and $t_{i+1}$ with measurements $D_i$ and $D_{i+1}$, we compute the posterior probability that they belong to the same event:
+We use a Bayesian linking model that combines temporal proximity with measurement similarity. For detections at times $t_i$ and $t_{i+1}$ with measurements $D_i$ and $D_{i+1}$, we compute an approximate linking probability:
 \begin{equation}
-    P(\text{same} \mid D_i, D_{i+1}, \Delta t) = \frac{P_{\text{prior}} \cdot \text{BF}}{1 + P_{\text{prior}} \cdot \text{BF}}.
+    P(\text{same} \mid D_i, D_{i+1}, \Delta t) = \frac{O_{\text{prior}} \cdot \text{BF}}{1 + O_{\text{prior}} \cdot \text{BF}}.
 \end{equation}
 
-The temporal prior $P_{\text{prior}} = \exp(-\Delta t \cdot p_{\text{off}})$ reflects the probability that an emission persists over the gap $\Delta t = t_{i+1} - t_i$.
+The linking calculation uses $P_{\text{prior}}=\exp(-\Delta t\,p_{\text{off}})$ and prior odds $O_{\text{prior}}=P_{\text{prior}}/(1-P_{\text{prior}})$, with $\Delta t=t_{i+1}-t_i$. This exponential survival approximation is retained from the original linking procedure. The transition likelihood instead uses the exact discrete-time survival probability $(1-p_{\text{off}})^{\Delta t}$.
 
-The Bayes factor (BF) compares two hypotheses: $H_{\text{same}}$, that both measurements come from the same underlying rate, versus $H_{\text{diff}}$, that they come from independent draws. Its derivation is given in Section~\ref{sec:bayes_factor}. We merge detections when $P(\text{same}) > 0.5$, proceeding sequentially through the detection sequence. For each identified event, we estimate the emission rate as the mean of its constituent measurements.
+The Bayes factor (BF) compares two hypotheses: $H_{\text{same}}$, that both measurements come from the same underlying rate, versus $H_{\text{diff}}$, that they come from independent draws. Its derivation is given in Section~\ref{sec:bayes_factor}. We merge detections when $P(\text{same}) > 0.5$, proceeding sequentially through the detection sequence. For each identified event, we combine measurements in log-space with inverse-variance weights and apply the lognormal mean correction below.
 
 \paragraph{Multi-technology plume identification.}
 When both technologies observe at the same time step and both produce a detection, these detections are always assigned to the same plume (same emission event). Their measurements are combined via inverse-variance weighted average in log-space \emph{before} computing the Bayes factor for linking with adjacent time steps. For detections at different time steps, the standard Bayesian linking procedure applies using the combined measurements and effective noise.
@@ -289,45 +280,59 @@ When both technologies observe at the same time step and both produce a detectio
 
 
 \subsection{Step 2: Emission-rate distribution}
+\label{sec:event_ipw}
 
 The identified plumes provide a sample of emission rates biased toward large values. We correct for this using inverse-probability weighting (IPW). Each plume with estimated rate $\hat{e}_m$ receives weight $w_m = 1/P_{\text{det}}(\hat{e}_m)$, where $P_{\text{det}}(e)$ is the marginal probability that an emission event of size~$e$ is detected at least once during its lifetime. The bias-corrected mean emission rate is
 \begin{equation}
     \hat{\mu}_{\text{emit}} = \frac{\sum_m w_m \hat{e}_m}{\sum_m w_m}.
 \end{equation}
 
-We want to show that this estimator is consistent for $\E[E \mid Z = 1]$.
+The weighting identity motivates the correction under ideal event identification, known detection probabilities, and observed true event sizes:
 Let $f(e)$ denote the true emission-rate density and $P_{\text{det}}(e)$ the probability that an event of size~$e$ is detected. The density of detected emission sizes is $f_{\text{obs}}(e) = P_{\text{det}}(e)\,f(e)/\bar{P}_{\text{det}}$, where $\bar{P}_{\text{det}} = \int P_{\text{det}}(e)\,f(e)\,de$. For any function $h$,
 \begin{equation}
     \E_{f_{\text{obs}}}\!\left[\frac{h(E)}{P_{\text{det}}(E)}\right] = \int \frac{h(e)}{P_{\text{det}}(e)} \cdot \frac{P_{\text{det}}(e)\,f(e)}{\bar{P}_{\text{det}}} \, de = \frac{\E_f[h(E)]}{\bar{P}_{\text{det}}}.
 \end{equation}
-The ratio estimator $\sum_m h(\hat{e}_m)/P_{\text{det}}(\hat{e}_m) \big/ \sum_m 1/P_{\text{det}}(\hat{e}_m)$ therefore converges to $\E_f[h(E)]$. Taking $h(e) = e$ yields the mean; taking $h(e) = q_j(e)$ yields $\kappa_j$.
+Under suitable laws of large numbers and positive detection probabilities, the corresponding ratio with true sizes and true inclusion probabilities converges to $\E_f[h(E)]$. Taking $h(e)=e$ yields the mean; taking $h(e)=q_j(e)$ yields $\kappa_j$. Substituting noisy size estimates, uncertain plume assignments, and fitted transition probabilities is an additional approximation, so this identity alone does not prove consistency of the full iterative estimator.
 
 \paragraph{Combining multi-technology measurements.}
 Each plume's size $\hat{e}_m$ is estimated as the inverse-variance weighted average in log-space of all its constituent measurements:
 \begin{equation}
-    \log \hat{e}_m = \frac{\sum_i \frac{\log D_i}{\sigma_i^2}}{\sum_i \frac{1}{\sigma_i^2}},
+    \hat e_m=\exp\!\left(\frac{\sum_i\sigma_i^{-2}\log D_i}{W_m}+\frac{n_m-1}{2W_m}\right),\qquad W_m=\sum_i\sigma_i^{-2},
 \end{equation}
-where $\sigma_i$ is the log-scale noise of the technology that produced measurement $D_i$.
+where $\sigma_i$ is the log-scale noise of the technology that produced measurement $D_i$ and $n_m$ is the number of measurements in the plume. The correction is unbiased conditional on a correctly identified event and the stated independent lognormal measurement model; data-dependent linking adds approximation error.
 
 \paragraph{Marginal detection probability.}
-A naive approach would compute detection probability over the \emph{observed span} of a plume (first to last detection time step). However, this systematically underestimates $P_{\text{det}}$ because events that persist longer than their detected span had additional time steps where they were missed---precisely the time steps that are excluded from the span-based calculation. The resulting overweighting of small emissions introduces a downward bias in $\hat{\mu}_{\text{emit}}$ that grows with campaign length~$T$. We therefore use a marginal approach that integrates over the full distribution of event durations and all possible start times in the campaign, eliminating this selection bias.
+A naive approach would compute detection probability over the \emph{observed span} of a plume (first to last detection time step). However, this systematically underestimates $P_{\text{det}}$ because events that persist longer than their detected span had additional time steps where they were missed---precisely the time steps that are excluded from the span-based calculation. The resulting overweighting of small emissions introduces a downward bias in $\hat{\mu}_{\text{emit}}$ that grows with campaign length~$T$. We therefore use a marginal approach that integrates over the full distribution of event durations and all possible start times in the campaign, accounting for the event-duration component of detection selection. The implementation evaluates the backward recursion on 60 logarithmically spaced sizes from 0.5 to 2,000~kg/h and interpolates detection probabilities for estimated plume sizes, clipping outside that range. This numerical approximation and campaign-boundary handling can contribute residual finite-sample error.
 
 \subsection{Step 3: Transition probability estimation}
 \label{sec:forward}
 
-Given the current estimate $\hat{\kappa}$, we estimate $(p_{\text{on}}, p_{\text{off}})$ by maximizing the likelihood of the observed detection sequence. With $\kappa$ fixed, this is a standard HMM inference problem.
+Given the current weighted empirical rate law $\hat f=\sum_{m=1}^M\tilde w_m\delta_{\hat e_m}$, define hidden states $H_t\in\{0,1,\ldots,M\}$, with $0$ denoting OFF and $m$ denoting ON at rate $\hat e_m$. With $a=p_{\text{on}}$ and $b=p_{\text{off}}$, the one-step transition probabilities are
+\begin{align}
+ A_{00}&=1-a,& A_{0m}&=a\tilde w_m,\\
+ A_{m0}&=b,& A_{mn}&=(1-b)\ind\{m=n\}.
+\end{align}
+An event that survives retains its size. If it ends and a new event begins, the new size is drawn from $\hat f$.
 
-Define the forward variable $\alpha_k(s) = P(Y_{t_1}, \ldots, Y_{t_k}, Z_{t_k} = s)$, the joint probability of the observations up to time $t_k$ and being in state $s$ at time $t_k$. It satisfies the recursion
+For observed detection vector $\mathbf Y_{t_i}$, let
 \begin{equation}
-    \alpha_k(s) = P(Y_{t_k} \mid Z_{t_k} = s) \sum_{s' \in \{0,1\}} \alpha_{k-1}(s') \cdot [\mathbf{T}^{\Delta_k}]_{s',s},
+ b_i(m)=\prod_{j\in\mathcal J_{t_i}}q_j(\hat e_m)^{Y_{j,t_i}}
+                  [1-q_j(\hat e_m)]^{1-Y_{j,t_i}},\qquad m\ge1.
 \end{equation}
-with initialization $\alpha_1(s) = \pi_s \cdot b_{t_1}(s)$, where $\pi_s$ is the stationary probability of state $s\in\{0,1\}$ (OFF, ON) and $b_{t_1}(s)$ is the joint emission probability at time $t_1$. In the general case with multiple technologies, $P(Y_{t_k} \mid Z_{t_k} = s)$ is replaced by the joint emission probability $b_{t_k}(s) = \prod_{j \in \mathcal{J}_{t_k}} P(D_{j,t_k} \mid Z_{t_k} = s)$ (see Section~\ref{sec:multitech}).
+For OFF, replace $q_j(\hat e_m)$ by the false-positive probability; all such probabilities are zero in the reported simulations. These conditional products preserve simultaneous sensor dependence after summing over size states. Measured rates enter through plume linking and $\hat f$, rather than a joint measurement-density term in this conditional likelihood.
 
-The likelihood is $\mathcal{L}(p_{\text{on}}, p_{\text{off}}) = \alpha_N(0) + \alpha_N(1)$, computed in $O(N)$ time. We maximize over $(p_{\text{on}}, p_{\text{off}})$ using a geometric grid of $G = 15$ candidate values per parameter, centered on initial estimates (see Section~\ref{sec:robustness_grid} for sensitivity analysis).
+Define $\alpha_i(m)=P(\mathbf Y_{t_1},\ldots,\mathbf Y_{t_i},H_{t_i}=m\mid\hat f)$. The forward recursion is
+\begin{equation}
+ \alpha_i(m)=b_i(m)\sum_{n=0}^{M}\alpha_{i-1}(n)[\mathbf A^{\Delta_i}]_{nm},
+ \qquad \Delta_i=t_i-t_{i-1}.
+\end{equation}
+It begins with stationary masses $\pi_0=b/(a+b)$ and $\pi_m=a\tilde w_m/(a+b)$. The likelihood is $\mathcal L(a,b\mid\hat f)=\sum_{m=0}^{M}\alpha_N(m)$; probabilities are rescaled at every step to prevent underflow.
+
+The structured multi-step transition below permits $O(M)$ work per observation, rather than a dense $O(M^2)$ multiplication. We maximize the conditional likelihood continuously in $(\log a,\log b)$ over $[10^{-5},1-10^{-6}]^2$. Starting values are fixed at $(0.025,0.10)$; the first outer iteration also uses the best point in a fixed coarse search. Subsequent iterations start at the previous transition estimate. Numerical stopping tolerances and derivative-free retries address optimizer conditioning; multiplying the entire log-likelihood by a fixed observation-count scale does not change its maximizer. No likelihood nudge is applied. A nonunit nudge argument is rejected by the code, preventing accidental use of the previous empirical adjustment.
 
 \subsection{Iteration and convergence}
 
-Steps 1--3 are repeated, with the updated estimate of $p_{\text{off}}$ from Step~3 feeding back into the temporal prior in Step~1. Iteration continues until successive estimates of $(p_{\text{on}}, p_{\text{off}})$ change by less than $10^{-3}$, typically requiring 5--15 iterations.
+Steps 1--3 are repeated, with the updated estimate of $p_{\text{off}}$ from Step~3 feeding back into the temporal prior in Step~1. Iteration stops when both transition changes are below $10^{-5}$ and the change in $\hat\mu$ is below $10^{-4}$~kg/h, or after 30 iterations. This outer iteration is a fixed-point procedure and is not guaranteed to increase a joint likelihood or avoid cycles. Non-converged and boundary estimates are retained and reported. For observed campaigns without detections, $\hat\mu=0$ is included in unconditional mean-performance summaries, while component parameters are left missing.
 
 The final estimate combines the activity fraction with the bias-corrected mean:
 \begin{equation}
@@ -344,19 +349,27 @@ The final estimate combines the activity fraction with the bias-corrected mean:
 
 For a gap of $\Delta$ time steps between observations, we need the transition matrix $\mathbf{T}^\Delta$. The eigenvalues of $\mathbf{T}$ are $\lambda_1 = 1$ and $\lambda_2 = 1 - p_{\text{on}} - p_{\text{off}} \equiv \rho$. The matrix power is
 \begin{equation}
-    \mathbf{T}^\Delta = \frac{1}{p_{\text{on}} + p_{\text{off}}} 
-    \begin{pmatrix} 
-        p_{\text{off}} + p_{\text{on}} \rho^\Delta & p_{\text{on}}(1 - \rho^\Delta) \\ 
-        p_{\text{off}}(1 - \rho^\Delta) & p_{\text{on}} + p_{\text{off}} \rho^\Delta 
+    \mathbf{T}^\Delta = \frac{1}{p_{\text{on}} + p_{\text{off}}}
+    \begin{pmatrix}
+        p_{\text{off}} + p_{\text{on}} \rho^\Delta & p_{\text{on}}(1 - \rho^\Delta) \\
+        p_{\text{off}}(1 - \rho^\Delta) & p_{\text{on}} + p_{\text{off}} \rho^\Delta
     \end{pmatrix}.
 \end{equation}
 
-As $\Delta \to \infty$, $\rho^\Delta \to 0$ and each row converges to the stationary distribution $(\pi_{\text{off}}, \pi_{\text{on}})$: observations far apart in time are nearly independent. For small $\Delta$, $\mathbf{T}^\Delta \approx \mathbf{I} + \Delta(\mathbf{T} - \mathbf{I})$, so observations close in time are strongly correlated. This temporal correlation is what allows our method to extract information beyond what independent-observation estimators can achieve.
+For the expanded size states, write $u_\Delta=(1-b)^\Delta$. The exact integer-gap transition is
+\begin{align}
+ [\mathbf A^\Delta]_{00}&=[\mathbf T^\Delta]_{00}, &
+ [\mathbf A^\Delta]_{0m}&=[\mathbf T^\Delta]_{01}\tilde w_m,\\
+ [\mathbf A^\Delta]_{m0}&=[\mathbf T^\Delta]_{10}, &
+ [\mathbf A^\Delta]_{mn}&=u_\Delta\ind\{m=n\}
+ +\bigl([\mathbf T^\Delta]_{11}-u_\Delta\bigr)\tilde w_n.
+\end{align}
+The first ON-to-ON term represents survival of the same event; the second represents at least one OFF period followed by a new event. It must not be omitted when observations are separated by gaps. The incoming mass for each size state is a sum of a size-specific survival term and a common reset term times $\tilde w_n$, yielding an $O(M)$ update. As $\Delta$ grows, transitions approach the stationary distribution and observations lose information about event identity.
 
 \subsection{Joint detection probabilities for multiple technologies}
 \label{sec:multitech}
 
-At each time step $t$, let $\mathcal{J}_t \subseteq \{\text{snap}, \text{cont}\}$ be the set of active technologies. Conditional on the hidden state $Z_t$ \emph{and} the emission size $E_t$, detections from different technologies are independent. However, after marginalizing over the emission size, the marginal detection events are \emph{correlated}. This requires three $\kappa$ quantities:
+At each time step $t$, let $\mathcal{J}_t \subseteq \{\text{snap}, \text{cont}\}$ be the set of active technologies. Conditional on the hidden state $Z_t$ \emph{and} the emission size $E_t$, detections from different technologies are independent. However, after marginalizing over the emission size, the marginal detection events are \emph{correlated}. The following three $\kappa$ quantities summarize the one-time marginal detection distribution:
 \begin{equation}
     \kappa_s = \int q_s(e)\, f(e)\, de, \quad
     \kappa_c = \int q_c(e)\, f(e)\, de, \quad
@@ -377,28 +390,24 @@ For \textbf{both technologies} deployed ($|\mathcal{J}_t| = 2$), given $Z_t = 1$
     P(Y_s{=}0, Y_c{=}1 \mid Z_t{=}1) &= \kappa_c - \kappa_{sc}, \\
     P(Y_s{=}0, Y_c{=}0 \mid Z_t{=}1) &= 1 - \kappa_s - \kappa_c + \kappa_{sc}.
 \end{align}
-These four probabilities sum to 1. Since we assume there are no false positives: $P(Y_s{=}y_s, Y_c{=}y_c \mid Z_t{=}0) = 0$ if $y_s\neq0$ or $y_c\neq 0$.
+These four probabilities sum to 1. They summarize a single time point, not the likelihood of a sequence with persistent sizes. That likelihood uses the size-specific probabilities and forward recursion above. Since we assume there are no false positives: $P(Y_s{=}y_s, Y_c{=}y_c \mid Z_t{=}0) = 0$ if $y_s\neq0$ or $y_c\neq 0$.
 
 % When $|\mathcal{J}_t| = 0$, $b_t(z) = 1$ (uninformative).
 
 \subsection{Derivation of the Bayes factor}
 \label{sec:bayes_factor}
 
-Under hypothesis $H_{\text{same}}$, measurements $D_i\doteq D_{t_i}$ and $D_{i+1}\doteq D_{t_{i+1}}$ are both noisy observations of the same true rate $E$:
+The retained linking score uses the difference $d=\log D_{i+1}^{\mathrm{comb}}-\log D_i^{\mathrm{comb}}$ between inverse-variance combined measurements at adjacent detection times. Its working distributions under same and different events are centered Gaussian distributions with variances
 \begin{equation}
-    P(D_i, D_{i+1} \mid H_{\text{same}}) = \int P(D_i \mid E) P(D_{i+1} \mid E) P(E) \, dE.
+ V_{\mathrm{same}}=\sigma_i^2+\sigma_{i+1}^2+\sigma_w^2,\qquad
+ V_{\mathrm{diff}}=\sigma_i^2+\sigma_{i+1}^2+2\sigma_b^2.
 \end{equation}
-Under $H_{\text{diff}}$, they come from independent rates:
+Here $\sigma_i$ denotes the effective measurement noise after combination, $\sigma_w=0$ and $\sigma_b=0.69$ in the implementation. The corresponding density ratio is
 \begin{equation}
-    P(D_i, D_{i+1} \mid H_{\text{diff}}) = \int P(D_i \mid E_i) P(E_i) \, dE_i \cdot \int P(D_{i+1} \mid E_{i+1}) P(E_{i+1}) \, dE_{i+1}.
+ \mathrm{BF}=\sqrt{\frac{V_{\mathrm{diff}}}{V_{\mathrm{same}}}}
+ \exp\!\left[-\frac{d^2}{2}\left(\frac1{V_{\mathrm{same}}}-\frac1{V_{\mathrm{diff}}}\right)\right].
 \end{equation}
-
-With log-normal measurement noise $\log D \mid E \sim \mathcal{N}(\log E, \sigma^2)$ and a flat prior on log-emission rate $P(E) \propto 1/E$, the integrals can be evaluated analytically. The result is
-\begin{equation}
-    \text{BF} = \frac{P(D_i, D_{i+1} \mid H_{\text{same}})}{P(D_i, D_{i+1} \mid H_{\text{diff}})} = \sqrt{2} \exp\left(-\frac{(\log D_i - \log D_{i+1})^2}{4\sigma^2}\right).
-\end{equation}
-
-The Bayes factor equals 1 (neutral) when $|\log D_i - \log D_{i+1}| = \sqrt{2\log 2} \cdot \sigma \approx 1.18\sigma$. For typical $\sigma = 0.3$, this corresponds to a ratio $D_i/D_{i+1}$ of about 1.4 or 0.7---measurements differing by more than 40\% favor the different-events hypothesis.
+This is an approximate Gaussian linking model, including its centered log-error and exponential temporal-prior assumptions. The linking threshold and measurement-combination steps are unchanged by the persistent-size likelihood repair; the resulting hard assignments are not the event posterior under the full detection-and-measurement model.
 
 
 %==============================================================================
@@ -410,24 +419,25 @@ We evaluate the method through simulations spanning realistic parameter ranges. 
 
 \begin{table}[h]
 \centering
-\caption{Simulation parameters.}
+\caption{Baseline simulation parameters. One time step is one hour; deviations for the sparse design and sensitivity experiments are described in their respective sections.}
 \label{tab:params}
-\begin{tabular}{llll}
+\begin{tabular}{@{}p{0.28\textwidth}llp{0.39\textwidth}@{}}
 \toprule
 Parameter & Symbol & Values & Physical interpretation \\
 \midrule
 \multicolumn{4}{l}{\textit{Emission process}} \\
-Turn-on probability & $p_{\text{on}}$ & 0.05--0.20 & New event every 5--20 days \\
-Turn-off probability & $p_{\text{off}}$ & 0.05--0.20 & Events last 5--20 days \\
+Turn-on probability & $p_{\text{on}}$ & 0.0125 & Mean OFF duration 80 hours \\
+Turn-off probability & $p_{\text{off}}$ & 0.05 & Mean ON duration 20 hours \\
 Log-mean rate & $\mu_{\log}$ & 3.787 & Median $\approx$ 44 kg/h, mean $50$ kg/h \\
 Log-std rate & $\sigma_{\log}$ & 0.5 & Moderate spread of event sizes \\
 \midrule
 \multicolumn{4}{l}{\textit{Observation process}} \\
-Snapshot obs.\ prob. & $p_{\text{snap}}$ & \edit{0.0014--1.0} & \edit{Monthly to sub-hourly cadence} \\
-Cont.\ monitoring prob. & $p_{\text{cont}}$ & 0.0--0.3 & Per-step prob.\ of starting continuous window \\
+Snapshot obs.\ prob. & $p_{\text{snap}}$ & 0.125 & Three expected visits per day \\
+Cont.\ monitoring prob. & $p_{\text{cont}}$ & 0.01 & Window trigger probability per unmonitored step \\
 Continuous duration & $T_{\text{cont}}$ & 50 & Time steps of continuous monitoring \\
-POD threshold & $\theta$ & 5--50 kg/h & Aircraft to satellite \\
-POD steepness & $k$ & 2--4 & Gradual to sharp \\
+Snapshot POD threshold & $\theta_s$ & 50 kg/h & Emission size at 50\% POD \\
+Continuous POD threshold & $\theta_c$ & 2.4 kg/h & Emission size at 50\% POD \\
+POD steepness & $(k_s,k_c)$ & $(2,3)$ & Snapshot and continuous curves \\
 Snapshot meas.\ noise & $\sigma_{\text{snap}}$ & 0.05 & Low noise (aerial/satellite) \\
 Continuous meas.\ noise & $\sigma_{\text{cont}}$ & 0.2 & Coefficient of variation of $\sim$20\% \\
 
@@ -465,10 +475,10 @@ For each pair of methods $(A, B)$, we compute the within-batch variance $\hat{\s
 \toprule
 Method & $t$ & $p$ & Sig. \\
 \midrule
-Naive          & $-28.105$ & $<0.001$ & $\bullet$ \\
-POD-weighted   & $+0.266$  & $0.793$  & $\circ$ \\
-MLE-ungrouped  & $-1.952$  & $0.063$  & $\circ$ \\
-MLE            & $+0.319$  & $0.753$  & $\circ$ \\
+Naive & $-28.105$ & $<0.001$ & $\bullet$ \\
+POD-weighted & $+0.266$ & $0.793$ & $\circ$ \\
+MLE-ungrouped & $-0.548$ & $0.589$ & $\circ$ \\
+MLE & $+2.013$ & $0.055$ & $\circ$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -481,26 +491,27 @@ MLE            & $+0.319$  & $0.753$  & $\circ$ \\
 \vspace{6pt}
 \begin{tabular}{l rr c rr c}
 \toprule
- & \multicolumn{3}{c}{Test~2: $|\text{Mean Bias}|$} & \multicolumn{3}{c}{Test~3: Variance} \\
+ & \multicolumn{3}{c}{Test~2: Mean $|\text{Batch Bias}|$} & \multicolumn{3}{c}{Test~3: Variance} \\
 \cmidrule(lr){2-4} \cmidrule(lr){5-7}
 Comparison & $t_b$ & $p_b$ & Sig. & $t_v$ & $p_v$ & Sig. \\
 \midrule
-Naive vs POD-weighted         & $+19.699$ & $<0.001$ & $\bigstar$ & $-31.216$ & $<0.001$ & $\blacklozenge$ \\
-Naive vs MLE-ungrouped        & $+28.395$ & $<0.001$ & $\bigstar$ & $+19.281$ & $<0.001$ & $\blacklozenge$ \\
-Naive vs MLE                  & $+22.443$ & $<0.001$ & $\bigstar$ & $+19.261$ & $<0.001$ & $\blacklozenge$ \\
-POD-weighted vs MLE-ungrouped & $+3.120$  & $0.005$  & $\bigstar$ & $+24.608$ & $<0.001$ & $\blacklozenge$ \\
-POD-weighted vs MLE           & $+3.484$  & $0.002$  & $\bigstar$ & $+24.211$ & $<0.001$ & $\blacklozenge$ \\
-MLE-ungrouped vs MLE          & $+1.001$  & $0.327$  & $\star$    & $+6.365$  & $<0.001$ & $\blacklozenge$ \\
+Naive vs POD-weighted & $+19.699$ & $<0.001$ & $\bigstar$ & $-31.216$ & $<0.001$ & $\blacklozenge$ \\
+Naive vs MLE-ungrouped & $+24.421$ & $<0.001$ & $\bigstar$ & $+19.124$ & $<0.001$ & $\blacklozenge$ \\
+Naive vs MLE & $+19.709$ & $<0.001$ & $\bigstar$ & $+17.553$ & $<0.001$ & $\blacklozenge$ \\
+POD-weighted vs MLE-ungrouped & $+3.471$ & $0.002$ & $\bigstar$ & $+25.633$ & $<0.001$ & $\blacklozenge$ \\
+POD-weighted vs MLE & $+2.100$ & $0.046$ & $\bigstar$ & $+23.256$ & $<0.001$ & $\blacklozenge$ \\
+MLE-ungrouped vs MLE & $-0.715$ & $0.482$ & $\star$ & $+6.323$ & $<0.001$ & $\blacklozenge$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \new{Three findings emerge.
 \begin{itemize}
-    \item \textbf{Unbiasedness.} The Naive estimator is significantly biased ($t = -28.10$, $p < 0.001$, mean bias $-1.28$~kg/h or $-12.8\%$ of the true mean). The POD-weighted, MLE-ungrouped, and MLE estimators are statistically consistent with unbiasedness at the $5\%$ level (all $p \ge 0.06$); their estimated mean biases are $+0.013$, $-0.068$, and $+0.011$~kg/h respectively.
-    \item \textbf{Absolute bias.} All three corrected estimators have significantly smaller per-batch absolute bias than the Naive estimator ($p < 0.001$ in every case). The MLE and the MLE-ungrouped estimator are statistically indistinguishable from each other on this metric ($t = +1.00$, $p = 0.33$); both are significantly more accurate than POD-weighted (MLE-ungrouped vs POD: $p = 0.005$; MLE vs POD: $p = 0.002$).
-    \item \textbf{Variance.} All six pairwise variance differences are highly significant ($p < 0.001$). The variance ordering, from smallest to largest, is $\mathrm{MLE} < \mathrm{MLE\text{-}ungrouped} < \mathrm{Naive} < \mathrm{POD\text{-}weighted}$, with batch-level variances of $18.4$, $19.3$, $26.5$, and $29.7$~$(\mathrm{kg/h})^2$. Compared to POD-weighted, the MLE achieves a $\sim 38\%$ variance reduction while remaining unbiased; compared to MLE-ungrouped, the variance reduction from event-level grouping is a further $\sim 5\%$.
-\end{itemize}}
+    \item \textbf{Signed bias.} The Naive estimator has bias $-1.277$~kg/h ($-12.8\%$; $p<0.001$). Estimated biases for POD-weighted, MLE-ungrouped, and MLE are $+0.013$, $-0.021$, and $+0.077$~kg/h, with $p=0.793$, $0.589$, and $0.055$, respectively. For MLE, the 95\% Student-$t$ Monte Carlo interval is $[-0.002,0.155]$~kg/h. Non-rejection does not establish unbiasedness.
+    \item \textbf{Absolute batch bias.} All corrected estimators have lower mean absolute batch bias than Naive ($p<0.001$). MLE and MLE-ungrouped do not differ significantly ($p=0.482$); both differ from POD-weighted ($p=0.046$ and $0.002$, respectively). This statistic includes sampling variation in each batch mean and differs from the absolute overall bias.
+    \item \textbf{Variance.} All six pairwise differences are significant ($p<0.001$). Average within-batch variances are $19.58$, $20.64$, $26.49$, and $29.64$~(kg/h)$^2$ for MLE, MLE-ungrouped, Naive, and POD-weighted. MLE reduces variance by $33.9\%$ relative to POD-weighted and by $5.1\%$ relative to MLE-ungrouped, while retaining a small estimated positive bias.
+\end{itemize}
+All $12{,}500$ mean estimates are included. Two campaigns have zero detections and receive mean zero with unavailable component parameters; among campaigns with detections, 57 reach the outer iteration limit and two have a final optimizer flag. Two estimates reach a transition bound. Finite flagged estimates are retained. The tests are descriptive comparisons at the stated 5\% level, without multiplicity adjustment.}
 
 %==============================================================================
 \section{Simulation Figures}
@@ -527,7 +538,7 @@ Figure~\ref{fig:size_dist} illustrates the emission size distribution and its in
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{figures/figure_size_distribution.pdf}
-\caption{Emission size distribution and its interaction with detection. \textbf{(a)}~The log-normal distribution of emission rates conditional on the source being active ($\mu_{\log} = 3.787$, $\sigma_{\log} = 0.5$; mean 50.0~kg/h, median 44.1~kg/h). \textbf{(b)}~Cumulative distribution of emission sizes overlaid with the POD curves of both technologies. The continuous sensor (dotted) detects nearly all emissions above 10~kg/h, while the snapshot sensor (dashed) has 50\% detection probability at 50~kg/h---close to the distribution's mean---so a substantial fraction of active emissions go undetected by snapshots alone. This illustrates why inverse-probability weighting is essential for unbiased estimation.}
+\caption{Emission size distribution and its interaction with detection. \textbf{(a)}~The log-normal distribution of emission rates conditional on the source being active ($\mu_{\log} = 3.787$, $\sigma_{\log} = 0.5$; mean 50.0~kg/h, median 44.1~kg/h). \textbf{(b)}~Cumulative distribution of emission sizes overlaid with the POD curves of both technologies. The continuous sensor (dotted) detects nearly all emissions above 10~kg/h, while the snapshot sensor (dashed) has 50\% detection probability at 50~kg/h---close to the distribution's mean---so a substantial fraction of active emissions go undetected by snapshots alone. This illustrates the detection-selection bias addressed by inverse-probability weighting.}
 \label{fig:size_dist}
 \end{figure}
 
@@ -561,10 +572,7 @@ per campaign in expectation), $T_{\text{cont}} = 50$~hours, and a continuous
 deliberately set well above the baseline value so that continuous monitoring
 is itself imperfect; if it were near-perfect, no estimator could improve on
 the POD-weighted baseline because there would be no detection bias to
-correct. The likelihood nudge factor is set to $\text{nudge} = 1.00$
-(the snapshot data are too sparse to incur the discretisation-induced
-upward bias in $\hat p_{\text{off}}$ that motivates the small nudge at
-baseline cadence). All other parameters are at their baseline values
+correct. The same persistent-size likelihood and unit nudge setting are used as at baseline; no empirical transition adjustment is made. All other parameters are at their baseline values
 (Table~\ref{tab:params}). The experiment uses the same nested design as
 the baseline analysis ($n_{\text{outer}} = 25$ batches of
 $n_{\text{inner}} = 500$ replicates, $12{,}500$ replicates in total).}
@@ -578,27 +586,12 @@ $T_{\text{cont}} = 50$, $\theta_c = 15$~kg/h, $T = 1{,}000$). Violin plots
 show the distribution of point estimates over $12{,}500$ replicates
 ($25 \times 500$); the dashed horizontal line marks the true value
 $\mu_{\text{true}} = 10.0$~kg/h. The MLE concentrates around the truth
-with the lowest variance among the unbiased estimators; the naive
+with lower variance than POD-weighted and MLE-ungrouped; the naive
 estimator is visibly biased downward.}}
 \label{fig:sparse_violin}
 \end{figure}
 
-\new{Figure~\ref{fig:sparse_violin} and Table~\ref{tab:sparse_comparison}
-summarise the results. The POD-weighted estimator and the MLE are both
-unbiased ($t = +1.68$, $p = 0.11$ and $t = +0.86$, $p = 0.40$
-respectively, n.s.), while the naive estimator is significantly biased
-downward ($t = -10.67$, $p < 0.001$). The variance ordering is the same
-as at baseline cadence (Naive~$<$~POD~$>$~MLE-ungrouped~$>$~MLE), and
-every pairwise variance difference is statistically significant in the
-expected direction ($p < 0.001$ in all cases). Quantitatively, the MLE
-achieves a $20.7\%$ reduction in variance relative to the POD-weighted
-estimator ($25.36$ vs.~$31.99$, paired $t = +13.18$, $p < 0.001$) and a
-$7.8\%$ reduction relative to the MLE-ungrouped variant ($25.36$ vs.~$27.52$,
-paired $t = +6.75$, $p < 0.001$). The latter quantifies the contribution
-of the HMM-based event grouping in this regime: even when only $\sim$1.5
-snapshot observations are available per facility-campaign, exploiting
-the temporal correlation across the continuous-monitoring windows
-yields a statistically significant variance improvement.}
+\new{Figure~\ref{fig:sparse_violin} and Table~\ref{tab:sparse_comparison} summarise the results. Estimated biases of POD-weighted and MLE are $+0.073$ and $+0.044$~kg/h ($p=0.105$ and $0.287$); zero bias is not rejected. Naive and MLE-ungrouped have detectable negative biases ($-0.451$ and $-0.102$~kg/h; $p<0.001$ and $p=0.018$). MLE reduces average within-batch variance by $15.4\%$ relative to POD-weighted ($27.01$ versus $31.94$, paired $t=10.32$, $p<0.001$), and by $6.4\%$ relative to MLE-ungrouped ($27.01$ versus $28.86$, $t=6.02$, $p<0.001$). These gains persist despite only about 1.5 snapshots per campaign. All $12{,}500$ mean estimates are retained, including 16 zero-detection campaigns. Among records with detections, 45 reach the outer iteration limit and five have a final optimizer flag; 18 estimates reach a transition bound. These flags delimit numerical and data limitations without removing finite results.}
 
 \begin{table}[h]
 \centering
@@ -607,18 +600,17 @@ very-sparse snapshot cadence ($p_{\text{snap}} = 0.0015$,
 $p_{\text{cont}} = 0.015$, $T_{\text{cont}} = 50$, $\theta_c = 15$~kg/h,
 $T = 1{,}000$, $n_{\text{outer}} = 25 \times n_{\text{inner}} = 500$).
 Bias is reported as $\hat\mu - \mu_{\text{true}}$ with
-$\mu_{\text{true}} = 10.0$~kg/h. Confidence intervals are 95\% across
-the 25 outer batches. Significance markers: $^{***}\!p<0.001$,
+$\mu_{\text{true}} = 10.0$~kg/h. Confidence intervals are 95\% Student-$t$ Monte Carlo intervals across the 25 outer batches (24 degrees of freedom). Variance is the mean within-batch variance; RMSE is its square-root after adding squared overall bias. Significance markers: $^{***}\!p<0.001$,
 $^{**}\!p<0.01$, $^{*}\!p<0.05$, n.s.\ otherwise.}}
 \label{tab:sparse_comparison}
 \begin{tabular}{lrrrr}
 \toprule
 Estimator         & Bias              & 95\% CI    & Variance        & RMSE \\
 \midrule
-Naive             & $-0.451^{***}$    & $\pm 0.083$ & $30.93$         & $5.58$ \\
-POD-weighted      & $+0.073$ (n.s.)   & $\pm 0.085$ & $31.99$         & $5.66$ \\
-MLE-ungrouped     & $-0.089^{*}$      & $\pm 0.072$ & $27.52$         & $5.25$ \\
-\textbf{MLE}      & $+0.032$ (n.s.)   & $\pm 0.074$ & $\mathbf{25.36}$ & $\mathbf{5.04}$ \\
+Naive & $-0.451^{***}$ & $\pm 0.087$ & $30.88$ & $5.58$ \\
+POD-weighted & $+0.073$ (n.s.) & $\pm 0.089$ & $31.94$ & $5.65$ \\
+MLE-ungrouped & $-0.102^{*}$ & $\pm 0.082$ & $28.86$ & $5.37$ \\
+MLE & $+0.044$ (n.s.) & $\pm 0.083$ & $27.01$ & $5.20$ \\
 \bottomrule
 \end{tabular}
 
@@ -628,24 +620,22 @@ MLE-ungrouped     & $-0.089^{*}$      & $\pm 0.072$ & $27.52$         & $5.25$ \
 \toprule
 Pairwise variance test (paired $t$ on 25 outer batches) & $t$ & $p$ \\
 \midrule
-Naive          vs.\ POD-weighted    & $-29.71$ & $<0.001^{***}$ \\
-POD-weighted   vs.\ MLE-ungrouped   & $+16.08$ & $<0.001^{***}$ \\
-POD-weighted   vs.\ MLE             & $+13.18$ & $<0.001^{***}$ \\
-MLE-ungrouped  vs.\ MLE             & $+6.75$  & $<0.001^{***}$ \\
+Naive vs POD-weighted & $-29.71$ & $<0.001$ \\
+POD-weighted vs MLE-ungrouped & $+12.03$ & $<0.001$ \\
+POD-weighted vs MLE & $+10.32$ & $<0.001$ \\
+MLE-ungrouped vs MLE & $+6.02$ & $<0.001$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \new{Two practical implications follow. First, the MLE's variance advantage
 established at baseline cadence persists at sub-monthly snapshot cadence
-provided that the continuous-monitoring channel is itself imperfect.
+for the particular imperfect continuous-monitoring channel simulated here.
 Second, in this regime the dominant source of the MLE's improvement
 over the POD-weighted estimator is the temporal information contained
 in the continuous-monitoring windows, which the HMM is able to exploit;
 the snapshot channel contributes little additional information when so
-few snapshots are available per campaign. This is consistent with the
-$p_{\text{cont}}$ sweep in Figure~\ref{fig:sweep_cont}a, where the
-variance ratio is maximised when continuous monitoring is sparse.}
+few snapshots are available per campaign. The continuous-monitoring sweeps in Figure~\ref{fig:sweep_cont} assess this dependence under the baseline sensor calibration.}
 
 
 %==============================================================================
@@ -653,15 +643,14 @@ variance ratio is maximised when continuous monitoring is sparse.}
 \label{sec:sweep_T}
 %==============================================================================
 
-We investigate how estimation performance varies with campaign length~$T$ by sweeping $T \in \{125, 250, 500, 1{,}000, 2{,}000\}$ while holding all other parameters at baseline values. 
+We investigate how estimation performance varies with campaign length~$T$ by sweeping $T \in \{125, 250, 500, 1{,}000, 2{,}000\}$ while holding all other parameters at baseline values.
 
-Figure~\ref{fig:composite_T} provides a comprehensive view of parameter recovery: the top row shows relative bias~(\%) and the bottom row shows the coefficient of variation~(CV~\%) for each MLE parameter as a function of~$T$. The time-averaged emission rate~$\hat{\mu}$ (rightmost column) also includes the POD-weighted estimator for comparison. All four parameters exhibit small relative biases that are stable or decrease with~$T$, and CV narrows monotonically. The main-paper parameter histograms (Figure~4 in the main text) correspond to the baseline $T = 1{,}000$ column of this composite.
+Figure~\ref{fig:composite_T} provides a comprehensive view of parameter recovery: the top row shows relative bias~(\%) and the bottom row shows the coefficient of variation~(CV~\%) for each MLE parameter as a function of~$T$. The time-averaged emission rate~$\hat{\mu}$ (rightmost column) also includes the POD-weighted estimator for comparison. The estimated bias and CV curves show how parameter recovery depends on campaign length; they should be read with their Monte Carlo uncertainty. Component-parameter curves summarize records with available component estimates, while $\hat\mu$ includes zero-detection observed campaigns assigned zero. Very short campaigns can therefore show both selection effects in component summaries and unstable transition recovery. The main-paper parameter histograms (Figure~4 in the main text) correspond to the baseline $T = 1{,}000$ column of this composite.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{figures/figure1_composite.pdf}
-\caption{Relative bias~(\%, top row) and coefficient of variation~(CV~\%, bottom row) of MLE parameter estimates as a function of campaign length~$T$. From left to right: $\hat{p}_{\text{on}}$, $\hat{p}_{\text{off}}$, $\hat{\mu}_{\text{emit}}$, and~$\hat{\mu}$ (with POD-weighted for comparison). Shaded bands show 95\% CIs. \edit{All parameters show stable or decreasing relative bias with~$T$, confirming that the small positive shifts in $(\hat p_{\text{on}}, \hat p_{\text{off}})$ reported in the main text are finite-sample effects that vanish asymptotically, consistent with the standard theory of MLEs \citep[Ch.~5]{vanderVaart1998}.} % [EVAN finite-sample-bias question]
-The CV of~$\hat{\mu}_{\text{emit}}$ and~$\hat{p}_{\text{off}}$ decreases substantially with longer campaigns, reflecting the additional data available for disentangling intermittency from detection effects. The rightmost bottom panel also shows the variance ratio (red, right axis).}
+\caption{Relative bias~(\%, top row) and coefficient of variation~(CV~\%, bottom row) of MLE parameter estimates as a function of campaign length~$T$. From left to right: $\hat{p}_{\text{on}}$, $\hat{p}_{\text{off}}$, $\hat{\mu}_{\text{emit}}$, and~$\hat{\mu}$ (with POD-weighted for comparison). Shaded bands show normal-approximation 95\% Monte Carlo intervals. The sweep evaluates finite-campaign parameter recovery; it does not establish asymptotic unbiasedness of the iterative plug-in estimator. The CV of~$\hat{\mu}_{\text{emit}}$ and~$\hat{p}_{\text{off}}$ decreases substantially with longer campaigns, reflecting the additional data available for disentangling intermittency from detection effects. The rightmost bottom panel also shows the variance ratio (red, right axis).}
 \label{fig:composite_T}
 \end{figure}
 
@@ -672,42 +661,38 @@ The CV of~$\hat{\mu}_{\text{emit}}$ and~$\hat{p}_{\text{off}}$ decreases substan
 %==============================================================================
 
 % [PB — consolidated section: p_cont sweep (moved from main) + new T_cont sweep, presented in a single figure]
-\new{This section reports two sweeps that jointly characterize the role of continuous-monitoring coverage in the MLE's variance reduction. The first sweeps the per-step probability $p_{\text{cont}}$ of triggering a continuous-monitoring window; the second sweeps the window duration $T_{\text{cont}}$. In each, all other parameters are held at baseline values. Together they decompose the expected continuous coverage fraction $T_{\text{cont}} / (T_{\text{cont}} + 1/p_{\text{cont}})$ into its two independent determinants, clarifying which aspect of continuous monitoring — frequency of window onsets or duration of each window — drives performance. Both sweeps are shown in Figure~\ref{fig:sweep_cont}.}
+\new{This section reports two sweeps that jointly characterize the role of continuous-monitoring coverage in the MLE's variance reduction. The first sweeps the per-step probability $p_{\text{cont}}$ of triggering a continuous-monitoring window; the second sweeps the window duration $T_{\text{cont}}$. In each, all other parameters are held at baseline values. Together they decompose the expected continuous coverage fraction $T_{\text{cont}} / (T_{\text{cont}} + (1-p_{\text{cont}})/p_{\text{cont}})$ into its two independent determinants, clarifying which aspect of continuous monitoring — frequency of window onsets or duration of each window — drives performance. Both sweeps are shown in Figure~\ref{fig:sweep_cont}.}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{figures/figure_sweeps_cont.pdf}
-\caption{\new{Sensitivity of estimation variance to the two continuous-monitoring parameters (shaded bands: 95\% CIs over 25 replicates). \textbf{(a)}~Sweep over the trigger probability $p_{\text{cont}}$, holding $T_{\text{cont}}$ at baseline. \textbf{(b)}~Sweep over the window duration $T_{\text{cont}}$, holding $p_{\text{cont}}$ at baseline. Top row: variance of the MLE and POD-weighted estimators. Bottom row: variance ratio (POD-weighted / MLE); values above the dashed line indicate lower MLE variance.}}
+\caption{\new{Sensitivity of estimation variance to the two continuous-monitoring parameters (shaded bands: normal-approximation 95\% Monte Carlo intervals over 25 outer batches; ratio bands propagate marginal variance standard errors by the delta method without a covariance term). \textbf{(a)}~Sweep over the trigger probability $p_{\text{cont}}$, holding $T_{\text{cont}}$ at baseline. \textbf{(b)}~Sweep over the window duration $T_{\text{cont}}$, holding $p_{\text{cont}}$ at baseline. Top row: variance of the MLE and POD-weighted estimators. Bottom row: variance ratio (POD-weighted / MLE); values above the dashed line indicate lower MLE variance.}}
 \label{fig:sweep_cont}
 \end{figure}
 
 \subsection{Continuous-monitoring frequency ($p_{\text{cont}}$)}
 \label{sec:sweep_pcont_SI}
 
-\new{The trigger probability $p_{\text{cont}}$ controls how often a site accumulates a window of dense temporal data. Figure~\ref{fig:sweep_cont}a shows that the MLE outperforms the POD-weighted estimator across the full range of $p_{\text{cont}}$, with the advantage markedly larger when continuous monitoring is sparse: the variance ratio peaks at approximately $1.36$ at $p_{\text{cont}} = 0$, drops to roughly $1.07$ by $p_{\text{cont}} = 0.2$, and stabilises in the $1.07$--$1.08$ range as $p_{\text{cont}}$ increases further. Two mechanisms account for this pattern. When continuous monitoring is rare, the snapshot data alone carry most of the inferential burden, and the HMM's exploitation of temporal correlation among repeated snapshots is the dominant source of variance reduction relative to the POD-weighted estimator. As continuous-monitoring coverage grows, both estimators benefit from the additional detections, and the variance gap narrows toward a regime in which most of the easy information has already been extracted by both methods.}
+\new{The trigger probability $p_{\text{cont}}$ controls how often a site accumulates a window of dense temporal data. In Figure~\ref{fig:sweep_cont}a, the POD-weighted/MLE variance ratio is $1.07$ with no continuous coverage, $1.16$ at $p_{\text{cont}}=0.05$, and approximately $1.11$ at $p_{\text{cont}}=1$. MLE has lower variance at these sampled settings, but the advantage is not monotonic in trigger frequency. The grid jumps from zero to $0.05$ and therefore does not resolve the region around the baseline probability $0.01$, where the independent baseline experiment gives ratio $1.51$. Additional continuous observations improve both estimators; the relative advantage depends on coverage, event linking, and how many distinct events inform the empirical rate law.}
 
 \subsection{Continuous-window duration ($T_{\text{cont}}$)}
 \label{sec:sweep_Tcont_SI}
 
-\new{The window duration $T_{\text{cont}}$ controls how long each continuous-monitoring window persists once triggered. Holding $p_{\text{cont}}$ at its baseline value and sweeping $T_{\text{cont}}$ varies the expected coverage fraction without changing the frequency of window onsets. Figure~\ref{fig:sweep_cont}b shows a non-monotonic pattern in the variance ratio. At $T_{\text{cont}} = 0$ (no continuous coverage), the ratio is approximately 1.35, matching the $p_{\text{cont}} = 0$ point of panel (a). As $T_{\text{cont}}$ grows, the ratio rises to a peak near 1.62 in the range $T_{\text{cont}} \in [25, 75]$ hours, then declines monotonically toward 1.34 at $T_{\text{cont}} = 200$ hours.}
+\new{The window duration $T_{\text{cont}}$ controls how long each monitoring window persists. Holding $p_{\text{cont}}$ fixed preserves the triggering probability per unmonitored step; it does not preserve the number of window onsets per calendar hour. The variance ratio is $1.07$ with no continuous coverage, reaches $1.54$ at $75$ hours, and declines to $1.31$ at $200$ hours.}
 
-\new{The location of the peak is informative. With baseline mean emission duration $\tau_{\text{emit}} = 20$ hours, windows in the 25--75 hour range are long enough to span a typical emission event in its entirety while still triggering frequently enough (under fixed $p_{\text{cont}} = 0.01$) to sample many distinct events. In this regime, the HMM can tightly constrain the hidden-state sequence within each window and the MLE extracts the maximum benefit from event-level grouping. As $T_{\text{cont}}$ grows beyond a few times $\tau_{\text{emit}}$, additional within-window observations sample the same events redundantly, and the marginal informational return of further duration declines. The POD-weighted estimator's variance also decreases at long $T_{\text{cont}}$, though more slowly, and the gap between the two methods narrows.}
-
-\new{Read jointly, the two sweeps indicate that the MLE benefits more from a moderate number of sufficiently long windows than from many short windows at the same total coverage fraction, and that the marginal value of additional continuous-monitoring effort declines once windows comfortably exceed the characteristic emission duration.}
+\new{With baseline mean event duration $20$ hours, moderate windows can provide repeated measurements while spanning multiple events. Longer windows also change coverage and the number of window onsets within a fixed campaign. The relative gain reflects these interacting effects, rather than grouping alone. Read jointly, the two sweeps show that relative precision is not monotonic in either monitoring parameter. They do not compare schedules matched for total coverage, and therefore do not establish that one window design dominates another at equal monitoring effort.}
 
 
 %==============================================================================
-\section{Robustness to Grid Resolution}
+\section{Numerical Sensitivity of Transition Optimization}
 \label{sec:robustness_grid}
-%==============================================================================
 
-The HMM grid search for $(p_{\text{on}}, p_{\text{off}})$ uses a geometric grid of $G$ candidate values centered on initial estimates. Since the grid resolution directly determines the precision of the search for $p_{\text{on}}$ and $p_{\text{off}}$, it is important to verify that the downstream estimates $\mu_{\text{emit}}$ and~$\hat{\mu}$ are insensitive to this choice.
-In figure~\ref{fig:grid_robustness}, we vary the number of grid points $G \in \{5, 9, 15, 25, 41\}$ while keeping the geometric ratio between consecutive points fixed ($N = 500$ replications each), and confirm that the results are not sensitive to the grid resolution near the chosen resolution for other experiments ($G=15$).
+The transition step now uses continuous optimization over fixed bounds, rather than a grid centered on generating parameters. Figure~\ref{fig:grid_robustness} varies the optimizer's relative objective tolerance $\mathrm{ftol}\in\{10^{-7},10^{-9},10^{-11},10^{-13}\}$ on the same 500 baseline datasets. All empirical size support points are retained in each calculation. This checks numerical stopping accuracy; it does not assess uncertainty in the empirical rate law or establish asymptotic unbiasedness.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{figures/figure_grid_robustness.pdf}
-\caption{Robustness to HMM grid resolution. Columns show relative bias~(\%) and CV~(\%) for $p_{\text{on}}$, $p_{\text{off}}$, $\mu_{\text{emit}}$, and~$\hat{\mu}$ as a function of the number of grid points~$G$. All estimates are stable across the full range, confirming that the baseline choice ($G = 15$) is not critical.}
+\caption{Numerical sensitivity of the transition update. Panels show relative bias (\%) and coefficient of variation (CV, \%) of $\hat\mu$ over the same 500 baseline datasets, as the relative objective tolerance is tightened. The horizontal axis is $-\log_{10}(\mathrm{ftol})$. The baseline tolerance is $10^{-11}$. The empirical size distribution and fixed transition bounds are unchanged.}
 \label{fig:grid_robustness}
 \end{figure}
 
@@ -716,12 +701,12 @@ In figure~\ref{fig:grid_robustness}, we vary the number of grid points $G \in \{
 \label{sec:threshold}
 %==============================================================================
 
-The Bayesian posterior linking step (Step~1 of the MLE loop) classifies consecutive detections as belonging to the same emission event when the posterior probability exceeds a decision threshold~$\delta$. We use $\delta = 0.5$ as baseline (i.e., maximum-a-posteriori classification). To verify that results are not sensitive to this choice, we sweep $\delta \in \{0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8\}$ while holding all other parameters at baseline ($N_{\text{outer}} = 5$, $N_{\text{inner}} = 500$). Figure~\ref{fig:threshold} confirms that performance is stable across this range.
+The approximate posterior linking step (Step~1 of the MLE loop) classifies consecutive detections as belonging to the same emission event when the posterior probability exceeds a decision threshold~$\delta$. We use $\delta = 0.5$ as baseline (i.e., classification using the working linking score). To verify that results are not sensitive to this choice, we sweep $\delta \in \{0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8\}$ while holding all other parameters at baseline ($N_{\text{outer}} = 5$, $N_{\text{inner}} = 500$). Figure~\ref{fig:threshold} assesses stability across this range; uncertainty bands use five outer batches.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{figures/figure_threshold_sweep.pdf}
-\caption{Sensitivity of MLE estimates to the plume-linking decision threshold~$\delta$. \textbf{(a)}~Relative bias of~$\hat{\mu}$ and~$\hat{\mu}_{\text{emit}}$. \textbf{(b)}~Coefficient of variation of~$\hat{\mu}$. The vertical dotted line marks the baseline value $\delta = 0.5$. The true value of $\mu$ remains in the 95\% confidence interval across $\delta\in[0.2,0.8]$. The null hypothesis ``unbiased estimator'' cannot be rejected.}
+\caption{Sensitivity of MLE estimates to the plume-linking decision threshold~$\delta$. \textbf{(a)}~Relative bias of~$\hat{\mu}$ and~$\hat{\mu}_{\text{emit}}$. \textbf{(b)}~Coefficient of variation of~$\hat{\mu}$. The vertical dotted line marks the baseline value $\delta = 0.5$. Shaded bands are 95\% Student-$t$ Monte Carlo intervals from five outer batches (four degrees of freedom). The sweep measures sensitivity to the linking choice; it does not establish unbiasedness.}
 \label{fig:threshold}
 \end{figure}
 
@@ -738,28 +723,7 @@ from the test environment. This section characterises the sensitivity of
 the estimator to this additional source of uncertainty.}
 
 \paragraph{Choice of perturbed parameter.}
-\new{The six sensor parameters $\boldsymbol{\psi} = (\theta_s, k_s, \sigma_s,
-\theta_c, k_c, \sigma_c)$ enter the likelihood with very different leverage,
-and a per-parameter analysis (Figure~\ref{fig:misspec_onebyone_SI}) confirms
-that a single one — the snapshot $50\%$ detection threshold $\theta_s$ —
-accounts for nearly all of the misspecification sensitivity at the
-baseline configuration. The reasons are structural. The threshold
-$\theta_s$ sets the location of the $50\%$ detection probability and
-therefore directly controls the fraction of emission events the estimator
-considers detectable; at baseline ($\theta_s = 50$~kg/h, lognormal
-emission median $44$~kg/h) it sits in the bulk of the emission
-distribution, so perturbations move a substantial share of events across
-the detection boundary. The POD steepness $k_j$ governs the transition
-near $\theta_j$ but not its location, and most emissions lie far from
-$\theta_j$ where the POD is close to either zero or one; perturbations of
-$k_j$ therefore alter the likelihood weakly. The noise parameters
-$\sigma_j$ affect quantification rather than detection, and within-plume
-averaging across many detections attenuates their downstream effect on
-$\hat\mu$. The continuous-monitor parameters $(\theta_c, k_c, \sigma_c)$
-contribute negligibly because $\theta_c = 2.4$~kg/h sits well below the
-bulk of active emissions, so virtually every active event is detected
-during a continuous window irrespective of small displacements of
-$\theta_c$. We therefore restrict the main analysis to $\theta_s$.}
+\new{We perturb each of the six calibration parameters $\boldsymbol\psi=(\theta_s,k_s,\sigma_s,\theta_c,k_c,\sigma_c)$ separately; the complete results are supplied in the reproduction repository. Figure~\ref{fig:misspec} focuses on the snapshot 50\% detection threshold $\theta_s$, which sits near the bulk of the baseline active-rate distribution ($\theta_s=50$~kg/h; median emission rate about $44$~kg/h). Its calibration directly changes which events are considered detectable. The continuous threshold is much lower ($2.4$~kg/h), so the baseline continuous channel detects most active emissions. Sensitivity depends on this sensor and rate configuration rather than a universal ranking of calibration parameters.}
 
 \paragraph{Experimental design.}
 \new{We perturb $\theta_s$ on the log scale,
@@ -777,8 +741,8 @@ truth from the parameters used in estimation, mimicking real deployment in
 which the analyst plugs in calibration estimates rather than the unknown
 truth. We sweep $\eta \in \{0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8\}$
 with $25$ outer replicates and $500$ inner data replicates per outer
-batch. Because random misspecification produces both random shifts in
-$\hat\mu$ and, asymmetrically at larger $\eta$, a small systematic shift,
+batch. Because random misspecification can produce both random shifts in
+$\hat\mu$ and a systematic shift,
 we report mean squared error,
 \begin{equation}
     \mathrm{MSE}(\hat\mu) \;=\; \mathbb{E}\!\bigl[(\hat\mu - \mu^{\text{true}})^2\bigr],
@@ -786,21 +750,7 @@ we report mean squared error,
 which captures both contributions in a single metric.}
 
 \paragraph{Results.}
-\new{Figure~\ref{fig:misspec} reports MSE as a function of $\eta$. At
-$\eta = 0$ (correct specification), $\mathrm{MSE} = 18.1$~kg$^2$/h$^2$,
-reflecting irreducible sampling variance alone. As $\eta$ grows, MSE
-rises gradually: it remains within $6\%$ of its $\eta=0$ value up to
-$\eta = 0.3$ (a $\sim\!30\%$ relative misspecification of $\theta_s$),
-and reaches $22.2$~kg$^2$/h$^2$ at $\eta = 0.5$. Even at $\eta = 0.8$ —
-corresponding to a log-normal SD of $0.8$ on $\theta_s$, far beyond the
-level achievable by any reasonable controlled-release calibration — the
-MLE retains an MSE advantage over the POD-weighted baseline
-($28.8$ versus $29.9$~kg$^2$/h$^2$). No crossover at which the MLE loses
-its advantage occurs within the range we tested. Bias remains small
-throughout (less than $6\%$ of MSE at $\eta = 0.8$, and below $1\%$ for
-$\eta \le 0.5$), so the rise in MSE is dominated by the variance
-component induced by drawing different $\tilde\theta_s$ across outer
-replicates.}
+\new{Figure~\ref{fig:misspec} reports MSE as a function of $\eta$. Under correct specification ($\eta=0$), MLE MSE is approximately $19.3$~kg$^2$/h$^2$, including sampling variation and residual bias, compared with a POD-weighted reference MSE of $29.9$~kg$^2$/h$^2$. At $\eta=0.3$, MLE MSE is $20.3$, about $5\%$ above its correctly specified value; at $\eta=0.5$, it is $22.9$. At $\eta=0.8$, MLE MSE is $29.7$, close to the POD-weighted reference. The broad Monte Carlo bands at large perturbations do not establish a performance advantage in that regime. The estimated bias at $\eta=0.8$ is $+1.25$~kg/h; its square contributes about $5\%$ of MSE. These results support sensitivity assessment for the baseline design, rather than a guarantee of robustness to large calibration errors. The curve need not be monotone: each setting uses 25 independent calibration draws and separately seeded monitoring records.}
 
 \begin{figure}[h]
 \centering
@@ -811,24 +761,12 @@ $\tilde\theta_s$ is drawn log-normally around $\theta_s^{\text{true}}$
 with standard deviation $\eta$ in log-space; data are generated under
 $\theta_s^{\text{true}}$, while estimation uses $\tilde\theta_s$. The
 horizontal dashed line marks the POD-weighted MSE under correct
-specification, used as a reference baseline. The shaded band is a
-$95\%$ confidence interval across $25$ outer replicates of
-$\tilde\theta_s$.}
+specification, used as a reference baseline. The shaded bands are normal-approximation 95\% Monte Carlo bands from 25 outer batches. For MLE, the standard error is computed from the batch mean squared errors; the POD reference uses its directly measured mean squared error at $\eta=0$.}
 \label{fig:misspec}
 \end{figure}
 
 \paragraph{Implications.}
-\new{Two implications follow. First, the MSE advantage of the MLE is
-robust to the level of $\theta_s$ uncertainty likely to be encountered
-after even rudimentary controlled-release characterisation: an $80\%$
-log-normal SD on $\theta_s$ — well in excess of values reported in the
-controlled-release literature — does not eliminate the advantage.
-Second, $\theta_s$ is the single sensor parameter to which the framework
-is most sensitive (Figure~\ref{fig:misspec_onebyone_SI}); refinement of
-the snapshot $50\%$ detection threshold therefore yields the largest
-reduction in total estimator error at the margin. Application of the
-framework to a new sensor should accordingly prioritise controlled-release
-coverage near the sensor's snapshot detection threshold.}
+\new{Calibration uncertainty is an additional contribution to total error and should be assessed for each deployment. These simulations evaluate randomly perturbed threshold estimates around the generating value; they do not validate systematic calibration shifts, environmental departures from the controlled-release setting, or every sensor design. Controlled-release coverage near the sensor's detection threshold helps constrain the fraction of events used by the weighting and likelihood steps. The single-parameter perturbation results in the repository support evaluation of other calibration priorities.}
 
 
 %==============================================================================
@@ -849,9 +787,9 @@ coverage near the sensor's snapshot detection threshold.}
 \new{The sampling log is a list of four-tuples $(t_i, j_i, Y_i, D_i)$ recording the time of observation, the technology used, the detection indicator, and the measured emission rate (zero or missing for non-detections). Non-detections — time steps at which a technology was active but did not register a detection — are informative and must be recorded; their omission biases the estimator toward large values.}
 
 \subsection{Workflow}
-\new{The sampling log is first converted into the format described in Section~2 of the main text. Time steps during which no technology was active appear as gaps and are handled automatically by the multi-step transition matrix of Section~\ref{sec:multistep}. The initial value $\hat p_{\text{off}}^{(0)}$ is set from the empirical mean gap between consecutive detections; the estimator is insensitive to this choice, and a gap of a few time steps is adequate. Steps~1--3 of the main-text algorithm are then iterated until successive estimates of $(p_{\text{on}}, p_{\text{off}})$ differ by less than $10^{-3}$, which typically requires 5--15 iterations.}
+\new{The sampling log is first converted into the format described in Section~2 of the main text. Time steps during which no technology was active appear as gaps and are handled automatically by the multi-step transition matrix of Section~\ref{sec:multistep}. The implementation initializes $(\hat p_{\text{on}},\hat p_{\text{off}})=(0.025,0.10)$ and uses the fixed bounds and first-iteration coarse search described in Section~\ref{sec:forward}. Steps~1--3 are iterated until transition changes are below $10^{-5}$ and the mean change is below $10^{-4}$~kg/h, with a limit of 30 iterations. The convergence flag and boundary behavior should be inspected rather than assuming that every record yields a stable estimate.}
 
-\new{In our simulation studies, estimator variance is characterized through Monte Carlo replication. For application to real monitoring data, a block bootstrap that resamples at the plume level rather than the individual-observation level preserves the within-event correlation structure and provides a natural route to within-campaign confidence intervals.}
+\new{In our simulation studies, estimator variance is characterized through Monte Carlo replication. For application to real monitoring data, a parametric bootstrap can simulate new emission and detection records under the fitted model while retaining the actual sampling masks, then refit the entire procedure. This preserves model-based temporal dependence and propagates the plug-in fitting steps. Its interval coverage would require separate validation; the Monte Carlo intervals reported here describe repeated-simulation performance, not within-campaign uncertainty.}
 
 \subsection{Practical considerations}
 \new{Several issues arise when applying the framework to real monitoring records. The HMM likelihood can become flat in $p_{\text{on}}$ when a facility produces fewer than roughly five detected events over the campaign; in such cases the estimate is unstable, and remedies include extending the campaign, pooling across similar facilities, or using the POD-weighted estimator instead. Continuous monitors typically have visibility windows governed by wind direction (main text, Section~2), so the sampling log should reflect visibility rather than instrument uptime — a sensor operating with no plume in its field of view contributes no information. Published POD curves are valid under the conditions in which they were measured; deployment under substantially different conditions (offshore, at night, or in high winds) calls for re-estimation of the curve or wider misspecification analysis. Finally, the MLE output $\hat\mu$ is already a time-average and should not be multiplied by a separately estimated persistence fraction.}

@@ -127,6 +127,10 @@ def _build_specs(theta_snap=None):
     )
 
 
+def _run_one_task(task):
+    return _run_one(*task)
+
+
 def _run_one(tech_specs, rep, T, p_snap, p_cont, T_cont,
              p_on, p_off, size_mu, size_sigma,
              max_gap, decision_threshold, seed,
@@ -147,12 +151,12 @@ def _run_one(tech_specs, rep, T, p_snap, p_cont, T_cont,
     nudge = p_off_nudge if p_off_nudge is not None else cfg.NUDGE
     naive_est = naive_baseline(obs)
     pod_est = pod_weighted_baseline(obs, tech_specs)
-    ms_res = mle_simple(obs, tech_specs,
+    ms_res = mle_simple(obs, tech_specs, transition_bounds=cfg.TRANSITION_BOUNDS,
                         p_on_grid=p_on_grid, p_off_grid=p_off_grid,
                         p_off_nudge=nudge)
     n_det = obs.n_total_detections()
 
-    if skip_full_mle or n_det < 2:
+    if skip_full_mle:
         return dict(naive=naive_est, pod=pod_est,
                     mle_simple=ms_res["mean"],
                     ms_p_on=ms_res["p_on"], ms_p_off=ms_res["p_off"],
@@ -160,7 +164,7 @@ def _run_one(tech_specs, rep, T, p_snap, p_cont, T_cont,
                     mle=np.nan,
                     mle_p_on=np.nan, mle_p_off=np.nan, mle_mu_emit=np.nan)
 
-    res = loop_empirical(obs, tech_specs, T,
+    res = loop_empirical(obs, tech_specs, T, **cfg.MLE_OPTIONS,
                          max_gap=max_gap,
                          decision_threshold=decision_threshold,
                          p_on_grid=p_on_grid, p_off_grid=p_off_grid,
@@ -215,8 +219,8 @@ def run_sweep(sweep_name: str, n_inner: int, n_outer: int,
         tech_specs = _build_specs(theta_snap)
         mu_true = p_on / (p_on + p_off) * cfg.MU_EMIT
         seed = cfg.BASE_SEED + vi * 1_000_000
-        p_on_grid = cfg.build_geom_grid(p_on, cfg.P_GEOM_FACTOR, cfg.P_GRID_RES)
-        p_off_grid = cfg.build_geom_grid(p_off, cfg.P_GEOM_FACTOR, cfg.P_GRID_RES)
+        p_on_grid = None  # fixed-bound continuous optimization
+        p_off_grid = None
 
         print(f"\n{'=' * 62}")
         print(f"  {sweep_name} = {val}")
@@ -234,13 +238,12 @@ def run_sweep(sweep_name: str, n_inner: int, n_outer: int,
             ests = {"naive": [], "pod": [], "mle_simple": [], "mle": []}
             param_inner = {"p_on": [], "p_off": [], "mu_emit": []}
             ms_param_inner = {"p_on": [], "p_off": [], "mu_emit": []}
-            for inner in range(n_inner):
-                rep = outer * n_inner + inner
-                r = _run_one(tech_specs, rep, T, p_snap, p_cont, T_cont,
-                             p_on, p_off, cfg.SIZE_MU, cfg.SIZE_SIGMA,
-                             cfg.MAX_GAP, cfg.DECISION_THRESHOLD, seed,
-                             skip_full_mle=skip_full_mle,
-                             p_on_grid=p_on_grid, p_off_grid=p_off_grid)
+            from experiments.parallel import ordered_map
+            tasks = [(tech_specs,outer*n_inner+inner,T,p_snap,p_cont,T_cont,
+                      p_on,p_off,cfg.SIZE_MU,cfg.SIZE_SIGMA,cfg.MAX_GAP,
+                      cfg.DECISION_THRESHOLD,seed,skip_full_mle,None,None)
+                     for inner in range(n_inner)]
+            for r in ordered_map(_run_one_task,tasks):
                 for k in ests:
                     ests[k].append(r[k])
                 param_inner["p_on"].append(r["mle_p_on"])
@@ -646,26 +649,14 @@ def main():
     print("  ALL SWEEPS DONE")
     print("=" * 62)
 
-    if sweep_name == "T":
+    if sweep_name == "T" and (res_dir.parent / "results/data_replications.csv").exists():
         print("\n  Generating composite Figure 1...")
-        import subprocess, shutil
+        import subprocess
         subprocess.run(
             [sys.executable, "-m", "experiments.make_figure1",
+             "--res-dir", str(res_dir.parent),
              "--out", str(fig_dir / "figure1_composite.pdf")],
-            cwd=str(PROJECT_ROOT),
-        )
-        hist_src = fig_dir / "figure1_histograms.pdf"
-        comp_src = fig_dir / "figure1_composite.pdf"
-        main_figs = PROJECT_ROOT / "mle_methane_paper" / "figures"
-        si_figs = PROJECT_ROOT / "Supplementary Methane MLE" / "figures"
-        main_figs.mkdir(parents=True, exist_ok=True)
-        si_figs.mkdir(parents=True, exist_ok=True)
-        if hist_src.exists():
-            shutil.copy2(hist_src, main_figs / "figure1_histograms.pdf")
-            print(f"  Copied histograms -> {main_figs / 'figure1_histograms.pdf'}")
-        if comp_src.exists():
-            shutil.copy2(comp_src, si_figs / "figure1_composite.pdf")
-            print(f"  Copied composite -> {si_figs / 'figure1_composite.pdf'}")
+            cwd=str(PROJECT_ROOT), check=True)
 
 
 if __name__ == "__main__":

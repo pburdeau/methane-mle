@@ -108,7 +108,7 @@ def main():
 
     ax.set_yscale("log")
     ax.set_xlabel("Target precision $\\varepsilon$ (%)")
-    ax.set_ylabel("Number of sites $N$")
+    ax.set_ylabel("Independent monitoring campaigns $N$")
     ax.legend(loc="upper right", framealpha=0.9)
     ax.grid(alpha=0.2, ls=":", lw=0.5, which="both")
     ax.spines["top"].set_visible(False)
@@ -144,8 +144,8 @@ def main():
         mid_y = np.sqrt(n_mle * n_pod)
         label = (
             f"$\\mathbf{{\\pm{pct}\\%}}$\n"
-            f"MLE: {n_mle:.0f} ({n_mle_lo:.0f}\u2013{n_mle_hi:.0f})   "
-            f"POD: {n_pod:.0f} ({n_pod_lo:.0f}\u2013{n_pod_hi:.0f})"
+            f"MLE: {np.ceil(n_mle):.0f} ({np.ceil(n_mle_lo):.0f}\u2013{np.ceil(n_mle_hi):.0f})   "
+            f"POD: {np.ceil(n_pod):.0f} ({np.ceil(n_pod_lo):.0f}\u2013{np.ceil(n_pod_hi):.0f})"
         )
         ax.annotate(
             label,
@@ -157,11 +157,11 @@ def main():
             arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8))
 
     ax.text(0.02, 0.04,
-            r"$N = (1.96\,/\,\varepsilon)^2"
+            r"$N = (1.96\,/(\varepsilon/100))^2"
             r" \times \mathrm{Var}(\hat{\mu})\,/\,\mu^2$"
             "\n"
             f"MLE variance is {reduction:.0f}% lower"
-            f" = {reduction:.0f}% fewer sites needed",
+            f" = {reduction:.0f}% fewer campaigns needed",
             transform=ax.transAxes, fontsize=7,
             ha="left", va="bottom",
             bbox=dict(boxstyle="round,pad=0.5", fc="#F0F7F0",
@@ -182,7 +182,7 @@ def main():
         print(f"{name:>15s}: Var = {V:.2f}")
         for eps_val in [0.03, 0.05, 0.10]:
             N = (Z / eps_val) ** 2 * V / mu_true ** 2
-            print(f"  \u00b1{eps_val*100:.0f}%: N = {N:.0f}")
+            print(f"  \u00b1{eps_val*100:.0f}%: N = {np.ceil(N):.0f}")
 
     print(f"\nVariance reduction: {reduction:.1f}%")
     print(f"Sample size reduction: {reduction:.1f}%")

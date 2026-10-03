@@ -1,0 +1,41 @@
+Figure 1
+File: figures/figure0.pdf
+
+Title: Challenges in estimating intermittent methane emissions
+
+Caption: Conceptual overview of the estimation challenges. An intermittent source switches between active and inactive states over time. Continuous monitors (crosses) and snapshot measurements (circles) sample this process irregularly. Three challenges arise: (A) multiple measurements may observe the same emission event, so positive dependence inflates the variance of the empirical mean and independent-sample assumptions overstate the effective sample size (details in SI, Section S1); (B) detected emissions are measured with noise, increasing the variance of estimators built from them; (C) small emissions fall below the detection threshold, producing false negatives that systematically shift the observed sample toward large values, biasing naive estimators of the time-averaged emission rate. Our framework addresses these challenges jointly.
+
+Figure 2
+File: Drawn directly in LaTeX (TikZ); no separate figure PDF in the project.
+
+Title: Graphical model of intermittent emissions and imperfect detection
+
+Caption: Graphical model for intermittent emissions with imperfect detection. Shaded nodes are observed; unshaded nodes are latent. The emission state Z_t follows a two-state Markov chain. The emission rate E_t is drawn at event onset and persists until the event ends. At each time step, the true rate may produce zero, one, or two pairs of detection/measurement outcomes depending on which technologies are deployed: Y_t^(j) (detection indicator) and D_t^(j) (measured value) for technology j ∈ {s, c}. Here t = 0 illustrates a dual-observation time step, t = 1 a single-technology observation, and t = T an unobserved time step. When both technologies are present their detections are conditionally independent given E_t.
+
+Figure 3
+File: figures/figure_baseline_violin_v2_wide.pdf
+
+Title: Bias and variance of time averaged emission rate estimates
+
+Caption: Bias–variance comparison of estimation methods (N = 12,500 simulations, 25 outer batches of 500). The central result is panel (d): the MLE reduces the variance of μ̂ by 34% relative to the probability-of-detection-weighted estimator (19.6 vs. 29.6 (kg/h)²) with estimated bias +0.077 kg/h on a true mean of 10 kg/h. (a) Violin plots of μ̂; white dots mark the mean, thick bars the interquartile range (IQR), and bold annotations show mean [IQR]. The dashed line indicates the true value μ = 10.0 kg/h. (b) Signed mean bias (kg/h) for each method, averaged across outer batches. Filled circles (●) indicate the null hypothesis of unbiasedness is rejected at p < 0.05 (one-sample t-test on 25 batch means); open circles (○) indicate it cannot be rejected. (c) Absolute value of the signed mean bias, |b̄| (kg/h), averaged over 25 outer batches. Brackets with filled stars (★) denote pairs whose absolute biases differ significantly (p < 0.05, paired t-test); open stars (☆) indicate no significant difference. (d) Variance of μ̂, averaged over 25 outer batches. Brackets with filled diamonds (◆) denote pairs whose variances differ significantly (p < 0.05, paired t-test); open diamonds (◇) indicate no significant difference. The MLE–POD-weighted difference is significant at p < 0.05; the intermediate MLE-ungrouped variance (20.6) provides a comparator for the combined effects of event linking, within-event averaging, event-level IPW, and iteration. This comparison does not isolate linking alone. Error bars in panels (b)–(d) are 95% Student-t Monte Carlo confidence intervals from 25 outer batches (24 degrees of freedom). Panel (b) averages signed batch biases, 25⁻¹∑_kb̄_k, whereas panel (c) averages their magnitudes, 25⁻¹∑_k|b̄_k|. These are different statistics: the latter includes Monte Carlo variation in finite batch means and is not the absolute value of the overall bias. Full test statistics and exact p-values are reported in SI, Section S8, Tables S3 and S4.
+
+Figure 4
+File: figures/figure1_histograms.pdf
+
+Title: Distributions of estimated emission process parameters
+
+Caption: (a–d) Distributions of MLE parameter estimates across N = 12,500 simulations (25 × 500). From left to right: (a) ON transition probability p̂_on, (b) OFF transition probability p̂_off, (c) conditional mean emission rate μ̂_emit, and (d) time-averaged emission rate μ̂. Solid vertical lines mark the true values; dashed lines mark the sample means. Transition-probability axes are logarithmic to show the full range, including rare boundary estimates. The conditional mean and time-averaged rate are close to their true values, while the transition estimates exhibit positive shifts. Panels (a–c) include the 12,498 campaigns with component estimates; panel (d) includes all 12,500 mean estimates. The campaign-length sweep (SI, Section S11) examines these shifts empirically; standard MLE asymptotics do not establish the behaviour of this plug-in estimator.
+
+Figure 5
+File: figures/figure4_composite.pdf
+
+Title: Estimator variance under changes in sampling and emission duration
+
+Caption: Sensitivity of estimation variance to key parameters (shaded bands show normal-approximation 95% Monte Carlo bands over 25 outer batches; ratio bands use delta-method propagation of the marginal variance standard errors). Each column varies one parameter while holding all others at baseline values. Top row: variance of the MLE and POD-weighted estimators. Bottom row: variance ratio (POD-weighted / MLE); values above the dashed line indicate lower MLE variance. (a) Snapshot observation probability p_snap (top axis also shown in units of average time between snapshot observations). (b) Snapshot 50% POD threshold. (c) Mean emission duration τ_emit.
+
+Figure 6
+File: figures/figure5_precision.pdf
+
+Title: Monitoring campaigns required for target estimation precision
+
+Caption: Required sample size to estimate μ within ±ε% at 95% confidence, derived analytically from the single-experiment variance via equation (11). Shaded bands propagate the empirical 2.5th and 97.5th percentiles of the 25 within-batch variances. Counts are rounded upward; the normal-approximation calculation assumes independent campaigns and negligible bias. Annotated boxes give the required number of campaigns at three precision targets (±3%, ±5%, ±10%), with ranges in parentheses. Because variance scales linearly into N, the MLE’s 34% variance reduction translates directly into 34% fewer required campaigns at every precision level.

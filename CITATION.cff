@@ -9,3 +9,5 @@ authors:
     given-names: Evan
   - family-names: Brandt
     given-names: Adam
+version: "persistent-ipw-v1"
+repository-code: "https://github.com/pburdeau/methane-mle"

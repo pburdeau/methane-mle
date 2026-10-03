@@ -92,6 +92,10 @@ def _build_specs():
     )
 
 
+def _run_one_task(task):
+    return _run_one(*task)
+
+
 def _run_one(tech_specs, rep, T, p_snap, p_cont, T_cont,
              p_on, p_off, size_mu, size_sigma,
              max_gap, decision_threshold, seed,
@@ -109,20 +113,14 @@ def _run_one(tech_specs, rep, T, p_snap, p_cont, T_cont,
 
     naive_est = naive_baseline(obs)
     pod_est = pod_weighted_baseline(obs, tech_specs)
-    ms_res = mle_simple(obs, tech_specs,
+    ms_res = mle_simple(obs, tech_specs, transition_bounds=cfg.TRANSITION_BOUNDS,
                         p_on_grid=p_on_grid, p_off_grid=p_off_grid,
                         p_off_nudge=cfg.NUDGE)
     n_det = obs.n_total_detections()
     n_snap_obs = int(np.sum(snap_mask))
     n_cont_obs = int(np.sum(cont_mask))
 
-    if n_det < 2:
-        return dict(naive=naive_est, pod=pod_est,
-                    mle_simple=ms_res["mean"], mle=np.nan,
-                    n_det=n_det, n_snap_obs=n_snap_obs,
-                    n_cont_obs=n_cont_obs)
-
-    res = loop_empirical(obs, tech_specs, T,
+    res = loop_empirical(obs, tech_specs, T, **cfg.MLE_OPTIONS,
                          max_gap=max_gap,
                          decision_threshold=decision_threshold,
                          p_on_grid=p_on_grid, p_off_grid=p_off_grid,
@@ -136,8 +134,8 @@ def _run_one(tech_specs, rep, T, p_snap, p_cont, T_cont,
 def run_sweep(T_vals, psnap_vals, n_inner, n_outer, csv_path=None):
     tech_specs = _build_specs()
     mu_true = cfg.P_ON / (cfg.P_ON + cfg.P_OFF) * cfg.MU_EMIT
-    p_on_grid = cfg.build_geom_grid(cfg.P_ON, cfg.P_GEOM_FACTOR, cfg.P_GRID_RES)
-    p_off_grid = cfg.build_geom_grid(cfg.P_OFF, cfg.P_GEOM_FACTOR, cfg.P_GRID_RES)
+    p_on_grid = None  # fixed-bound continuous optimization
+    p_off_grid = None
 
     records = []
     case_idx = 0
@@ -165,14 +163,12 @@ def run_sweep(T_vals, psnap_vals, n_inner, n_outer, csv_path=None):
                 batch_dets = []
                 batch_snap_obs = []
 
-                for inner in range(n_inner):
-                    rep = outer * n_inner + inner
-                    r = _run_one(tech_specs, rep, T, p_snap,
-                                 cfg.P_CONT, cfg.T_CONT,
-                                 cfg.P_ON, cfg.P_OFF,
-                                 cfg.SIZE_MU, cfg.SIZE_SIGMA,
-                                 cfg.MAX_GAP, cfg.DECISION_THRESHOLD, seed,
-                                 p_on_grid=p_on_grid, p_off_grid=p_off_grid)
+                from experiments.parallel import ordered_map
+                tasks = [(tech_specs,outer*n_inner+inner,T,p_snap,cfg.P_CONT,
+                          cfg.T_CONT,cfg.P_ON,cfg.P_OFF,cfg.SIZE_MU,cfg.SIZE_SIGMA,
+                          cfg.MAX_GAP,cfg.DECISION_THRESHOLD,seed,None,None)
+                         for inner in range(n_inner)]
+                for r in ordered_map(_run_one_task,tasks):
                     for k in ests:
                         ests[k].append(r[k])
                     batch_dets.append(r["n_det"])

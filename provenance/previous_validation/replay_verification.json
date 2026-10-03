@@ -1,0 +1,65 @@
+{
+  "tolerance": "rtol=atol=1e-10",
+  "replications": [
+    {
+      "experiment": "baseline",
+      "replication": 0,
+      "matched": true
+    },
+    {
+      "experiment": "baseline",
+      "replication": 499,
+      "matched": true
+    },
+    {
+      "experiment": "baseline",
+      "replication": 500,
+      "matched": true
+    },
+    {
+      "experiment": "baseline",
+      "replication": 1184,
+      "matched": true
+    },
+    {
+      "experiment": "baseline",
+      "replication": 1581,
+      "matched": true
+    },
+    {
+      "experiment": "baseline",
+      "replication": 12499,
+      "matched": true
+    },
+    {
+      "experiment": "sparse",
+      "replication": 0,
+      "matched": true
+    },
+    {
+      "experiment": "sparse",
+      "replication": 241,
+      "matched": true
+    },
+    {
+      "experiment": "sparse",
+      "replication": 499,
+      "matched": true
+    },
+    {
+      "experiment": "sparse",
+      "replication": 500,
+      "matched": true
+    },
+    {
+      "experiment": "sparse",
+      "replication": 1581,
+      "matched": true
+    },
+    {
+      "experiment": "sparse",
+      "replication": 12499,
+      "matched": true
+    }
+  ]
+}

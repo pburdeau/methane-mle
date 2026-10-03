@@ -1,0 +1,12 @@
+{
+  "action": "tests",
+  "utc": "2026-10-02T19:55:41.351183+00:00",
+  "python": "3.14.5 (main, May 10 2026, 10:21:34) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "dependencies": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.1",
+    "matplotlib": "3.10.8",
+    "scipy": "1.17.1"
+  },
+  "elapsed_seconds": 5.545131874998333
+}

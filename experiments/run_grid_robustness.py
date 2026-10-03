@@ -1,13 +1,8 @@
-"""
-Grid robustness check: resolution
-============================================================
-Vary the number of grid points G while keeping the geometric ratio
-between consecutive points fixed.
+"""Numerical sensitivity of conditional transition optimization.
 
-Reports relative bias (%) and CV (%) for p_on, p_off, mu_emit, and mu.
-
-Usage:
-    python -m experiments.run_grid_robustness
+Keeps all empirical emission-size support points; varies optimizer stopping
+accuracy on the same 500 baseline datasets. The legacy output filename is
+retained to avoid changing Overleaf figure references.
 """
 from __future__ import annotations
 
@@ -40,7 +35,7 @@ from src import (
 
 N_REPS = 500
 
-RESOLUTION_G_VALUES = [5, 9, 15, 25, 41]
+OPTIMIZER_TOLERANCES = [1e-7, 1e-9, 1e-11, 1e-13]
 
 PARAMS = [
     ("p_on",    cfg.P_ON,    r"$p_{\mathrm{on}}$"),
@@ -55,76 +50,27 @@ COLORS = {
 }
 
 
-def run_one(tech_specs, rep, p_on_grid, p_off_grid):
-    mask_rng = np.random.default_rng(cfg.BASE_SEED + rep)
-    emit_rng = np.random.default_rng(cfg.BASE_SEED + rep + 100_000)
-
-    snap_mask, cont_mask = generate_masks(
-        cfg.T, cfg.P_SNAP, cfg.P_CONT, cfg.T_CONT, mask_rng)
-
-    obs, _st, _sz, _eid = simulate_series(
-        T=cfg.T, p_on=cfg.P_ON, p_off=cfg.P_OFF,
-        size_mu=cfg.SIZE_MU, size_sigma=cfg.SIZE_SIGMA,
-        tech_specs=tech_specs,
-        snap_mask=snap_mask, cont_mask=cont_mask, rng=emit_rng)
-
-    if obs.n_total_detections() < 2:
-        return dict(p_on=np.nan, p_off=np.nan, mu_emit=np.nan, mu=np.nan)
-
-    res = loop_empirical(obs, tech_specs, cfg.T,
-                         max_gap=cfg.MAX_GAP,
-                         decision_threshold=cfg.DECISION_THRESHOLD,
-                         p_on_grid=p_on_grid, p_off_grid=p_off_grid,
-                         p_off_nudge=cfg.NUDGE)
-
-    return dict(p_on=res["p_on"], p_off=res["p_off"],
-                mu_emit=res["mu_emit"], mu=res["mean"])
+def _run_one_task(task):
+    specs,rep,ftol=task
+    sm,cm=generate_masks(cfg.T,cfg.P_SNAP,cfg.P_CONT,cfg.T_CONT,np.random.default_rng(cfg.BASE_SEED+rep))
+    obs,*_=simulate_series(cfg.T,cfg.P_ON,cfg.P_OFF,cfg.SIZE_MU,cfg.SIZE_SIGMA,specs,sm,cm,
+                          np.random.default_rng(cfg.BASE_SEED+rep+100_000))
+    res=loop_empirical(obs,specs,cfg.T, **cfg.MLE_OPTIONS,optimizer_tolerance=ftol)
+    return dict(p_on=res['p_on'],p_off=res['p_off'],mu_emit=res['mu_emit'],mu=res['mean'])
 
 
-def run_sweep(tech_specs, sweep_name, configs):
-    """Run a sweep and return a list of result dicts.
-
-    configs: list of (sweep_val, display_label, p_on_grid, p_off_grid)
-    """
-    records = []
-    for sweep_val, display, p_on_grid, p_off_grid in configs:
-        step = p_on_grid[1] / p_on_grid[0] if len(p_on_grid) > 1 else 0
-
-        print(f"\n{'=' * 62}")
-        print(f"  {display}")
-        print(f"  p_on grid:  [{p_on_grid[0]:.6f} ... {p_on_grid[-1]:.6f}]"
-              f"  ({len(p_on_grid)} pts, step={step:.3f}x)")
-        print(f"  p_off grid: [{p_off_grid[0]:.6f} ... {p_off_grid[-1]:.6f}]"
-              f"  ({len(p_off_grid)} pts)")
-        print(f"{'=' * 62}")
-
-        results = []
-        t0 = time.time()
-        for rep in range(N_REPS):
-            if (rep + 1) % 100 == 0:
-                el = time.time() - t0
-                eta = el / (rep + 1) * (N_REPS - rep - 1)
-                print(f"  rep {rep+1}/{N_REPS}  elapsed={el:.0f}s  "
-                      f"eta={eta:.0f}s", flush=True)
-            results.append(run_one(tech_specs, rep, p_on_grid, p_off_grid))
-
-        for key, true_val, _ in PARAMS:
-            arr = np.array([r[key] for r in results])
-            valid = arr[np.isfinite(arr)]
-            bias = float(np.mean(valid) - true_val)
-            var = float(np.var(valid, ddof=0))
-            rel_bias = bias / true_val * 100
-            cv = np.sqrt(var) / true_val * 100
-            records.append(dict(
-                sweep=sweep_name, sweep_val=sweep_val,
-                param=key, true=true_val,
-                mean=float(np.mean(valid)), bias=bias,
-                rel_bias_pct=rel_bias,
-                variance=var, cv_pct=cv,
-                n_valid=len(valid),
-            ))
-            print(f"  {key:>8s}: mean={np.mean(valid):.4f}  "
-                  f"rel_bias={rel_bias:+.2f}%  CV={cv:.1f}%")
+def run_sweep(specs):
+    from experiments.parallel import ordered_map
+    records=[]
+    for ftol in OPTIMIZER_TOLERANCES:
+        results=list(ordered_map(_run_one_task,[(specs,rep,ftol) for rep in range(N_REPS)]))
+        for key,true,_ in PARAMS:
+            x=np.array([r[key] for r in results]);x=x[np.isfinite(x)]
+            records.append(dict(sweep='resolution',sweep_val=-np.log10(ftol),
+                optimizer_ftol=ftol,param=key,true=true,mean=x.mean(),bias=x.mean()-true,
+                rel_bias_pct=100*(x.mean()-true)/true,variance=x.var(),
+                cv_pct=100*x.std()/true,n_valid=len(x)))
+        print('Optimizer tolerance',ftol,'complete',flush=True)
     return records
 
 
@@ -148,7 +94,7 @@ def make_figure(df, out_path):
     ax.plot(sub["sweep_val"], sub["rel_bias_pct"], "o-",
             color=c, markersize=8, markeredgecolor="white", lw=2)
     ax.axhline(0, color="gray", ls="--", lw=1)
-    ax.set_xlabel("Number of grid points $G$")
+    ax.set_xlabel(r"Optimizer tolerance $-\log_{10}(\mathrm{ftol})$")
     ax.set_ylabel("Relative bias (%)")
     ax.set_title(r"(a) Bias of $\hat{\mu}$", fontweight="bold")
     ax.set_xticks(sorted(sub["sweep_val"].unique()))
@@ -159,7 +105,7 @@ def make_figure(df, out_path):
     ax = axes[1]
     ax.plot(sub["sweep_val"], sub["cv_pct"], "o-",
             color=c, markersize=8, markeredgecolor="white", lw=2)
-    ax.set_xlabel("Number of grid points $G$")
+    ax.set_xlabel(r"Optimizer tolerance $-\log_{10}(\mathrm{ftol})$")
     ax.set_ylabel("CV (%)")
     ax.set_title(r"(b) CV of $\hat{\mu}$", fontweight="bold")
     ax.set_xticks(sorted(sub["sweep_val"].unique()))
@@ -203,26 +149,11 @@ def main():
         cont_fp_scale=cfg.CONT_FP_SCALE,
     )
 
-    all_records = []
-
-    print("\n" + "=" * 62)
-    print(f"  Resolution Sweep (fixed step r={cfg.P_GEOM_FACTOR})")
-    print("=" * 62)
-
-    configs_res = []
-    for G in RESOLUTION_G_VALUES:
-        p_on_grid = cfg.build_geom_grid(cfg.P_ON, cfg.P_GEOM_FACTOR, G)
-        p_off_grid = cfg.build_geom_grid(cfg.P_OFF, cfg.P_GEOM_FACTOR, G)
-        step = p_on_grid[1] / p_on_grid[0] if G > 1 else 1.0
-        spread = cfg.P_GEOM_FACTOR ** ((G - 1) / 2)
-        label = f"G={G} (step={step:.3f}x, spread={spread:.2f}x)"
-        configs_res.append((G, label, p_on_grid, p_off_grid))
-
-    all_records.extend(run_sweep(tech_specs, "resolution", configs_res))
+    all_records = run_sweep(tech_specs)
 
     df = pd.DataFrame(all_records)
     out_csv = res_dir / "grid_robustness.csv"
-    df.to_csv(out_csv, index=False, float_format="%.6f")
+    df.to_csv(out_csv, index=False, float_format="%.12g")
     print(f"\nSaved: {out_csv}")
 
     out_fig = fig_dir / "figure_grid_robustness.pdf"
