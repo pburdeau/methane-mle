@@ -1,0 +1,207 @@
+{
+  "method_version": "persistent-ipw-v1",
+  "nudge": 1.0,
+  "transition_bounds": [
+    1e-05,
+    0.999999
+  ],
+  "original_commit": "8906acd",
+  "experiments": [
+    {
+      "experiment": "baseline",
+      "settings": 1,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 12500
+    },
+    {
+      "experiment": "sparse",
+      "settings": 1,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 12500
+    },
+    {
+      "experiment": "sweep_T",
+      "settings": 5,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 62500
+    },
+    {
+      "experiment": "sweep_theta_snap",
+      "settings": 10,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 125000
+    },
+    {
+      "experiment": "sweep_tau_emit",
+      "settings": 15,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 187500
+    },
+    {
+      "experiment": "sweep_p_cont",
+      "settings": 10,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 125000
+    },
+    {
+      "experiment": "sweep_T_cont",
+      "settings": 9,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 112500
+    },
+    {
+      "experiment": "sweep_psnap",
+      "settings": 9,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 112500
+    },
+    {
+      "experiment": "optimizer_tolerance",
+      "settings": 4,
+      "n_outer": 1,
+      "n_inner": 500,
+      "campaign_evaluations": 2000
+    },
+    {
+      "experiment": "linking_threshold",
+      "settings": 7,
+      "n_outer": 5,
+      "n_inner": 500,
+      "campaign_evaluations": 17500
+    },
+    {
+      "experiment": "calibration_misspecification",
+      "settings": 60,
+      "n_outer": 25,
+      "n_inner": 500,
+      "campaign_evaluations": 750000
+    }
+  ],
+  "total_campaign_evaluations": 1519500,
+  "note": "The optimizer-tolerance experiment reuses the same 500 datasets at four tolerances; campaign evaluations are not all distinct simulated datasets.",
+  "csv_files": [
+    {
+      "path": "data/baseline/results/data_parameters.csv",
+      "rows": 1,
+      "sha256": "4c8503ce2310047c6f9ff2d620f53159e81bc158d65129bf3b4da9015dd74489"
+    },
+    {
+      "path": "data/baseline/results/data_pod_curves.csv",
+      "rows": 500,
+      "sha256": "889c10207f70a589123ff1fa21be608aebb9bbcb157e62b5a84a9d4376882d0d"
+    },
+    {
+      "path": "data/baseline/results/data_realization_rep1581.csv",
+      "rows": 1000,
+      "sha256": "e69954d1cc76ae5c0f5e1ef444759f409643b414741f4ec1b42a758889d470ba"
+    },
+    {
+      "path": "data/baseline/results/data_realization_rep3973.csv",
+      "rows": 1000,
+      "sha256": "96d49754a6d8ae6409003a366e2844607c73360ed12f12d4ef8217c2683d432c"
+    },
+    {
+      "path": "data/baseline/results/data_realization_rep4215.csv",
+      "rows": 1000,
+      "sha256": "dde548e59fecc9386732baefe3ef02b38ca7fcfd9839da3ac9ba330b2fcc3b1b"
+    },
+    {
+      "path": "data/baseline/results/data_replications.csv",
+      "rows": 12500,
+      "sha256": "3ab98a2c25222956f10dfc103577b45eb383698b494de615eaa19529c6146913"
+    },
+    {
+      "path": "data/baseline/results/data_summary.csv",
+      "rows": 10,
+      "sha256": "8ac055a6ae33211a4f8f83f056ef12f781495e9cfac3bfa2c6925f094a8b91cb"
+    },
+    {
+      "path": "data/baseline/results/grid_robustness.csv",
+      "rows": 16,
+      "sha256": "551b5d8b6916b9c6d6d9b1c0bb4c1f2f176cae19a5f2033fecb6b3b2ec6a6f90"
+    },
+    {
+      "path": "data/baseline/results/misspec_onebyone.csv",
+      "rows": 60,
+      "sha256": "eea1ef0dbf36195d0f64cddec24874ee0d95a21e9b747cd3d2093fcf4e5660f3"
+    },
+    {
+      "path": "data/baseline/results/sweep_psnap.csv",
+      "rows": 36,
+      "sha256": "2de9124f1010b63f056b73061be9a50bda07fd4d778135394d26c9dae31e979b"
+    },
+    {
+      "path": "data/baseline/results/threshold_sweep.csv",
+      "rows": 7,
+      "sha256": "e09b88e9611ba99ff23ef1e691039e1e49d33d4f753dc7b6af834c40c3bb5f67"
+    },
+    {
+      "path": "data/baseline/results_linear/sweep_T_cont_summary.csv",
+      "rows": 36,
+      "sha256": "41d9b16d3d8a622ae11bcaa1748abd4f404223b0ebfb3da8106664455d999880"
+    },
+    {
+      "path": "data/baseline/results_linear/sweep_T_summary.csv",
+      "rows": 20,
+      "sha256": "d209aa48ede3b5085ec86cf326e174468d1a36393656839a3c2b4568a08f1700"
+    },
+    {
+      "path": "data/baseline/results_linear/sweep_p_cont_summary.csv",
+      "rows": 40,
+      "sha256": "9c02f8786ddc455c670c57440d2f82c9b93768bef05daebb2eb004a28bfccd33"
+    },
+    {
+      "path": "data/baseline/results_linear/sweep_tau_emit_summary.csv",
+      "rows": 60,
+      "sha256": "3571907a50a4fb0ef85711c05e37b5a731b9c90dff963e2a6388cd0aebde3539"
+    },
+    {
+      "path": "data/baseline/results_linear/sweep_theta_snap_summary.csv",
+      "rows": 40,
+      "sha256": "9b14826b18f6b6a7661878f7ca7bb8d8433394dc5964005f585e3d2521b93ebb"
+    },
+    {
+      "path": "data/sparse/results/data_parameters.csv",
+      "rows": 1,
+      "sha256": "7f3483e031ae9c924f5ebf09c7b9a11a3e71938c0e8cef1df3f817da8ac54517"
+    },
+    {
+      "path": "data/sparse/results/data_pod_curves.csv",
+      "rows": 500,
+      "sha256": "bf40495a96a7b9a962c62172e7b9fb9408213f087c68905737842b7528e182ab"
+    },
+    {
+      "path": "data/sparse/results/data_realization_rep1581.csv",
+      "rows": 1000,
+      "sha256": "59dfb3bab26afcc00acc339f3cd4de046d33eb946a86fb3440915635ce459e40"
+    },
+    {
+      "path": "data/sparse/results/data_realization_rep1835.csv",
+      "rows": 1000,
+      "sha256": "8cc6e16e0724993d9fb352b599a2b4070b2750dacdba621e343d1e2b1bb86b29"
+    },
+    {
+      "path": "data/sparse/results/data_realization_rep819.csv",
+      "rows": 1000,
+      "sha256": "1226898cea2829950f68951352be6b8705653453e3e443a698121fe40be98183"
+    },
+    {
+      "path": "data/sparse/results/data_replications.csv",
+      "rows": 12500,
+      "sha256": "6a8d3b3180fe833fb4977bff9de5b88130d366630f9269b6bee56e946f08f460"
+    },
+    {
+      "path": "data/sparse/results/data_summary.csv",
+      "rows": 10,
+      "sha256": "b7d246cf83e27aac02e1521bec677537d17e63ec9b322d584ede8eb48fe80544"
+    }
+  ]
+}

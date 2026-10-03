@@ -1,160 +1,123 @@
 # Methane MLE paper reproduction
 
-Code, saved simulation results, and Overleaf sources for **Maximum likelihood
+Code, synthetic simulation results, and manuscript sources for **Maximum likelihood
 estimation improves the precision of methane emission quantification from
 multi-tiered monitoring**, by Philippine Burdeau, Evan Sherwin, and Adam Brandt.
 
-This package uses the October 2026 manuscript copies inside
-`mle_methane_clean_simultaneous`. The older top-level Overleaf exports are
-preserved under `provenance/top_level_overleaf` for comparison. The original
-workspace has not been changed.
+This revision removes the empirical likelihood nudge while retaining plume linking,
+measurement combination, event-level inverse-probability weighting (IPW), and the
+outer iteration. Step 3 uses OFF plus persistent ON-size states, conditional on the
+weighted empirical event-size distribution. A size persists until its event ends;
+a new event draws a new size. The forward recursion is exact conditional on this
+finite distribution. Estimating it from linked noisy measurements is a plug-in
+approximation: the procedure is neither joint maximum likelihood nor exact EM,
+and standard MLE theory does not establish its unbiasedness or efficiency.
 
 ## Contents
 
-- `src/`: simulator, observation model, MLE, and comparison estimators.
-- `config.py`: baseline parameters and the transition-probability grid.
-- `experiments/`: the experiments and plotting code needed by the manuscripts.
-- `tests/`: the original 17 model tests; no pytest dependency is required.
-- `data/baseline/`: 12,500 baseline replications, example realizations, and saved
-  parameter sweeps, grid robustness, threshold sensitivity, and misspecification.
-- `data/sparse/`: 12,500 very-sparse-cadence replications and their parameters.
-- `paper/` and `si/`: manuscript sources, bibliographies, required template files,
-  and only the figures actually referenced by the current manuscripts.
-- `reproduce.py`: supported reproduction entry point.
-- `provenance/`: source checksums, figure provenance, validation, and repairs.
+- `src/`: simulator, observation model, persistent-size estimator and comparators.
+- `config.py`: scenario parameters and fixed numerical settings.
+- `experiments/`: manuscript experiments and plotting code.
+- `tests/`: 17 original model checks and six persistent-likelihood checks.
+- `data/baseline/` and `data/sparse/`: revised saved results, including 12,500
+  campaigns per scenario and the manuscript sensitivity experiments.
+- `paper/` and `si/`: LaTeX sources, bibliographies and the 14 referenced figure PDFs.
+  The main paper's graphical model is drawn within its LaTeX source.
+- `reproduce.py`: reproduction entry point.
+- `provenance/`: original source records, current checksums and validation notes.
 
-All scientific data used here are synthetic. No external observational dataset,
-spreadsheet, notebook, API credential, or download is needed by the selected code.
+All study data are synthetic; no external data or credentials are needed.
+The previous implementation and results remain recoverable in Git history.
+Optional legacy estimator variants in `src/estimate_variants.py` are historical;
+they are not used by the revised manuscript experiments.
 
-## Setup
+## Setup and checks
 
-The verification environment was Python 3.14.5 with the versions pinned in
-`requirements.txt`. A TeX installation is only needed to compile the manuscripts.
+Verified with Python 3.14.5 and the pinned versions in `requirements.txt`:
 
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-```
-
-Run all commands below from this directory. Outputs go under `build/`, which is
-excluded from version control. The supplied data and reference figures are kept
-unchanged.
-
-## Check the package and estimator
-
-```sh
-python reproduce.py check
+python reproduce.py check --strict
 python reproduce.py tests
 python reproduce.py replay
 python reproduce.py statistics
 ```
 
-`check` validates package hashes, every manuscript figure reference, bibliography
-keys, and both 12,500-row replication files. It reports unresolved publication
-items as warnings; use `--strict` to treat those as failures.
+The runner attempts to build the optional C acceleration with the system C
+compiler. If no compiler is available, the same recursion runs in NumPy, more
+slowly. No platform-specific compiled library is committed. Tests compare the
+forward recursion against independently constructed dense transition matrices,
+including irregular gaps, and check the original IPW recursion and no-nudge rule.
+Replay checks selected campaigns across both scenarios, including zero detections.
+Rates allow 0.005 kg/h absolute tolerance and transitions 0.00001, with relative
+tolerance 0.00001, to accommodate numerical optimizer and backend differences.
 
-`tests` runs the original 17 model tests. `replay` reruns 12 selected simulations
-across the two scenarios, including examples with undefined MLEs, and compares ten
-estimator outputs with the archived values at absolute and relative tolerance
-`1e-10`. This is a numerical consistency check, not a rerun of the entire study.
+`check` validates current file hashes, figure references, bibliography keys, and
+both replication counts and method-version records. `statistics` reports the
+original 25-by-500 batch design, Monte Carlo standard errors, paired comparisons,
+parameter summaries, numerical flags and campaign planning calculations.
+Outputs go under `build/` and do not overwrite the bundled reference data.
 
-`statistics` computes nested-batch bias, variance, paired comparisons, and sample
-size requirements from both archived datasets, saving `build/statistics.json`.
-
-## Rebuild figures from the saved results
+## Figures and simulations
 
 ```sh
 python reproduce.py figures
-```
-
-This reconstructs the 13 computational figures used in the paper and SI, and
-copies the externally authored method schematic. Example realization plots are
-regenerated from their recorded seeds and parameters. Final manuscript assets
-are in `build/figures/`; auxiliary plots may also be produced.
-
-The publication reference PDFs remain in `paper/figures` and `si/figures`.
-Rebuilt PDFs can differ in metadata, fonts, and rendering across machines; do not
-expect byte-identical PDFs. The original scientific plotting conventions are
-preserved, including finite-MLE filtering in the baseline violin routine.
-
-## Rerun the simulations
-
-```sh
-python reproduce.py simulations
-```
-
-This runs every experiment required by the current manuscript figures, using
-fresh output directories under `build/simulations/`. It can take many hours.
-It does not reuse the bundled CSVs or overwrite them. Each selected experiment
-starts again when invoked; the runner is not a checkpoint/resume system.
-
-To rerun one experiment:
-
-```sh
-python reproduce.py simulations --only baseline
-python reproduce.py simulations --only sparse
-python reproduce.py simulations --only sweep_T
-```
-
-Other experiment names are `sweep_theta_snap`, `sweep_tau_emit`, `sweep_p_cont`,
-`sweep_T_cont`, `sweep_psnap`, `grid_robustness`, `threshold_sweep`, and `misspec`.
-The last experiment includes the original eta grid and its 0.6, 0.7, 0.8 extension
-with the original separate seed offset. The snapshot sweep uses T=1000, the value
-in the archived manuscript dataset. Grid robustness uses 500 replications, and
-linking-threshold sensitivity uses 5 x 500, as defined in the original scripts;
-baseline, sparse, other sweeps, and misspecification use 25 x 500.
-
-After all simulations finish, rebuild figures from the fresh data:
-
-```sh
+METHANE_WORKERS=6 python reproduce.py simulations
 python reproduce.py figures --data-root build/simulations
+python reproduce.py statistics --data-root build/simulations
 ```
 
-The baseline seed is 2602. Baseline likelihood nudge is 1.015; the sparse scenario
-uses 1.00, p_snap=0.0015, p_cont=0.015, and continuous POD threshold 15 kg/h.
-The archived `data_parameters.csv` files omit nudge; the sparse value is confirmed
-by its original run log and SI text. The baseline value is supported by the
-run-directory name and current configuration, and was verified by numerical
-replay. Nudge is explicitly set by the reproduction runner.
+Worker count defaults to one; ordered tasks and per-campaign seeds make the
+scientific draws independent of worker count. A full rerun can take several hours.
+Each requested experiment starts again; the runner does not resume checkpoints.
+For one experiment, use `python reproduce.py simulations --only baseline`.
+Other names: `sparse`, `sweep_T`, `sweep_theta_snap`, `sweep_tau_emit`, `sweep_p_cont`,
+`sweep_T_cont`, `sweep_psnap`, `grid_robustness`, `threshold_sweep`, `misspec`.
 
-The transition grids are centered on the generating transition probabilities,
-as in the original experiments. This reproduces the study's simulation setup;
-application to real monitoring data would need a separately chosen search domain.
-MLE outputs with insufficient detections remain missing, matching the archived
-code; the baseline has 12,490 valid MLEs and the sparse scenario 12,471.
+The baseline seed is 2602. All scenarios use a unit nudge argument; a nonunit
+argument raises an error. Both transition probabilities are optimized over the
+fixed domain [0.00001, 0.999999], independent of generating truth. The first
+iteration uses fixed starting values and a fixed coarse search; later iterations
+start at the preceding estimate. The outer iteration stops at transition changes
+below 0.00001 and mean changes below 0.0001 kg/h, or after 30 iterations. Numerical
+flags are retained; finite estimates are not removed because of those flags.
+Campaigns with observations but zero detections contribute a zero mean estimate,
+with missing component estimates; entirely unobserved campaigns remain missing.
+The `has_detections` flag records availability of detected data; it does not
+assert formal statistical identifiability.
+
+Baseline, sparse and most sweeps use 25 batches of 500 campaigns per setting.
+Linking-threshold sensitivity uses five batches of 500. Numerical accuracy uses
+four optimizer tolerances on the same 500 datasets, retaining all empirical size
+support points; its historical filename is `grid_robustness.csv`. Misspecification
+uses the original eta grid and separately seeded 0.6, 0.7 and 0.8 extension for
+all six sensor parameters. The snapshot sweep uses campaign length 1000.
+
+The sparse scenario uses p_snap=0.0015, p_cont=0.015 and continuous POD threshold
+15 kg/h. Figure reconstruction regenerates 13 computational assets and copies
+the externally authored schematic. PDF bytes and rendering can vary by platform.
+Confidence bands describe Monte Carlo performance, not uncertainty for an
+individual monitoring record. Campaign counts are normal-approximation planning
+values rounded upward and assume that bias is negligible at the target precision.
 
 ## Compile the paper and SI
 
-A complete TeX distribution with `latexmk`, `pdflatex`, and BibTeX is needed:
+Use Overleaf, latexmk with a TeX distribution, or Tectonic:
 
 ```sh
 python reproduce.py manuscripts
+python reproduce.py manuscripts --regenerated
 ```
 
 The runner stages both projects under `build/manuscripts`, compiles the SI first
-to resolve external references, and writes `build/paper.pdf` and `build/si.pdf`.
-Use `--regenerated` to compile with the rebuilt figures instead of reference PDFs.
+for external references, and writes `build/paper.pdf` and `build/si.pdf`.
+For Overleaf upload both `paper/` and `si/` in one project and compile `si/main.tex`
+then `paper/main.tex`. A separate combined upload ZIP has `main.tex` and `si.tex`
+at the root, shared figures, and cache-safe compilation settings.
 
-For Overleaf, use a single project containing both the `paper/` and `si/` folders.
-Compile `si/main.tex` first and then `paper/main.tex`. Alternatively, upload each
-folder separately and copy the SI's compiled `main.aux` into the paper project as
-`SI.aux`, replacing `\externaldocument{../si/main}` with `\externaldocument{SI}`.
-
-## Verification and remaining items
-
-See `provenance/VALIDATION.md` for observed results and limitations. Figure
-reconstruction, model tests, and selected numerical replay have been verified.
-The full simulation suite was not rerun, and manuscript compilation is unverified
-because this machine does not have a TeX compiler.
-
-The current paper cites `Reuland2026` twice, but its bibliography has no such
-entry. The intended bibliographic record must be supplied before publication.
-The baseline unbiasedness p-value in the paper (0.40) differs from the archived
-nested-batch calculation (0.752849); the manuscript text is preserved for review.
-The method schematic is available as its original PDF; no editable source was
-found in this workspace.
-
-The GitHub repository has not been created. A license should be selected by the
-authors before public release. No license or publication identifier has been
-invented for this package.
+See `provenance/VALIDATION.md` for measured results and verification details.
+The source manifest preserves the original assembly record; the package manifest
+checks the current revision. The GitHub repository is public at
+https://github.com/pburdeau/methane-mle. The authors still need to choose a license.

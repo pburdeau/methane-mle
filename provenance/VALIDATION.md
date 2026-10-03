@@ -1,72 +1,108 @@
-# Validation on October 2, 2026
+# Validation of persistent-size IPW revision
 
-## Verified
+The previous nudge implementation remains in Git history at `8906acd`.
+Its original validation records are in `previous_validation/`; they describe
+that earlier method and must not be treated as checks of this revision.
+The current scientific version is `persistent-ipw-v1`.
 
-- Located all 14 figures referenced by the current paper and SI. Exact source
-  PDF hashes match the baseline revision experiment directory for 13 assets and
-  the very-sparse experiment directory for its comparison figure.
-- The curated simulator, estimator, configuration, and model tests match their
-  original source files. All 87 collected original files remain unchanged.
-- All 17 existing model tests pass with Python 3.14.5, NumPy 2.4.6, pandas 3.0.1,
-  Matplotlib 3.10.8, and SciPy 1.17.1.
-- Twelve selected simulations from the two 12,500-row datasets reproduce all ten
-  checked estimator fields at absolute/relative tolerance `1e-10`, with matching
-  missing values. Selected replication IDs are 0, 499, 500, 1581, 12499, and the
-  first replication with an undefined MLE in each dataset.
-- The new figure runner completes successfully: 13 computational manuscript
-  figures are rebuilt and the manual schematic is copied. All required output
-  filenames match the current TeX sources.
-- Visual comparison against reference PDFs shows matching layout and content.
-  At 1200-pixel Poppler rendering, 13 of 14 assets match pixel-for-pixel; the
-  threshold figure differs by a negligible rendering amount (mean absolute
-  channel difference 0.000153 on a 0-255 scale). This includes the copied schematic.
-- Nested-batch baseline variances are 18.3394898259 for MLE and 29.6350391871 for
-  POD-weighted, giving 38.1155202457% variance reduction. The sparse scenario gives
-  25.3239208076 and 31.9409403611, approximately 20.72% reduction. Exact results are
-  in `validation/statistics.json`.
+## Method and numerical verification
 
-## Items to resolve before publication
+All 17 original model tests and six new estimator checks pass. New checks compare
+the structured forward recursion with independently constructed dense matrix
+powers for multiple support sizes, irregular observation gaps, and transition
+probabilities whose sum exceeds one. They check within-event size dependence,
+NumPy/C agreement, the original backward IPW calculation, nudge rejection,
+numerical diagnostics, and zero-detection handling. A frozen fixture generated
+from the original implementation verifies unchanged plume assignments, combined
+rates, IPW weights, and weighted means at unit nudge.
 
-1. **Bibliography:** `Reuland2026` is cited twice in `paper/main.tex` and is absent
-   from `paper/references.bib`. No uncertain replacement entry was invented.
-2. **Baseline p-value:** the paper's introduction reports p=0.40 for the baseline
-   MLE bias. The archived baseline's 25 original batches give t=0.318516 and
-   p=0.752849. The sparse scenario gives p approximately 0.40, as stated in the SI.
-   Both baseline values imply failure to reject zero bias, so the headline
-   conclusion is unchanged, but the exact baseline value needs correction or an
-   explanation. Manuscript text has been preserved.
-3. **Editable diagram:** the methods schematic is included as the supplied PDF.
-   Its original editable drawing/source was not found. PDF inclusion and assembly
-   are reproducible; authoring that schematic from source is not yet reproducible.
-4. **Compilation:** manuscript compilation was attempted through the new runner;
-   it stopped with a clear message because `latexmk` is not installed. No compiled
-   paper or SI PDF is claimed as verified. The full Overleaf source projects and
-   compilation instructions are provided.
-5. **Full simulations:** the entire Monte Carlo suite has not been rerun. Existing
-   datasets, selected numerical replay, tests, and figure reconstruction were
-   checked. Fresh-run commands are supplied for all currently required experiments.
-6. **License:** the authors should select a code/data license before public release.
-   GitHub hosting and a publication DOI have not been created or assumed.
+Twelve selected baseline/sparse campaigns reproduce all ten checked estimator
+fields, including the first zero-detection campaign in each scenario. Numerical
+optimizer/backend tolerances are 0.005 kg/h for rates and 0.00001 for transitions,
+with relative tolerance 0.00001 and matching missing component values.
 
-## Statistical conventions preserved
+Every required experiment is rerun with the original seeds, designs, and sample
+counts. Baseline and sparse designs each contain 25 batches of 500 campaigns.
+Other counts and current CSV hashes are recorded in `analysis_manifest.json`.
+The numerical-accuracy experiment reuses the same 500 datasets at four optimizer
+tolerances; these are not four independent datasets. Fresh outputs are saved in
+`data/`, and all 13 computational figure assets are regenerated. The supplied
+external schematic is copied unchanged. The unused legacy joint-perturbation CSV
+is omitted; that original file remains in Git history.
 
-The original violin routine receives finite-filtered MLE arrays and subsequently
-repartitions them for some plotted batch statistics. Its supplied `outer_stats`
-still uses the original unfiltered batch boundaries for signed-bias tests. This
-behavior is preserved to reproduce the reference figures. The separate
-`statistics` command uses original row/batch boundaries for every method, so
-minor differences in batch variance and paired-test results are expected.
+The optimizer domain is fixed at [0.00001, 0.999999] for both transitions,
+independent of simulation truth. The objective is the persistent-size detection
+likelihood conditional on the full weighted empirical rate law. Nonunit nudge
+arguments raise an error. Linking, measurement combination, event IPW and the
+outer iteration remain; the law estimated from linked noisy rates is still a
+plug-in approximation, not joint MLE or exact EM. These checks do not prove
+unbiasedness, consistency, efficiency, or individual-record interval coverage.
 
-The figure rounds campaign requirements to the nearest integer (e.g. 455 and
-70), while a strict minimum sample requirement uses the ceiling (456 and 71 in
-those examples). Both rounded and ceiling values, plus unrounded values, are
-recorded in the statistics output. This is a rounding convention, not a missing
-input or failed reproduction.
+## Measured results
 
-## Evidence files
+Under baseline monitoring, MLE mean bias is +0.0766 kg/h on a true mean of
+10 kg/h (Monte Carlo SE 0.0381; one-sample t=2.013, p=0.0555). Its 95% Student-t
+Monte Carlo interval is approximately [-0.002, 0.155] kg/h. Non-rejection of zero
+bias is not proof of unbiasedness. Average within-batch variance is 19.5831 for
+MLE and 29.6350 for POD weighting, a 33.9192% reduction. Ungrouped variance is
+20.6412, so the grouped procedure improves by 5.1% relative to that comparator.
+The comparator changes event linking, averaging, event-level IPW and iteration
+together; it does not isolate linking alone.
 
-`validation/` contains the model-test log, selected-replay comparisons, nested
-statistics, figure completion record, environment records, and raster comparison
-results. Temporary rebuilt PDFs, PNGs, and full logs are in `build/` and are
-excluded from the future GitHub repository. Original file checksums are in
-`source_manifest.json`; final package checksums are in `package_manifest.json`.
+In the sparse design, MLE bias is +0.0436 kg/h (p=0.2869). Variances are 27.0083
+and 31.9409 for MLE and POD weighting, a 15.4429% reduction. Both scenarios retain
+all 12,500 mean estimates, including two baseline and 16 sparse zero-detection
+campaigns assigned zero. Component parameters remain missing for those records.
+Among records with detections, 57 baseline and 45 sparse campaigns reach the
+outer iteration limit; two and five have final optimizer flags. Two baseline and
+18 sparse estimates reach a transition boundary. Finite flagged estimates remain
+in the summaries. The mean baseline OFF-transition estimate is 0.05851 versus
+0.05 truth; residual component bias is reported in the manuscript.
+
+Baseline planning counts, rounded upward, are 836 versus 1265 campaigns at 3%
+precision, 301 versus 456 at 5%, and 76 versus 114 at 10%. These normal-approximation
+counts assume independent campaigns and negligible bias at the target precision.
+Their bands propagate batch variance percentiles, rather than confidence intervals
+for the average planning count. A paired before/after design additionally requires
+the covariance of repeated measurements.
+
+Misspecification MSE combines within-batch variance, between-batch variability,
+and squared overall bias. Its Monte Carlo standard error is calculated directly
+from batch mean squared errors. The POD reference is its measured MSE, rather
+than just its variance. Large-calibration-error comparisons are qualified by
+the broad Monte Carlo bands. Curves use the original 25 calibration draws per
+setting; finite simulation noise need not yield monotone sensitivity curves.
+
+## Manuscripts and submission artifacts
+
+The main paper and SI compile with Tectonic 0.16.9 using their local figures and
+bibliographies. Logs have no undefined citations/references, missing glyphs, or
+overfull boxes. The compiler emits package-encoding and PostScript crop-special
+warnings from the supplied OUP template; the rendered PDFs are checked separately.
+Switching one shared `output.aux` from main to SI and back succeeds. The SI loads
+lineno without enabling line numbers and hyperref to read the other document's
+cached commands. Imported SI labels have an `SI-` prefix; supplementary sections,
+equations, tables and figures use S numbering. The combined upload ZIP contains
+exactly two root TeX documents and the 14 referenced external PDF figure assets.
+
+The revised Word main manuscript has 37 rendered pages, six figures, two editable
+tables and 11 numbered native equations. Full source captions are retained,
+body text is justified, and line numbering is continuous after the title page.
+Every rendered page is visually checked, including mathematical displays and
+figure/caption placement. Existing funding, affiliations and author declarations
+are retained. The supplied Reuland 2025 reference is included, and the Conrad
+preprint title placeholder is completed from the publisher's record.
+
+## Evidence and environment
+
+`validation/` contains current test, replay, statistics, figure, compilation and
+cache-switch records. The generated Word document and combined Overleaf archive
+are provided separately in the parent workspace. `source_manifest.json` preserves
+the original collection record; `package_manifest.json` verifies this revision's
+files. Raw working outputs under `build/` and compiled native libraries are ignored.
+
+Verified with Python 3.14.5, NumPy 2.3.4, pandas 2.3.3, Matplotlib 3.10.7 and
+SciPy 1.16.2. The optional C accelerator implements the same recursion as NumPy;
+no platform-specific library is committed. PDF metadata/fonts and numerical
+optimizer output can vary across platforms. The authors should choose a license
+for the public code/data repository before the paper is submitted.

@@ -42,9 +42,16 @@ CONT_FP_SCALE = 4.0
 MAX_GAP = 3
 DECISION_THRESHOLD = 0.5   # Bayesian plume-linking threshold
 BASE_SEED = 2602
-NUDGE = 1.015              # p_off likelihood nudge for baseline p_snap=0.125
+NUDGE = 1.0                # Compatibility only: no likelihood adjustment.
+TRANSITION_BOUNDS = (1e-5, 1-1e-6)
+MAX_ITER = 30
+TRANSITION_TOL = 1e-5
+MEAN_TOL = 1e-4
+METHOD_VERSION = "persistent-ipw-v1"
+MLE_OPTIONS = dict(transition_bounds=TRANSITION_BOUNDS, max_iter=MAX_ITER,
+                   tol=TRANSITION_TOL, mean_tol=MEAN_TOL)
 
-# ── HMM grid search for p_on / p_off ────────────────────────────
+# ── Legacy grid helper, retained for explicit numerical diagnostics ────────────────────────────
 P_GRID_RES = 11            # Number of grid points (must be odd)
 P_GEOM_FACTOR = 1.2       # Geometric ratio between consecutive points
 

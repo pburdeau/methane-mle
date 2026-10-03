@@ -112,7 +112,9 @@ def main():
             ax.bar(uv, densities, width=widths, color=color, alpha=0.6,
                    edgecolor="none", linewidth=0, zorder=3, align="center")
         else:
-            ax.hist(arr_clean, bins=bins_per_panel[col], color=color,
+            hist_bins = (np.geomspace(arr_clean.min()*.98, min(arr_clean.max()*1.02,1.0),31)
+                         if col < 2 else bins_per_panel[col])
+            ax.hist(arr_clean, bins=hist_bins, color=color,
                     alpha=0.6, edgecolor="none", linewidth=0, density=True,
                     rwidth=1.0, zorder=3)
         lbl_true = "True" if col > 0 else "True value"
@@ -120,6 +122,8 @@ def main():
         ax.axvline(true, color="k", lw=1.5, ls="-", label=lbl_true)
         ax.axvline(float(np.mean(arr_clean)), color="k", lw=1.2, ls="--",
                    label=lbl_mean)
+        if col < 2:
+            ax.set_xscale("log")
         ax.set_xlabel(label + unit)
         if col == 0:
             ax.legend(framealpha=0.9, loc="upper left")
@@ -269,7 +273,9 @@ def main():
             ax.bar(uv, densities, width=widths, color=color, alpha=0.6,
                    edgecolor="none", linewidth=0, zorder=3, align="center")
         else:
-            ax.hist(arr_clean, bins=bins_per_panel[idx], color=color,
+            hist_bins = (np.geomspace(arr_clean.min()*.98, min(arr_clean.max()*1.02,1.0),31)
+                         if idx < 2 else bins_per_panel[idx])
+            ax.hist(arr_clean, bins=hist_bins, color=color,
                     alpha=0.6, edgecolor="none", linewidth=0, density=True,
                     rwidth=1.0, zorder=3)
         est_mean = float(np.mean(arr_clean))
@@ -280,6 +286,8 @@ def main():
         panel_label = chr(97 + idx)  # a, b, c, d
         ax.set_title(f"({panel_label})", loc="left", fontsize=9,
                      fontweight="bold")
+        if idx < 2:
+            ax.set_xscale("log")
         ax.set_xlabel(label + unit)
         ax.legend(framealpha=0.9, fontsize=5)
         ax.spines["top"].set_visible(False)
@@ -296,18 +304,6 @@ def main():
     print(f"Saved histograms: {hist_out}")
     print(f"Saved histograms: {hist_out.with_suffix('.png')}")
 
-    # ── Auto-copy to paper directories ────────────────────────
-    import shutil
-    paper_fig = PROJECT_ROOT / "mle_methane_paper" / "figures"
-    si_fig = PROJECT_ROOT / "Supplementary Methane MLE" / "figures"
-
-    if paper_fig.exists():
-        shutil.copy2(hist_out, paper_fig / "figure1_histograms.pdf")
-        print(f"  -> Copied to paper: figure1_histograms.pdf")
-
-    if si_fig.exists():
-        shutil.copy2(out, si_fig / "figure1_composite.pdf")
-        print(f"  -> Copied to SI: figure1_composite.pdf")
 
 
 if __name__ == "__main__":

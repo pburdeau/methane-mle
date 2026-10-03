@@ -1,0 +1,17 @@
+[
+  {
+    "document": "main_first",
+    "returncode": 0,
+    "errors": []
+  },
+  {
+    "document": "si_after_main",
+    "returncode": 0,
+    "errors": []
+  },
+  {
+    "document": "main_after_si",
+    "returncode": 0,
+    "errors": []
+  }
+]

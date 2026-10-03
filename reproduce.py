@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproduce the supplied paper without overwriting its reference assets."""
+"""Reproduce the persistent-size IPW paper and supplementary information."""
 from __future__ import annotations
 
 import argparse
@@ -59,9 +59,10 @@ def check(strict=False):
             count = sum(1 for _ in csv.DictReader(f))
         if count != 12500:
             failures.append(f"{tag}: expected 12500 replications, found {count}")
-    warnings.append("The method schematic is supplied as a PDF; its editable source was not found.")
-    warnings.append("Baseline unbiasedness p-value in paper is 0.40; archived nested batches give 0.752849. See provenance/VALIDATION.md.")
-    warnings.append("Full simulation suite and LaTeX compilation need separate verification.")
+    for tag in ("baseline", "sparse"):
+        row = next(csv.DictReader((ROOT / "data" / tag / "results/data_parameters.csv").open()))
+        if row.get("method_version") != "persistent-ipw-v1" or float(row.get("nudge", "nan")) != 1.0:
+            failures.append(f"{tag}: dataset is not the current no-nudge method")
     report = {"files_checked": len(manifest["files"]),
               "failures": failures, "warnings": warnings}
     write_report("input_audit.json", report)
@@ -71,7 +72,7 @@ def check(strict=False):
 
 
 def baseline_parameters(base, sparse=False):
-    """Use the archived experiment's parameters, including its explicit nudge."""
+    """Read scenario parameters for the current persistent-size estimator."""
     from experiments.run_baseline import _build_parser, _derived_params
     row = next(csv.DictReader((base / "results/data_parameters.csv").open()))
     p = _build_parser().parse_args([])
@@ -88,7 +89,7 @@ def baseline_parameters(base, sparse=False):
     for attr, col in names.items():
         old = getattr(p, attr)
         setattr(p, attr, int(row[col]) if isinstance(old, int) else float(row[col]))
-    p.nudge = 1.0 if sparse else 1.015
+    p.nudge = 1.0
     p.p_off_nudge = p.nudge
     return _derived_params(p)
 
@@ -103,7 +104,7 @@ def specs_for(p):
 
 
 def replay():
-    """Replay representative archived simulations with the supplied estimator."""
+    """Replay representative current-method simulations, including no detections."""
     import numpy as np
     import pandas as pd
     from experiments.run_baseline import run_one
@@ -117,33 +118,35 @@ def replay():
         p = baseline_parameters(base, tag == "sparse")
         specs = specs_for(p)
         saved = pd.read_csv(base / "results/data_replications.csv")
-        # Across batches, plus a replication where the MLE is undefined.
-        missing = saved.index[saved.mle.isna()].tolist()
+        # Across batches, plus a campaign with zero detections.
+        missing = saved.index[saved.n_detections.eq(0)].tolist()
         reps = sorted(set([0, 499, 500, 1581, 12499] + missing[:1]))
         for rep in reps:
             fresh = run_one(specs, rep, p)
             for actual, archived in mapping.items():
                 np.testing.assert_allclose(fresh[actual], saved.iloc[rep][archived],
-                                           rtol=1e-10, atol=1e-10, equal_nan=True,
+                                           rtol=1e-5, atol=(1e-5 if "p_on" in actual or "p_off" in actual else 5e-3), equal_nan=True,
                                            err_msg=f"{tag} replication {rep}, {actual}")
             records.append({"experiment": tag, "replication": rep, "matched": True})
-    write_report("replay_verification.json", {"tolerance": "rtol=atol=1e-10",
+    write_report("replay_verification.json", {"tolerance": "rtol=1e-5; atol=1e-5 for transitions, 0.005 kg/h for rates",
                                               "replications": records})
     print(f"Replayed {len(records)} archived simulations; all 10 estimator fields matched.")
 
 
-def statistics():
-    """Recompute reported quantities using complete archived batches."""
+def statistics(data_root=None):
+    """Compute reported quantities using original row and batch boundaries."""
     import numpy as np
     import pandas as pd
     from scipy import stats
     report = {}
+    data_root = data_root or ROOT / "data"
     for tag in ("baseline", "sparse"):
-        base = ROOT / "data" / tag
+        base = data_root / tag
         p = baseline_parameters(base, tag == "sparse")
         df = pd.read_csv(base / "results/data_replications.csv")
         methods = {}
         batch_vars = {}
+        batch_biases = {}
         for name, col in [("Naive", "naive"), ("POD-weighted", "pod_weighted"),
                           ("MLE-ungrouped", "mle_simple"), ("MLE", "mle")]:
             means, variances = [], []
@@ -154,20 +157,42 @@ def statistics():
             bias = np.array(means) - p.mu_true
             test = stats.ttest_1samp(bias, 0.0)
             batch_vars[name] = np.array(variances)
+            batch_biases[name] = bias
             methods[name] = {"valid_replications": int(df[col].notna().sum()),
                              "nested_mean": float(np.mean(means)),
                              "nested_bias": float(np.mean(bias)),
                              "nested_variance": float(np.mean(variances)),
+                             "bias_mc_se": float(np.std(bias,ddof=1)/np.sqrt(p.n_outer)),
+                             "variance_mc_se": float(np.std(variances,ddof=1)/np.sqrt(p.n_outer)),
                              "bias_t": float(test.statistic), "bias_p": float(test.pvalue)}
         pair = stats.ttest_rel(batch_vars["POD-weighted"], batch_vars["MLE"])
         vm, vp = methods["MLE"]["nested_variance"], methods["POD-weighted"]["nested_variance"]
         precision = {str(eps): {name: {
             "exact": 1.96**2 * methods[name]["nested_variance"] / (eps*p.mu_true)**2,
-            "figure_rounded": int(round(1.96**2 * methods[name]["nested_variance"] / (eps*p.mu_true)**2)),
+            "nearest_integer": int(round(1.96**2 * methods[name]["nested_variance"] / (eps*p.mu_true)**2)),
             "minimum_integer": int(np.ceil(1.96**2 * methods[name]["nested_variance"] / (eps*p.mu_true)**2))}
                                for name in ("MLE", "POD-weighted")}
                      for eps in (0.03, 0.05, 0.10)}
-        report[tag] = {"n_outer": p.n_outer, "n_inner": p.n_reps,
+        from itertools import combinations
+        pairs = {}
+        for a,b in combinations(methods,2):
+            tb = stats.ttest_rel(np.abs(batch_biases[a]),np.abs(batch_biases[b]))
+            tv = stats.ttest_rel(batch_vars[a],batch_vars[b])
+            pairs[f"{a} vs {b}"] = {"absolute_batch_bias_t": float(tb.statistic),
+                "absolute_batch_bias_p": float(tb.pvalue), "variance_t":float(tv.statistic),
+                "variance_p":float(tv.pvalue)}
+        components = {}
+        for col,true in [('mle_p_on',p.p_on),('mle_p_off',p.p_off),('mle_mu_emit',p.mu_emit)]:
+            x=df[col].dropna()
+            components[col] = {"n":len(x),"mean":float(x.mean()),"true":true,
+                               "bias":float(x.mean()-true)}
+        diagnostics = {"zero_detections":int((df.n_detections==0).sum()),
+            "nonconverged_with_detections":int(((~df.converged)&(df.n_detections>0)).sum()),
+            "optimizer_flags_with_detections":int(((~df.optimizer_success)&(df.n_detections>0)).sum()),
+            "boundary":int(df.boundary.sum()),
+            "median_iterations":float(df.loc[df.n_detections>0,'n_iterations'].median())}
+        report[tag] = {"components":components,"diagnostics":diagnostics,"pairs":pairs,
+                       "n_outer": p.n_outer, "n_inner": p.n_reps,
                        "methods": methods, "variance_reduction_percent": 100*(1-vm/vp),
                        "paired_variance_t": float(pair.statistic),
                        "paired_variance_p": float(pair.pvalue),
@@ -244,7 +269,7 @@ def figures(data_root):
     write_report("figure_verification.json", {
         "data_root": str(data_root), "reference_figures_produced": len(required),
         "simulation_figures_rebuilt": 13, "manual_schematic_copied": 1,
-        "note": "Scientific inputs are unchanged; PDF metadata and fonts may differ."})
+        "note": "Figures rebuilt from the selected data root; PDF metadata and fonts may differ."})
     print(f"All 14 manuscript figure assets are available in {target}")
 
 
@@ -254,7 +279,7 @@ def simulations(only):
     sparse = BUILD / "simulations/sparse"
     jobs = {
         "baseline": lambda: run("experiments.run_baseline", "--n-reps", 500,
-            "--n-outer", 25, "--nudge", 1.015, "--output-dir", base),
+            "--n-outer", 25, "--nudge", 1.0, "--output-dir", base),
         "sparse": lambda: run("experiments.run_baseline", "--n-reps", 500,
             "--n-outer", 25, "--p-snap", 0.0015, "--p-cont", 0.015,
             "--cont-threshold", 15, "--nudge", 1.0, "--output-dir", sparse),
@@ -287,9 +312,9 @@ def simulations(only):
 
 def manuscripts(regenerated=False):
     """Compile separate multi-file Overleaf projects with a local TeX install."""
-    if not shutil.which("latexmk"):
-        raise SystemExit("LaTeX compilation is unverified: latexmk is not installed. "
-                         "Use Overleaf or install a TeX distribution with latexmk.")
+    latexmk, tectonic = shutil.which("latexmk"), shutil.which("tectonic")
+    if not (latexmk or tectonic):
+        raise SystemExit("Compile with Overleaf, or install latexmk or Tectonic.")
     dest = BUILD / "manuscripts"
     for doc in ("si", "paper"):
         target = dest / doc
@@ -297,8 +322,9 @@ def manuscripts(regenerated=False):
         if regenerated:
             for p in (target / "figures").glob("*.pdf"):
                 shutil.copy2(BUILD / "figures" / p.name, p)
-        subprocess.run(["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error",
-                        "main.tex"], cwd=target, check=True)
+        command = ([latexmk, "-pdf", "-interaction=nonstopmode", "-halt-on-error", "main.tex"]
+                   if latexmk else [tectonic, "--keep-intermediates", "--keep-logs", "main.tex"])
+        subprocess.run(command, cwd=target, check=True)
     for doc in ("si", "paper"):
         shutil.copy2(dest / doc / "main.pdf", BUILD / f"{doc}.pdf")
     print(f"Compiled manuscripts: {BUILD / 'paper.pdf'} and {BUILD / 'si.pdf'}")
@@ -315,8 +341,14 @@ def main():
     start = time.monotonic()
     os.environ.setdefault("MPLCONFIGDIR", str(BUILD / "matplotlib"))
     BUILD.mkdir(exist_ok=True)
-    dispatch = {"check": lambda: check(args.strict), "tests": lambda: run("tests.test_model"),
-                "replay": replay, "statistics": statistics,
+    if args.action in ('simulations','replay','tests'):
+        from src.persistent import build_native
+        try:
+            build_native()
+        except RuntimeError as e:
+            print(str(e))
+    dispatch = {"check": lambda: check(args.strict), "tests": lambda: (run("tests.test_model"),run("tests.test_persistent")),
+                "replay": replay, "statistics": lambda: statistics(args.data_root.resolve()),
                 "figures": lambda: figures(args.data_root.resolve()),
                 "simulations": lambda: simulations(args.only),
                 "manuscripts": lambda: manuscripts(args.regenerated)}

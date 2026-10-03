@@ -30,6 +30,7 @@ import time
 from pathlib import Path
 
 import numpy as np
+from scipy.stats import t as student_t
 import pandas as pd
 
 import os
@@ -62,66 +63,8 @@ if hasattr(sys.stdout, "reconfigure"):
         pass
 
 
-def calibrate_nudge(tech_specs, P, n_pilot=300, seed_offset=999_000):
-    """Find the p_off nudge that minimises bias on mu via loop_empirical.
-
-    Pre-simulates n_pilot datasets, then runs loop_empirical at each
-    candidate nudge on the *same* datasets (paired comparison) and
-    picks the nudge whose mean(mu_hat) is closest to mu_true.
-    """
-    mu_true = P.mu_true
-    candidates = [0.98, 1.0, 1.02, 1.03, 1.04, 1.05, 1.06,
-                  1.07, 1.08, 1.10, 1.12, 1.15]
-    print(f"  Calibrating p_off nudge ({n_pilot} pilot sims "
-          f"x {len(candidates)} candidates, using loop_empirical) ...")
-
-    pilot_seed = P.seed + seed_offset
-    pilot_data = []
-    for rep in range(n_pilot):
-        mask_rng = np.random.default_rng(pilot_seed + rep)
-        emit_rng = np.random.default_rng(pilot_seed + rep + 100_000)
-        snap_mask, cont_mask = generate_masks(
-            P.T, P.p_snap, P.p_cont, P.T_cont, mask_rng)
-        obs, _st, _sz, _eid = simulate_series(
-            T=P.T, p_on=P.p_on, p_off=P.p_off,
-            size_mu=P.size_mu, size_sigma=P.size_sigma,
-            tech_specs=tech_specs,
-            snap_mask=snap_mask, cont_mask=cont_mask, rng=emit_rng)
-        if obs.n_total_detections() < 2:
-            continue
-        pilot_data.append(obs)
-
-    if len(pilot_data) < 30:
-        print(f"  WARNING: only {len(pilot_data)} valid pilot sims, "
-              f"using nudge=1.03")
-        return 1.03
-
-    best_nudge = 1.03
-    best_abs_bias = np.inf
-    print(f"  {'nudge':>6s}  {'mean(mu)':>9s}  {'bias':>8s}  {'rel':>6s}")
-    for nudge_val in candidates:
-        mu_ests = []
-        for obs in pilot_data:
-            res = loop_empirical(
-                obs, tech_specs, P.T, max_gap=P.max_gap,
-                decision_threshold=P.decision_threshold,
-                p_on_grid=P.p_on_grid, p_off_grid=P.p_off_grid,
-                p_off_nudge=nudge_val)
-            if np.isfinite(res["mean"]):
-                mu_ests.append(res["mean"])
-        if not mu_ests:
-            continue
-        mean_mu = float(np.mean(mu_ests))
-        bias = mean_mu - mu_true
-        print(f"  {nudge_val:6.2f}  {mean_mu:9.4f}  {bias:+8.4f}  "
-              f"{bias / mu_true * 100:+5.1f}%")
-        if abs(bias) < best_abs_bias:
-            best_abs_bias = abs(bias)
-            best_nudge = nudge_val
-
-    print(f"  => best nudge = {best_nudge:.2f} "
-          f"(|bias| = {best_abs_bias:.4f} kg/h)")
-    return float(best_nudge)
+def _run_one_task(task):
+    return run_one(*task)
 
 
 def run_one(tech_specs, rep: int, P):
@@ -150,9 +93,9 @@ def run_one(tech_specs, rep: int, P):
     n_cont_obs = int(np.sum(cont_mask))
     n_both_obs = int(np.sum(snap_mask & cont_mask))
 
-    nudge = getattr(P, "p_off_nudge", 1.03)
+    nudge = getattr(P, "p_off_nudge", 1.0)
 
-    ms_res = mle_simple(obs, tech_specs,
+    ms_res = mle_simple(obs, tech_specs, transition_bounds=cfg.TRANSITION_BOUNDS,
                         p_on_grid=P.p_on_grid, p_off_grid=P.p_off_grid,
                         p_off_nudge=nudge)
     ms_mean = ms_res["mean"]
@@ -160,16 +103,7 @@ def run_one(tech_specs, rep: int, P):
     ms_p_off = ms_res["p_off"]
     ms_mu_emit = ms_res["mu_emit"]
 
-    if n_det < 2:
-        return dict(true_mean=true_mean, naive=naive, pod=pod,
-                    mle_simple=ms_mean,
-                    ms_p_on=ms_p_on, ms_p_off=ms_p_off,
-                    ms_mu_emit=ms_mu_emit,
-                    mle=np.nan, p_on=np.nan, p_off=np.nan, mu_emit=np.nan,
-                    n_snap_obs=n_snap_obs, n_cont_obs=n_cont_obs,
-                    n_both_obs=n_both_obs)
-
-    res = loop_empirical(obs, tech_specs, P.T, max_gap=P.max_gap,
+    res = loop_empirical(obs, tech_specs, P.T, **cfg.MLE_OPTIONS, max_gap=P.max_gap,
                          decision_threshold=P.decision_threshold,
                          p_on_grid=P.p_on_grid, p_off_grid=P.p_off_grid,
                          p_off_nudge=nudge)
@@ -179,7 +113,11 @@ def run_one(tech_specs, rep: int, P):
     pi_hat = p_on_hat / (p_on_hat + p_off_hat)
     mu_emit_hat = mu_hat / pi_hat if pi_hat > 1e-10 else np.nan
 
-    return dict(true_mean=true_mean, naive=naive, pod=pod,
+    return dict(n_detections=n_det, converged=res['converged'],
+                n_iterations=res['n_iterations'], optimizer_success=res['optimizer_success'],
+                has_detections=res['has_detections'], boundary=res['boundary'],
+                ms_optimizer_success=ms_res['optimizer_success'],
+                true_mean=true_mean, naive=naive, pod=pod,
                 mle_simple=ms_mean,
                 ms_p_on=ms_p_on, ms_p_off=ms_p_off,
                 ms_mu_emit=ms_mu_emit,
@@ -301,7 +239,7 @@ def figure_violin(naive_arr, pod_arr, mle_simple_arr,
             biases = st["bias_arr"]
             vars_arr = st["var_arr"]
             n_o = len(biases)
-            z = 1.96
+            z = float(student_t.ppf(.975, n_o-1))
             bias_mean = np.mean(biases)
             bias_se = np.std(biases, ddof=1) / np.sqrt(n_o)
             var_mean = np.mean(vars_arr)
@@ -405,13 +343,13 @@ def figure_violin_v2(naive_arr, pod_arr, mle_simple_arr,
         ab_fin = ab[np.isfinite(ab)]
         n_b = len(ab_fin)
         bias_means.append(float(np.mean(ab_fin)))
-        bias_cis.append(1.96 * float(np.std(ab_fin, ddof=1)) / np.sqrt(n_b)
+        bias_cis.append(float(student_t.ppf(.975,n_b-1)) * float(np.std(ab_fin, ddof=1)) / np.sqrt(n_b)
                         if n_b > 1 else 0)
         vb = batch_var[name]
         vb_fin = vb[np.isfinite(vb)]
         n_v = len(vb_fin)
         var_means.append(float(np.mean(vb_fin)))
-        var_cis.append(1.96 * float(np.std(vb_fin, ddof=1)) / np.sqrt(n_v)
+        var_cis.append(float(student_t.ppf(.975,n_v-1)) * float(np.std(vb_fin, ddof=1)) / np.sqrt(n_v)
                        if n_v > 1 else 0)
 
     # ── Test 1: One-sample t-test for unbiasedness (per method) ──
@@ -484,7 +422,7 @@ def figure_violin_v2(naive_arr, pod_arr, mle_simple_arr,
         fin = arr[np.isfinite(arr)]
         n_sb = len(fin)
         signed_bias_means.append(float(np.mean(fin)))
-        signed_bias_cis.append(1.96 * float(np.std(fin, ddof=1))
+        signed_bias_cis.append(float(student_t.ppf(.975,n_sb-1)) * float(np.std(fin, ddof=1))
                                / np.sqrt(n_sb) if n_sb > 1 else 0)
 
     # ── Shared drawing helpers ──
@@ -571,8 +509,8 @@ def figure_violin_v2(naive_arr, pod_arr, mle_simple_arr,
                               ec="none", alpha=0.85))
         ax.set_xticks(positions)
         ax.set_xticklabels(names, rotation=25, ha="right")
-        ax.set_ylabel("|Mean Bias| (kg/h)")
-        ax.set_title(f"{label} |Mean Bias|", fontweight="bold")
+        ax.set_ylabel("Mean |Batch Bias| (kg/h)")
+        ax.set_title(f"{label} Mean |Batch Bias|", fontweight="bold")
         ax.set_ylim(0, None)
         _style_ax(ax)
         # ★ / ☆ brackets
@@ -727,13 +665,17 @@ def figure_params(p_on_v, p_off_v, me_v, mle_v, out: Path,
             ax.bar(uv, densities, width=widths, color=color, alpha=0.6,
                    edgecolor="none", linewidth=0, zorder=3, align="center")
         else:
-            ax.hist(arr_clean, bins=bins_per_panel[idx], color=color,
+            hist_bins = (np.geomspace(arr_clean.min()*.98, min(arr_clean.max()*1.02,1.0),31)
+                         if idx < 2 else bins_per_panel[idx])
+            ax.hist(arr_clean, bins=hist_bins, color=color,
                     alpha=0.6, edgecolor="none", linewidth=0, density=True,
                     rwidth=1.0, zorder=3)
         ax.axvline(true_val, color="k", lw=1.5, ls="-", zorder=5,
                    label=f"True = {true_val:.4g}")
         ax.axvline(est_mean, color="k", lw=1.2, ls="--", zorder=5,
                    label=f"Mean = {est_mean:.4g}")
+        if idx < 2:
+            ax.set_xscale("log")
         ax.set_xlabel(label + unit)
         ax.legend(framealpha=0.9)
         ax.spines["top"].set_visible(False)
@@ -1054,7 +996,7 @@ def _build_parser():
     g.add_argument("--p-grid-res",    type=int,   default=cfg.P_GRID_RES)
     g.add_argument("--p-geom-factor", type=float, default=cfg.P_GEOM_FACTOR)
     g.add_argument("--nudge",         type=float, default=cfg.NUDGE,
-                   help="p_off likelihood nudge factor")
+                   help="Compatibility option; only 1.0 is accepted")
 
     g = p.add_argument_group("Output")
     g.add_argument("--output-dir", type=str, default=None)
@@ -1067,10 +1009,10 @@ def _derived_params(args):
     args.p_off = 1.0 / args.tau_emit
     args.p_on  = args.pi_on * args.p_off / (1.0 - args.pi_on)
     args.mu_true = args.pi_on * args.mu_emit
-    args.p_on_grid = cfg.build_geom_grid(args.p_on, args.p_geom_factor,
-                                         args.p_grid_res)
-    args.p_off_grid = cfg.build_geom_grid(args.p_off, args.p_geom_factor,
-                                          args.p_grid_res)
+    args.p_on_grid = None
+    args.p_off_grid = None
+    if args.nudge != 1.0:
+        raise ValueError("The revised estimator requires nudge=1.0.")
     return args
 
 
@@ -1142,15 +1084,18 @@ def main():
             print(f"  MAIN EXPERIMENT  ({P.n_reps} reps)")
             print(f"{'=' * 62}")
 
+        from experiments.parallel import ordered_map
         batch_results = []
         t0 = time.time()
+        batch_tasks = [(tech_specs,rep,batch_P) for rep in range(P.n_reps)]
+        batch_iterator = ordered_map(_run_one_task,batch_tasks)
         for rep in range(P.n_reps):
             if (rep + 1) % max(P.n_reps // 10, 1) == 0:
                 el = time.time() - t0
                 eta = el / (rep + 1) * (P.n_reps - rep - 1)
                 print(f"  rep {rep+1:>4d}/{P.n_reps}  "
                       f"elapsed={el:.1f}s  eta={eta:.1f}s", flush=True)
-            batch_results.append(run_one(tech_specs, rep, batch_P))
+            batch_results.append(next(batch_iterator))
 
         all_results.extend(batch_results)
 
@@ -1256,7 +1201,7 @@ def main():
             st = outer_stats[key]
             b_arr, v_arr = st["bias_arr"], st["var_arr"]
             n_o = len(b_arr)
-            z = 1.96
+            z = float(student_t.ppf(.975, n_o-1))
             b_m, b_se = np.mean(b_arr), np.std(b_arr, ddof=1) / np.sqrt(n_o)
             v_m, v_se = np.mean(v_arr), np.std(v_arr, ddof=1) / np.sqrt(n_o)
             print(f"    {key:<20s}  bias={b_m:+.3f} +/- {z*b_se:.3f}  "
@@ -1314,6 +1259,8 @@ def main():
     print(f"{'=' * 62}")
 
     param_dict = {
+        "method_version": cfg.METHOD_VERSION, "nudge": 1.0,
+        "transition_lower": cfg.TRANSITION_BOUNDS[0], "transition_upper": cfg.TRANSITION_BOUNDS[1],
         "T": P.T, "pi_on": P.pi_on, "tau_emit": P.tau_emit,
         "p_on": P.p_on, "p_off": P.p_off,
         "mu_emit": P.mu_emit, "mu_true": P.mu_true,
@@ -1333,6 +1280,9 @@ def main():
 
     df_reps = pd.DataFrame({
         "rep": np.arange(n_total),
+        **{key: [r[key] for r in all_results] for key in
+           ('n_detections','converged','n_iterations','optimizer_success',
+            'has_detections','boundary','ms_optimizer_success')},
         "true_mean_empirical": true_mean_arr,
         "true_mean_theoretical": mu_true,
         "naive": naive_arr,

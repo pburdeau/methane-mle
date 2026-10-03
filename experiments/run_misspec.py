@@ -92,12 +92,21 @@ def _build_specs_from_dict(params: dict):
     )
 
 
+def _simulate_inner_task(task):
+    seed_base,rep,tech_specs_true,tech_specs_misspec=task
+    mask_rng=np.random.default_rng(seed_base+rep)
+    emit_rng=np.random.default_rng(seed_base+rep+500_000)
+    sm,cm=generate_masks(cfg.T,cfg.P_SNAP,cfg.P_CONT,cfg.T_CONT,mask_rng)
+    obs,*_=simulate_series(cfg.T,cfg.P_ON,cfg.P_OFF,cfg.SIZE_MU,cfg.SIZE_SIGMA,
+                          tech_specs_true,sm,cm,emit_rng)
+    return (_run_inner(obs,tech_specs_misspec,None,None),
+            pod_weighted_baseline(obs,tech_specs_true))
+
+
 def _run_inner(obs, tech_specs_misspec, p_on_grid, p_off_grid):
     """Run MLE with misspecified sensor parameters on pre-simulated data."""
-    if obs.n_total_detections() < 2:
-        return np.nan
     res = loop_empirical(
-        obs, tech_specs_misspec, cfg.T,
+        obs, tech_specs_misspec, cfg.T, **cfg.MLE_OPTIONS,
         max_gap=cfg.MAX_GAP,
         decision_threshold=cfg.DECISION_THRESHOLD,
         p_on_grid=p_on_grid, p_off_grid=p_off_grid,
@@ -121,8 +130,8 @@ def run_misspec(mode: str, n_inner: int, n_outer: int, csv_path: Path,
         eta_values = ETA_VALUES
 
     mu_true = cfg.P_ON / (cfg.P_ON + cfg.P_OFF) * cfg.MU_EMIT
-    p_on_grid = cfg.build_geom_grid(cfg.P_ON, cfg.P_GEOM_FACTOR, cfg.P_GRID_RES)
-    p_off_grid = cfg.build_geom_grid(cfg.P_OFF, cfg.P_GEOM_FACTOR, cfg.P_GRID_RES)
+    p_on_grid = None  # fixed-bound continuous optimization
+    p_off_grid = None
 
     tech_specs_true = _build_specs_from_dict(PARAM_TRUE)
 
@@ -148,6 +157,7 @@ def run_misspec(mode: str, n_inner: int, n_outer: int, csv_path: Path,
             within_vars = []
             between_means = []
             pod_vars = []
+            pod_mses = []
             t0 = time.time()
 
             for outer in range(n_outer):
@@ -171,25 +181,11 @@ def run_misspec(mode: str, n_inner: int, n_outer: int, csv_path: Path,
                 mu_mle_inner = []
                 mu_pod_inner = []
 
-                for inner in range(n_inner):
-                    rep = outer * n_inner + inner
-                    mask_rng = np.random.default_rng(seed_base + rep)
-                    emit_rng = np.random.default_rng(seed_base + rep + 500_000)
-
-                    snap_mask, cont_mask = generate_masks(
-                        cfg.T, cfg.P_SNAP, cfg.P_CONT, cfg.T_CONT, mask_rng)
-                    obs, _st, _sz, _eid = simulate_series(
-                        T=cfg.T, p_on=cfg.P_ON, p_off=cfg.P_OFF,
-                        size_mu=cfg.SIZE_MU, size_sigma=cfg.SIZE_SIGMA,
-                        tech_specs=tech_specs_true,
-                        snap_mask=snap_mask, cont_mask=cont_mask,
-                        rng=emit_rng)
-
-                    mu_hat = _run_inner(obs, tech_specs_misspec,
-                                       p_on_grid, p_off_grid)
+                from experiments.parallel import ordered_map
+                tasks = [(seed_base,outer*n_inner+inner,tech_specs_true,tech_specs_misspec)
+                         for inner in range(n_inner)]
+                for mu_hat,pod_hat in ordered_map(_simulate_inner_task,tasks):
                     mu_mle_inner.append(mu_hat)
-
-                    pod_hat = pod_weighted_baseline(obs, tech_specs_true)
                     mu_pod_inner.append(pod_hat)
 
                 arr = np.array(mu_mle_inner)
@@ -203,6 +199,8 @@ def run_misspec(mode: str, n_inner: int, n_outer: int, csv_path: Path,
 
                 pod_arr = np.array(mu_pod_inner)
                 pod_valid = pod_arr[np.isfinite(pod_arr)]
+                pod_mses.append(float(np.mean((pod_valid-mu_true)**2))
+                                if len(pod_valid) else np.nan)
                 pod_vars.append(float(np.var(pod_valid, ddof=0))
                                 if len(pod_valid) > 1 else np.nan)
 
@@ -247,7 +245,13 @@ def run_misspec(mode: str, n_inner: int, n_outer: int, csv_path: Path,
             else:
                 total_se = np.nan
 
+            mse_batches = wv_valid + (bm_valid-mu_true)**2
+            pod_mse_batches = np.array(pod_mses)
+            pod_mse_batches = pod_mse_batches[np.isfinite(pod_mse_batches)]
             records.append(dict(
+                mse_mc_se=float(np.std(mse_batches,ddof=1)/np.sqrt(len(mse_batches))),
+                pod_mse=float(np.mean(pod_mse_batches)),
+                pod_mse_se=float(np.std(pod_mse_batches,ddof=1)/np.sqrt(len(pod_mse_batches))),
                 perturb=perturb_label,
                 eta=eta,
                 within_var=E_within,
@@ -378,7 +382,8 @@ def _mse_with_se(df):
     """Append MSE and MSE_SE columns to a copy of df.
 
     MSE = bias^2 + total_var
-    SE(MSE) ~ sqrt( (2|bias| SE(bias))^2 + SE(total_var)^2 )
+    Revised runs use the SE of batch mean squared errors. Legacy records
+    fall back to a delta-method approximation for backward plotting support.
     """
     out = df.copy()
     out["bias_sq"] = out["bias"] ** 2
@@ -390,6 +395,11 @@ def _mse_with_se(df):
     out["bias_sq_se"] = 2.0 * out["bias"].abs() * bias_se
     tot_se = out["total_var_se"] if "total_var_se" in out.columns else 0.0
     out["mse_se"] = np.sqrt(out["bias_sq_se"] ** 2 + tot_se ** 2)
+    if "mse_mc_se" in out.columns:
+        out["mse_se"] = out["mse_mc_se"]
+    if "pod_mse" in out.columns:
+        # MSE plots use the directly measured POD MSE, rather than variance.
+        out["pod_var"],out["pod_var_se"] = out["pod_mse"],out["pod_mse_se"]
     return out
 
 
