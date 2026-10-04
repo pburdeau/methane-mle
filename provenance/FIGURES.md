@@ -1,4 +1,12 @@
-# Current manuscript figure provenance
+# Figure source provenance
+
+The entries below record the original figure collection. The current
+persistent-IPW figures are regenerated from the revised data. Figure colours
+are shared through `experiments/plot_style.py`: grey for Naive, orange for
+POD weighting, blue for MLE-ungrouped, and teal for MLE. The supplied vector
+schematic has matching teal annotations and a neutral background, with its
+text and geometry preserved. `validation/palette_review.json` records the
+palette and content checks. Figure 3 retains mean absolute batch bias.
 
 SHA-256 comparisons identified exact matches between every referenced manuscript
 PDF and the named original experiment directory. All paths below are relative to

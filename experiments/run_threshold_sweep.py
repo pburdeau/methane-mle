@@ -29,6 +29,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 from src import (
     build_baseline_specs,
     simulate_series,
@@ -189,18 +190,18 @@ def make_figure(df, out_fig):
     # Relative bias (%)
     b_pct = df["mu_bias"].values / mu_true_val * 100
     bse_pct = df["mu_bias_se"].values / mu_true_val * 100
-    ax1.plot(thrs, b_pct, "o-", color="#2ECC71", markersize=7,
+    ax1.plot(thrs, b_pct, "o-", color=ps.MLE, markersize=7,
              markeredgecolor="white", label=r"$\hat{\mu}$")
     ax1.fill_between(thrs, b_pct - z * bse_pct, b_pct + z * bse_pct,
-                     alpha=0.15, color="#2ECC71")
+                     alpha=0.15, color=ps.MLE)
 
     me_b_pct = df["mu_emit_bias"].values / mu_emit_true * 100
     me_bse_pct = df["mu_emit_bias_se"].values / mu_emit_true * 100
-    ax1.plot(thrs, me_b_pct, "s-", color="#9B59B6", markersize=7,
+    ax1.plot(thrs, me_b_pct, "s-", color=ps.EMISSION_SIZE, markersize=7,
              markeredgecolor="white", label=r"$\hat{\mu}_{\mathrm{emit}}$")
     ax1.fill_between(thrs, me_b_pct - z * me_bse_pct,
                      me_b_pct + z * me_bse_pct,
-                     alpha=0.15, color="#9B59B6")
+                     alpha=0.15, color=ps.EMISSION_SIZE)
 
     ax1.axhline(0, color="gray", ls="--", lw=1)
     ax1.axvline(0.5, color="gray", ls=":", lw=1, alpha=0.5)
@@ -218,9 +219,9 @@ def make_figure(df, out_fig):
     vse = df["mu_variance_se"].values
     cv_lo = np.sqrt(np.maximum(v - z * vse, 0)) / mu_true_val * 100
     cv_hi = np.sqrt(v + z * vse) / mu_true_val * 100
-    ax2.plot(thrs, cv_pct, "o-", color="#2ECC71", markersize=7,
+    ax2.plot(thrs, cv_pct, "o-", color=ps.MLE, markersize=7,
              markeredgecolor="white")
-    ax2.fill_between(thrs, cv_lo, cv_hi, alpha=0.15, color="#2ECC71")
+    ax2.fill_between(thrs, cv_lo, cv_hi, alpha=0.15, color=ps.MLE)
 
     ax2.axvline(0.5, color="gray", ls=":", lw=1, alpha=0.5)
     ax2.set_xlabel("Decision threshold")

@@ -46,6 +46,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 from src import (
     build_baseline_specs,
     simulate_series,
@@ -152,9 +153,9 @@ def figure_pod_curves(tech_specs, out: Path,
     pod_snap = tech_specs[0].pod.probability(e_grid)
     pod_cont = tech_specs[1].pod.probability(e_grid)
 
-    ax.plot(e_grid, pod_snap, color="#2C3E50", lw=2.2,
+    ax.plot(e_grid, pod_snap, color=ps.SNAPSHOT, lw=2.2,
             label=f"Snapshots ($\\theta$={st:.1f}, k={ss})")
-    ax.plot(e_grid, pod_cont, color="#E74C3C", lw=2.2, ls="--",
+    ax.plot(e_grid, pod_cont, color=ps.CONTINUOUS, lw=2.2, ls="--",
             label=f"Continuous ($\\theta$={ct:.2f}, k={cs})")
 
     ax.axhline(0.9, color="gray", ls=":", lw=1, alpha=0.6)
@@ -190,10 +191,10 @@ def figure_violin(naive_arr, pod_arr, mle_simple_arr,
         "legend.fontsize": 7,
     })
 
-    c_naive = "#D98880"
-    c_pod   = "#C39BD3"
-    c_ms    = "#85C1E9"
-    c_mle   = "#2ECC71"
+    c_naive = ps.NAIVE
+    c_pod   = ps.POD
+    c_ms    = ps.UNGROUPED
+    c_mle   = ps.MLE
 
     method_data = [
         ("Naive", naive_arr, c_naive),
@@ -219,7 +220,7 @@ def figure_violin(naive_arr, pod_arr, mle_simple_arr,
         ax1.vlines(i, q1, q3, color="k", linewidth=4, zorder=5)
         ax1.scatter(i, np.mean(d), color="white", s=20, zorder=6, edgecolor="k", linewidth=0.8)
 
-    ax1.axhline(mu_true, color="#7D3C98", ls="--", lw=1.5,
+    ax1.axhline(mu_true, color=ps.TRUTH, ls="--", lw=1.5,
                 label=f"True: {mu_true:.2f}", zorder=8)
     ax1.set_xticks(range(len(method_data)))
     ax1.set_xticklabels([n for n, _, _ in method_data])
@@ -285,10 +286,10 @@ def figure_violin_v2(naive_arr, pod_arr, mle_simple_arr,
         "legend.fontsize": 6.5,
     })
 
-    c_naive = "#D98880"
-    c_pod   = "#C39BD3"
-    c_ms    = "#85C1E9"
-    c_mle   = "#2ECC71"
+    c_naive = ps.NAIVE
+    c_pod   = ps.POD
+    c_ms    = ps.UNGROUPED
+    c_mle   = ps.MLE
 
     method_data = [
         ("Naive",         naive_arr,      c_naive),
@@ -486,7 +487,7 @@ def figure_violin_v2(naive_arr, pod_arr, mle_simple_arr,
                               ec="none", alpha=0.85))
         max_label_y = max(placed_y) + min_gap * 1.5
         ax.set_ylim(bottom=0, top=max(y_top, max_label_y))
-        ax.axhline(mu_true, color="#7D3C98", ls="--", lw=1.5,
+        ax.axhline(mu_true, color=ps.TRUTH, ls="--", lw=1.5,
                    label=f"True $\\mu$={mu_true:.1f}", zorder=8)
         ax.set_xticks(range(n_methods))
         ax.set_xticklabels(names, rotation=20, ha="right")
@@ -638,7 +639,7 @@ def figure_params(p_on_v, p_off_v, me_v, mle_v, out: Path,
         "legend.fontsize": 5,
     })
 
-    C_PARAMS = ["#B0B0B0", "#909090", "#C8C8C8", "#2ECC71"]
+    C_PARAMS = ps.PARAMETERS
 
     panels = [
         (r"$\hat{p}_{\mathrm{on}}$",  p_on_v,  true_p_on  or cfg.P_ON, C_PARAMS[0], ""),
@@ -782,10 +783,10 @@ def figure_realizations(tech_specs, P, out: Path, reps=None):
     if n == 1:
         axes = [axes]
 
-    c_on     = "#F9E79F"
-    c_snap   = "#2C3E50"
-    c_cont   = "#E74C3C"
-    c_true   = "#7D3C98"
+    c_on     = ps.EMISSION_BAND
+    c_snap   = ps.SNAPSHOT
+    c_cont   = ps.CONTINUOUS
+    c_true   = ps.TRUTH
 
     for panel_idx, (ax, rep) in enumerate(zip(axes, reps)):
         rng_m = np.random.default_rng(P.seed + rep)
@@ -892,11 +893,11 @@ def figure_size_distribution(P, out: Path):
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4), dpi=200)
 
-    ax1.fill_between(e_grid, pdf, alpha=0.25, color="#2C3E50")
-    ax1.plot(e_grid, pdf, color="#2C3E50", lw=2)
-    ax1.axvline(e_mean, color="#7D3C98", ls="--", lw=1.5,
+    ax1.fill_between(e_grid, pdf, alpha=0.25, color=ps.TOTAL_ERROR)
+    ax1.plot(e_grid, pdf, color=ps.TOTAL_ERROR, lw=2)
+    ax1.axvline(e_mean, color=ps.TRUTH, ls="--", lw=1.5,
                 label=f"Mean = {e_mean:.1f} kg/h")
-    ax1.axvline(e_median, color="#E67E22", ls=":", lw=1.5,
+    ax1.axvline(e_median, color=ps.EMISSION_SIZE, ls=":", lw=1.5,
                 label=f"Median = {e_median:.1f} kg/h")
     ax1.set_xlabel("Emission size when ON  [kg/h]")
     ax1.set_ylabel("Probability density")
@@ -914,18 +915,18 @@ def figure_size_distribution(P, out: Path):
              fontsize=9, bbox=dict(boxstyle="round,pad=0.3",
                                     fc="white", ec="gray", alpha=0.9))
 
-    ax2.plot(e_grid, cdf, color="#2C3E50", lw=2, label="Size CDF")
+    ax2.plot(e_grid, cdf, color=ps.TOTAL_ERROR, lw=2, label="Size CDF")
     e_log = np.logspace(-1, np.log10(250), 500)
     from src.utils import LogisticPOD
     pod_snap = LogisticPOD(threshold=P.snap_threshold,
                             slope=P.snap_slope).probability(e_log)
     pod_cont = LogisticPOD(threshold=P.cont_threshold,
                             slope=P.cont_slope).probability(e_log)
-    ax2.plot(e_log, pod_snap, color="#34495E", lw=1.8, ls="--",
+    ax2.plot(e_log, pod_snap, color=ps.SNAPSHOT, lw=1.8, ls="--",
              label=f"POD Snapshots ($\\theta$={P.snap_threshold:.1f})")
-    ax2.plot(e_log, pod_cont, color="#E74C3C", lw=1.8, ls=":",
+    ax2.plot(e_log, pod_cont, color=ps.CONTINUOUS, lw=1.8, ls=":",
              label=f"POD Continuous ($\\theta$={P.cont_threshold:.1f})")
-    ax2.axvline(e_mean, color="#7D3C98", ls="--", lw=1, alpha=0.5)
+    ax2.axvline(e_mean, color=ps.TRUTH, ls="--", lw=1, alpha=0.5)
     ax2.set_xlabel("Emission size  [kg/h]")
     ax2.set_ylabel("Probability")
     ax2.set_title("(b)  Size CDF and Detection Probability",

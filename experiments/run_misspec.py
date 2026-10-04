@@ -39,6 +39,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 from src import (
     build_baseline_specs,
     simulate_series,
@@ -301,30 +302,30 @@ def figure_misspec_joint(df, out):
     fig, ax = plt.subplots(figsize=(6, 4.5))
 
     z = 1.96
-    ax.plot(eta, dfa["within_var"], "o-", color="#2ECC71",
+    ax.plot(eta, dfa["within_var"], "o-", color=ps.MLE,
             label="Within (sampling)")
     if "within_var_se" in dfa.columns:
         se = dfa["within_var_se"].values
         ax.fill_between(eta, dfa["within_var"] - z * se,
                         dfa["within_var"] + z * se,
-                        alpha=0.15, color="#2ECC71")
-    ax.plot(eta, dfa["between_var"], "s--", color="#E67E22",
+                        alpha=0.15, color=ps.MLE)
+    ax.plot(eta, dfa["between_var"], "s--", color=ps.POD,
             label="Between (misspec)")
-    ax.plot(eta, dfa["total_var"], "D-", color="#2C3E50",
+    ax.plot(eta, dfa["total_var"], "D-", color=ps.TOTAL_ERROR,
             linewidth=2.5, label="Total")
     if "total_var_se" in dfa.columns:
         se = dfa["total_var_se"].values
         ax.fill_between(eta, dfa["total_var"] - z * se,
                         dfa["total_var"] + z * se,
-                        alpha=0.15, color="#2C3E50")
+                        alpha=0.15, color=ps.TOTAL_ERROR)
     pod_ref = dfa["pod_var"].values[0]
     pod_se = (dfa["pod_var_se"].values[0]
               if "pod_var_se" in dfa.columns else 0.0)
-    ax.axhline(pod_ref, color="#C39BD3", ls="--", lw=1.5,
+    ax.axhline(pod_ref, color=ps.POD, ls="--", lw=1.5,
                label="POD-weighted (correct spec.)")
     if pod_se > 0:
         ax.axhspan(pod_ref - z * pod_se, pod_ref + z * pod_se,
-                   alpha=0.10, color="#C39BD3")
+                   alpha=0.10, color=ps.POD)
 
     crossover_eta = np.nan
     for i in range(len(eta) - 1):
@@ -423,38 +424,38 @@ def figure_misspec_joint_mse(df, out):
 
     fig, ax = plt.subplots(figsize=(6, 4.5))
 
-    ax.plot(eta, dfa["within_var"], "o-", color="#2ECC71",
+    ax.plot(eta, dfa["within_var"], "o-", color=ps.MLE,
             label="Within (sampling)")
     if "within_var_se" in dfa.columns:
         se = dfa["within_var_se"].values
         ax.fill_between(eta, dfa["within_var"] - z * se,
                         dfa["within_var"] + z * se,
-                        alpha=0.15, color="#2ECC71")
-    ax.plot(eta, dfa["between_var"], "s--", color="#E67E22",
+                        alpha=0.15, color=ps.MLE)
+    ax.plot(eta, dfa["between_var"], "s--", color=ps.POD,
             label="Between (misspec)")
-    ax.plot(eta, dfa["bias_sq"], "^:", color="#8E44AD",
+    ax.plot(eta, dfa["bias_sq"], "^:", color=ps.EMISSION_SIZE,
             label=r"Bias$^2$")
     if "bias_sq_se" in dfa.columns:
         se = dfa["bias_sq_se"].values
         ax.fill_between(eta, np.maximum(0, dfa["bias_sq"] - z * se),
                         dfa["bias_sq"] + z * se,
-                        alpha=0.15, color="#8E44AD")
-    ax.plot(eta, dfa["mse"], "D-", color="#2C3E50",
+                        alpha=0.15, color=ps.EMISSION_SIZE)
+    ax.plot(eta, dfa["mse"], "D-", color=ps.TOTAL_ERROR,
             linewidth=2.5, label="Total MSE")
     if "mse_se" in dfa.columns:
         se = dfa["mse_se"].values
         ax.fill_between(eta, dfa["mse"] - z * se,
                         dfa["mse"] + z * se,
-                        alpha=0.15, color="#2C3E50")
+                        alpha=0.15, color=ps.TOTAL_ERROR)
 
     pod_ref = dfa["pod_var"].values[0]
     pod_se = (dfa["pod_var_se"].values[0]
               if "pod_var_se" in dfa.columns else 0.0)
-    ax.axhline(pod_ref, color="#C39BD3", ls="--", lw=1.5,
+    ax.axhline(pod_ref, color=ps.POD, ls="--", lw=1.5,
                label="POD-weighted (correct spec.)")
     if pod_se > 0:
         ax.axhspan(pod_ref - z * pod_se, pod_ref + z * pod_se,
-                   alpha=0.10, color="#C39BD3")
+                   alpha=0.10, color=ps.POD)
 
     crossover_eta = np.nan
     for i in range(len(eta) - 1):
@@ -507,20 +508,20 @@ def figure_misspec_onebyone_mse(df, out):
         z = 1.96
 
         ax = axes[0, col]
-        ax.plot(eta, dfp["mse"], "o-", color="#2C3E50",
+        ax.plot(eta, dfp["mse"], "o-", color=ps.MLE,
                 linewidth=2, label="MLE MSE")
         if "mse_se" in dfp.columns:
             se = dfp["mse_se"].values
             ax.fill_between(eta, dfp["mse"] - z * se,
                             dfp["mse"] + z * se,
-                            alpha=0.15, color="#2C3E50")
-        ax.axhline(pod_ref, color="#C39BD3", ls="--", lw=1.5,
+                            alpha=0.15, color=ps.MLE)
+        ax.axhline(pod_ref, color=ps.POD, ls="--", lw=1.5,
                    label="POD (correct)")
         if "pod_var_se" in dfp.columns:
             pod_se = dfp["pod_var_se"].values[0]
             if pod_se > 0:
                 ax.axhspan(pod_ref - z * pod_se, pod_ref + z * pod_se,
-                           alpha=0.10, color="#C39BD3")
+                           alpha=0.10, color=ps.POD)
         ax.set_title(f"({chr(97 + col)}) {PARAM_LABELS[pname]}")
         ax.set_xlabel(r"$\eta$")
         if col == 0:
@@ -551,12 +552,12 @@ def figure_misspec_joint_bias(df, out):
 
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.axhline(0.0, color="gray", ls="--", lw=1)
-    ax.plot(eta, dfa["bias"], "o-", color="#8E44AD",
+    ax.plot(eta, dfa["bias"], "o-", color=ps.EMISSION_SIZE,
             linewidth=2, label=r"Bias of $\hat\mu_{\mathrm{MLE}}$")
     if "bias_se" in dfa.columns:
         se = dfa["bias_se"].values
         ax.fill_between(eta, dfa["bias"] - z * se, dfa["bias"] + z * se,
-                        alpha=0.20, color="#8E44AD")
+                        alpha=0.20, color=ps.EMISSION_SIZE)
     ax.set_xlabel(r"Misspecification level $\eta$")
     ax.set_ylabel(r"Bias of $\hat\mu$ (kg/h)")
     ax.set_title("MLE bias under joint sensor misspecification")
@@ -589,13 +590,13 @@ def figure_misspec_onebyone_bias(df, out):
 
         ax = axes[0, col]
         ax.axhline(0.0, color="gray", ls="--", lw=1)
-        ax.plot(eta, dfp["bias"], "o-", color="#8E44AD",
+        ax.plot(eta, dfp["bias"], "o-", color=ps.EMISSION_SIZE,
                 linewidth=2, label="Bias")
         if "bias_se" in dfp.columns:
             se = dfp["bias_se"].values
             ax.fill_between(eta, dfp["bias"] - z * se,
                             dfp["bias"] + z * se,
-                            alpha=0.20, color="#8E44AD")
+                            alpha=0.20, color=ps.EMISSION_SIZE)
         ax.set_title(f"({chr(97 + col)}) {PARAM_LABELS[pname]}")
         ax.set_xlabel(r"$\eta$")
         if col == 0:
@@ -626,22 +627,22 @@ def figure_misspec_single_param_mse(df, out, pname: str = "theta_s"):
 
     fig, ax = plt.subplots(figsize=(6, 4.5))
 
-    ax.plot(eta, dfp["mse"], "o-", color="#2C3E50",
+    ax.plot(eta, dfp["mse"], "o-", color=ps.MLE,
             linewidth=2.5, label=r"MLE (misspecified $\theta_s$)")
     if "mse_se" in dfp.columns:
         se = dfp["mse_se"].values
         ax.fill_between(eta, dfp["mse"] - z * se,
                         dfp["mse"] + z * se,
-                        alpha=0.18, color="#2C3E50")
+                        alpha=0.18, color=ps.MLE)
 
     pod_ref = dfp["pod_var"].values[0]
     pod_se = (dfp["pod_var_se"].values[0]
               if "pod_var_se" in dfp.columns else 0.0)
-    ax.axhline(pod_ref, color="#C39BD3", ls="--", lw=1.8,
+    ax.axhline(pod_ref, color=ps.POD, ls="--", lw=1.8,
                label="POD-weighted baseline")
     if pod_se > 0:
         ax.axhspan(pod_ref - z * pod_se, pod_ref + z * pod_se,
-                   alpha=0.12, color="#C39BD3")
+                   alpha=0.12, color=ps.POD)
 
     ax.set_xlabel(r"Misspecification level $\eta$ (log-normal SD)")
     ax.set_ylabel(r"MSE of $\hat\mu$ (kg$^2$/h$^2$)")
@@ -678,21 +679,21 @@ def figure_misspec_onebyone(df, out):
         pod_ref = dfp["pod_var"].values[0]
 
         ax = axes[0, col]
-        ax.plot(eta, dfp["total_var"], "o-", color="#2C3E50",
+        ax.plot(eta, dfp["total_var"], "o-", color=ps.TOTAL_ERROR,
                 linewidth=2, label="MLE total")
         if "total_var_se" in dfp.columns:
             z = 1.96
             se = dfp["total_var_se"].values
             ax.fill_between(eta, dfp["total_var"] - z * se,
                             dfp["total_var"] + z * se,
-                            alpha=0.15, color="#2C3E50")
-        ax.axhline(pod_ref, color="#C39BD3", ls="--", lw=1.5,
+                            alpha=0.15, color=ps.TOTAL_ERROR)
+        ax.axhline(pod_ref, color=ps.POD, ls="--", lw=1.5,
                    label="POD (correct)")
         if "pod_var_se" in dfp.columns:
             pod_se = dfp["pod_var_se"].values[0]
             if pod_se > 0:
                 ax.axhspan(pod_ref - 1.96 * pod_se, pod_ref + 1.96 * pod_se,
-                           alpha=0.10, color="#C39BD3")
+                           alpha=0.10, color=ps.POD)
         ax.set_title(f"({chr(97 + col)}) {PARAM_LABELS[pname]}")
         ax.set_xlabel(r"$\eta$")
         if col == 0:

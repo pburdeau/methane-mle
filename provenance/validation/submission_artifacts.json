@@ -3,33 +3,33 @@
   "artifacts": [
     {
       "name": "methane_paper_and_si_persistent_IPW_overleaf.zip",
-      "sha256": "27a8dc6f2b2bd4b9e68cf78ec4286f504d681e9313b3a216f691cc09ae6daa21",
-      "bytes": 939330
+      "sha256": "d2c28e2994d9f0cba79489b58f9ab632271503803f2da4521ea3906fc08222c2",
+      "bytes": 937841
     },
     {
       "name": "methane_main_figures_persistent_IPW.zip",
-      "sha256": "a67255998248763d822d7edf273440a12918d6c5c8fc22ae8ff78149bd335285",
-      "bytes": 547430
+      "sha256": "f5e0d92eb351bcf01d6a8e66437ffff3c1219c9ae283a4efe3ea627e3bbe7a61",
+      "bytes": 545757
     },
     {
       "name": "methane_main_paper_persistent_IPW.pdf",
-      "sha256": "6dfbe5fd942ae6e4db5ec4fac8c655ab921eef2b3f50475434a3fd73965b9834",
-      "bytes": 745837
+      "sha256": "4c2b2644aa6e27ae443a42554720e533078c3b6974019d7962ea60d0b0623beb",
+      "bytes": 745647
     },
     {
       "name": "methane_SI_persistent_IPW.pdf",
-      "sha256": "7e317ed0cfeea16e21d084ed541ab69a95c19333bd5b64fd742f4d812081ff4d",
-      "bytes": 523676
+      "sha256": "129cfb227d9e3e3832378e351f293953619dd5be94a1cb94cf30780fee1f7220",
+      "bytes": 523079
     },
     {
       "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.docx",
-      "sha256": "93db993ae9efe4d8a0253feb986af1e0e97a947f6730ec6e5ea41e4a0e0caf53",
-      "bytes": 1482779
+      "sha256": "e1d1548e749f23d5519d1fbc545db8f308050f9fad7c93a97d74a5c1851f0156",
+      "bytes": 1493849
     },
     {
       "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.pdf",
-      "sha256": "8d90901c0ca18d154b4398d7b50f8a7b6f60321c26c00fdfc039fa44e8bdfca7",
-      "bytes": 1288546
+      "sha256": "bf1ac914de50da2cd987dc296117ec5ae5939ecc10c9c31d68951d0277eabf42",
+      "bytes": 1311103
     }
   ],
   "word_pages": 37,
@@ -40,6 +40,6 @@
   "full_captions": true,
   "continuous_line_numbers": true,
   "body_justified": true,
-  "visual_review": "All 37 Word pages are pixel-identical to the previously reviewed version retaining the original survey-effort wording. Main and SI source wording matches the existing Overleaf ZIP. Both source projects compile; full captions and numerical results are unchanged.",
+  "visual_review": "All 14 external figures reviewed; changed Word pages 8, 22, 24, 25, 28 reviewed; other pages match the previously reviewed version. Word text, native equations, captions, and layout are unchanged. Main and SI compile with synchronized colors.",
   "last_updated_date": "2026-10-04"
 }

@@ -42,6 +42,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 from src import (
     build_baseline_specs,
     simulate_series,
@@ -251,11 +252,11 @@ def figure_psnap(df, out):
         "legend.fontsize": 9, "lines.linewidth": 2,
     })
 
-    C_NAIVE = "#D98880"
-    C_POD   = "#C39BD3"
-    C_MS    = "#85C1E9"
-    C_MLE   = "#2ECC71"
-    C_RATIO = "#888888"
+    C_NAIVE = ps.NAIVE
+    C_POD   = ps.POD
+    C_MS    = ps.UNGROUPED
+    C_MLE   = ps.MLE
+    C_RATIO = ps.RATIO
 
     T_groups = sorted(df["T"].unique())
 

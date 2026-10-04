@@ -33,9 +33,10 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 
-C_POD = "#C39BD3"
-C_MLE = "#2ECC71"
+C_POD = ps.POD
+C_MLE = ps.MLE
 Z = 1.96
 
 
@@ -154,7 +155,7 @@ def main():
             xytext=(bx, by), textcoords="axes fraction",
             bbox=dict(boxstyle="round,pad=0.4", fc="white",
                       ec="#AAAAAA", lw=0.7),
-            arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8))
+            arrowprops=dict(arrowstyle="->", color=ps.RATIO, lw=0.8))
 
     ax.text(0.02, 0.04,
             r"$N = (1.96\,/(\varepsilon/100))^2"
@@ -164,7 +165,7 @@ def main():
             f" = {reduction:.0f}% fewer campaigns needed",
             transform=ax.transAxes, fontsize=7,
             ha="left", va="bottom",
-            bbox=dict(boxstyle="round,pad=0.5", fc="#F0F7F0",
+            bbox=dict(boxstyle="round,pad=0.5", fc=ps.PANEL_BACKGROUND,
                       ec=C_MLE, lw=1.0))
 
     plt.tight_layout()

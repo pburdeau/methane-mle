@@ -29,6 +29,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from experiments import plot_style as ps
+
 
 SWEEP_META = {
     "p_snap": {
@@ -85,9 +87,9 @@ SWEEP_META = {
     },
 }
 
-C_POD = "#C39BD3"
-C_MLE = "#2ECC71"
-C_RATIO = "#888888"
+C_POD = ps.POD
+C_MLE = ps.MLE
+C_RATIO = ps.RATIO
 
 PANEL_LETTERS = "abcdefghijklmnop"
 

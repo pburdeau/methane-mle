@@ -26,6 +26,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 from src import (
     build_baseline_specs,
     simulate_series,
@@ -45,8 +46,8 @@ PARAMS = [
 ]
 
 COLORS = {
-    "p_on": "#9B59B6", "p_off": "#E67E22",
-    "mu_emit": "#2ECC71", "mu": "#3498DB",
+    "p_on": ps.PARAMETERS[0], "p_off": ps.PARAMETERS[1],
+    "mu_emit": ps.PARAMETERS[2], "mu": ps.PARAMETERS[3],
 }
 
 

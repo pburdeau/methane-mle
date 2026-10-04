@@ -45,6 +45,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 from src import (
     build_baseline_specs,
     simulate_series,
@@ -365,10 +366,10 @@ _RC = {
     "legend.fontsize": 9, "lines.linewidth": 2,
 }
 
-C_NAIVE, C_POD, C_MLE, C_RATIO = "#D98880", "#C39BD3", "#2ECC71", "#1A1A1A"
+C_NAIVE, C_POD, C_MLE, C_RATIO = ps.NAIVE, ps.POD, ps.MLE, ps.RATIO
 
 
-C_MS = "#85C1E9"
+C_MS = ps.UNGROUPED
 
 
 def figure_variance_ratio(df: pd.DataFrame, sweep_name: str, out: Path):
@@ -490,7 +491,7 @@ def figure_param_accuracy(df: pd.DataFrame, out: Path):
     ]
 
     fig, axes = plt.subplots(2, 4, figsize=(16, 7), sharex=True)
-    colors = ["#9B59B6", "#E67E22", "#2ECC71", "#3498DB"]
+    colors = ps.PARAMETERS
 
     for col, (label, prefix) in enumerate(params):
         ax_bias = axes[0, col]

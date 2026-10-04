@@ -36,11 +36,12 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 
-C_POD = "#C39BD3"
-C_MLE = "#2ECC71"
-C_RATIO = "#1A1A1A"
-C_PARAMS = ["#B0B0B0", "#909090", "#C8C8C8", "#2ECC71"]
+C_POD = ps.POD
+C_MLE = ps.MLE
+C_RATIO = ps.RATIO
+C_PARAMS = ps.PARAMETERS
 
 
 def main():
@@ -243,8 +244,11 @@ def main():
     ax.set_title(r"CV of $\hat{\mu}$ + ratio")
     ax.set_xlabel(r"$T$ (time steps)")
     ax.set_ylabel("CV (%)")
-    ax.legend(loc="upper right", framealpha=0.9)
-    ax_r.legend(loc="center right", framealpha=0.9)
+    handles, labels = ax.get_legend_handles_labels()
+    ratio_handles, ratio_labels = ax_r.get_legend_handles_labels()
+    ax_r.legend(handles + ratio_handles, labels + ratio_labels,
+                loc="center right", bbox_to_anchor=(1.0, 0.65),
+                fontsize=6.3, framealpha=1.0)
     ax.spines["top"].set_visible(False)
     ax.grid(alpha=0.2, ls=":", lw=0.5)
 
