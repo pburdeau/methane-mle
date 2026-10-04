@@ -3,8 +3,8 @@
   "artifacts": [
     {
       "name": "methane_paper_and_si_persistent_IPW_overleaf.zip",
-      "sha256": "f1f81558578509634c2089779fde18a97929c74f1cc38373c22b77bc4a8c4c28",
-      "bytes": 939282
+      "sha256": "27a8dc6f2b2bd4b9e68cf78ec4286f504d681e9313b3a216f691cc09ae6daa21",
+      "bytes": 939330
     },
     {
       "name": "methane_main_figures_persistent_IPW.zip",
@@ -13,23 +13,23 @@
     },
     {
       "name": "methane_main_paper_persistent_IPW.pdf",
-      "sha256": "3e0b9a6a1c3455a2f8c1307b36c6a35e4036ed24c9a9c006ae41e7d7d53fa51b",
-      "bytes": 745719
+      "sha256": "6dfbe5fd942ae6e4db5ec4fac8c655ab921eef2b3f50475434a3fd73965b9834",
+      "bytes": 745837
     },
     {
       "name": "methane_SI_persistent_IPW.pdf",
-      "sha256": "1ee86ea3579ee7f35fc5c1d8d9124df69e2d640b29021984c5af8b1b16600fcd",
-      "bytes": 523677
+      "sha256": "7e317ed0cfeea16e21d084ed541ab69a95c19333bd5b64fd742f4d812081ff4d",
+      "bytes": 523676
     },
     {
       "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.docx",
-      "sha256": "f657a4171f8eda3470317a6367e34da01ab821f6e3c06c50baca4472ca7ae354",
-      "bytes": 1482725
+      "sha256": "e1cba679e10168a099c28287b86d4149380971c6d12e095ada786674ef618598",
+      "bytes": 1482779
     },
     {
       "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.pdf",
-      "sha256": "b1a00750a1c7ddf3c043ef9f3a0ef27048191a1bfa08108523e501f876618b26",
-      "bytes": 1288313
+      "sha256": "48a94c344358abaffb518676276a904f764d6394daa94bf78ff230d730df71d3",
+      "bytes": 1288546
     }
   ],
   "word_pages": 37,
@@ -40,6 +40,6 @@
   "full_captions": true,
   "continuous_line_numbers": true,
   "body_justified": true,
-  "visual_review": "Layout of all 37 Word pages reviewed, with detailed checks of revised method and discussion pages. Revised main and SI PDFs visually checked across all 21 and 25 pages. Full captions and numerical results retained.",
+  "visual_review": "Layout of all 37 Word pages reviewed, with detailed checks of revised method and discussion pages. After restoring the original survey-effort sentence, pages 7-9 were re-reviewed; other body regions are pixel-identical apart from line numbering. All 21 main and 25 SI PDF pages reviewed; final main page 4 re-reviewed.",
   "last_updated_date": "2026-10-04"
 }
