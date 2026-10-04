@@ -23,12 +23,12 @@
     },
     {
       "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.docx",
-      "sha256": "e1cba679e10168a099c28287b86d4149380971c6d12e095ada786674ef618598",
+      "sha256": "93db993ae9efe4d8a0253feb986af1e0e97a947f6730ec6e5ea41e4a0e0caf53",
       "bytes": 1482779
     },
     {
       "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.pdf",
-      "sha256": "48a94c344358abaffb518676276a904f764d6394daa94bf78ff230d730df71d3",
+      "sha256": "8d90901c0ca18d154b4398d7b50f8a7b6f60321c26c00fdfc039fa44e8bdfca7",
       "bytes": 1288546
     }
   ],
@@ -40,6 +40,6 @@
   "full_captions": true,
   "continuous_line_numbers": true,
   "body_justified": true,
-  "visual_review": "Layout of all 37 Word pages reviewed, with detailed checks of revised method and discussion pages. After restoring the original survey-effort sentence, pages 7-9 were re-reviewed; other body regions are pixel-identical apart from line numbering. All 21 main and 25 SI PDF pages reviewed; final main page 4 re-reviewed.",
+  "visual_review": "All 37 Word pages are pixel-identical to the previously reviewed version retaining the original survey-effort wording. Main and SI source wording matches the existing Overleaf ZIP. Both source projects compile; full captions and numerical results are unchanged.",
   "last_updated_date": "2026-10-04"
 }

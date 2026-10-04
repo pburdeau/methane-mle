@@ -459,12 +459,12 @@
     },
     {
       "path": "provenance/validation/manuscript_build.log",
-      "sha256": "e99be3b93ef577013b7f8a9d96ca2189a16c1c403fa1d90da47a8b04707a7264",
-      "bytes": 13055
+      "sha256": "1952090c8dd877b3dbc773f0842157d0af5dae219ec1527021e6123f735de58f",
+      "bytes": 13057
     },
     {
       "path": "provenance/validation/manuscripts_run.json",
-      "sha256": "29024ac83ab4242c2f56be9875b5f124a5b3eec2ce91bfd3a9c484501dc1d06a",
+      "sha256": "d735a9292adeecd92f036f490380221a450c89189b9a5752f4fe0e2db7f595af",
       "bytes": 325
     },
     {
@@ -499,8 +499,8 @@
     },
     {
       "path": "provenance/validation/submission_artifacts.json",
-      "sha256": "f59b92404de8e41bcaaff3a5ef3f2fcd09e2c053ad3adbab3caae97d7eb619ed",
-      "bytes": 1779
+      "sha256": "245a264b57e438f0b2bd7a94e333d0eb82cf4833df1d89a863f894046f0e45ae",
+      "bytes": 1722
     },
     {
       "path": "provenance/validation/tests_run.json",
