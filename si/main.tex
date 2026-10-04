@@ -227,7 +227,7 @@ The full paths contain all $T$ time steps, including unobserved gaps. The condit
 
 Marginal detection probabilities $\kappa_j=\E[q_j(E)]$ are useful summaries, but they do not characterize the joint detection sequence when size persists within an event. Conditional on two observations sharing an event, their joint snapshot detection probability is $\E[q_s(E)^2]$, whereas replacing size by a single average POD would give $\E[q_s(E)]^2$. The latter corresponds to discarding temporal dependence through the shared rate.
 
-We retain the original plume-identification and event-IPW steps, representing their output as $\hat f=\sum_{m=1}^M\tilde w_m\delta_{\hat e_m}$. The transition likelihood then uses OFF plus $M$ persistent-size ON states. It is exact for the discrete law $\hat f$, but this law is estimated from noisy, linked detections rather than known true sizes. Our procedure is an iterative plug-in estimator with conditional maximum-likelihood updates, not joint maximization of equation~\eqref{eq:full_likelihood_SI} or an exact EM algorithm. Increasing the number of detected events enriches the empirical support; no arbitrary fixed grid of size bins is required in this transition step.
+Plume identification and event-level IPW give the estimated size distribution $\hat f=\sum_{m=1}^M\tilde w_m\delta_{\hat e_m}$. The transition likelihood uses an OFF state and $M$ ON states, one for each estimated event size. It is exact conditional on this discrete distribution, whose sizes and weights are estimated from noisy detections and inferred event assignments. The procedure uses conditional maximum-likelihood updates, rather than joint maximization of equation~\eqref{eq:full_likelihood_SI} or an exact EM algorithm. The size support consists of the estimated plume sizes and is not restricted to a fixed grid of bins.
 
 %==============================================================================
 \section{Alternative Estimation Approaches}
@@ -236,9 +236,9 @@ We retain the original plume-identification and event-IPW steps, representing th
 
 Several likelihood-based approaches are possible. Discretizing continuous rates and fitting an expanded-state HMM is a standard numerical route \citep{LangrockKing2013}. Irregular integer observation gaps can be handled exactly within that finite-state model using transition-matrix powers; interpolation is unnecessary. Baum--Welch can estimate discrete size weights, while direct numerical optimization can impose a parametric size distribution. Parametric projection after an unconstrained update changes the optimization target and requires separate justification.
 
-Continuous-time models provide another route, using $\exp(\mathbf Q\Delta)$ for arbitrary time gaps. Their computational cost depends on the state representation and numerical integration scheme; it is not inherently prohibitive. In the discrete-time model studied here, the persistent-size transition structure permits an $O(NM)$ forward recursion conditional on $M$ weighted size points.
+Continuous-time models provide another route, using $\exp(\mathbf Q\Delta)$ for arbitrary time gaps. Their computational cost depends on the state representation and numerical integration scheme. In the discrete-time model studied here, the persistent-size transition structure permits an $O(NM)$ forward recursion conditional on $M$ weighted size points.
 
-Our choice retains interpretable plume estimates and the event-level IPW correction. It trades joint likelihood optimization for an empirical distribution update and hard event assignments. These approximations can introduce residual bias and do not come with a general convergence or efficiency guarantee.
+We use explicit plume assignments and event-level IPW to estimate the size distribution before each transition update. This avoids joint optimization over event histories and the size distribution, but introduces approximation error. Convergence and efficiency of the resulting iteration have not been established.
 
 \begin{table}[h]
 \centering
@@ -328,11 +328,11 @@ Define $\alpha_i(m)=P(\mathbf Y_{t_1},\ldots,\mathbf Y_{t_i},H_{t_i}=m\mid\hat f
 \end{equation}
 It begins with stationary masses $\pi_0=b/(a+b)$ and $\pi_m=a\tilde w_m/(a+b)$. The likelihood is $\mathcal L(a,b\mid\hat f)=\sum_{m=0}^{M}\alpha_N(m)$; probabilities are rescaled at every step to prevent underflow.
 
-The structured multi-step transition below permits $O(M)$ work per observation, rather than a dense $O(M^2)$ multiplication. We maximize the conditional likelihood continuously in $(\log a,\log b)$ over $[10^{-5},1-10^{-6}]^2$. Starting values are fixed at $(0.025,0.10)$; the first outer iteration also uses the best point in a fixed coarse search. Subsequent iterations start at the previous transition estimate. Numerical stopping tolerances and derivative-free retries address optimizer conditioning; multiplying the entire log-likelihood by a fixed observation-count scale does not change its maximizer. No likelihood nudge is applied. A nonunit nudge argument is rejected by the code, preventing accidental use of the previous empirical adjustment.
+The structured multi-step transition below permits $O(M)$ work per observation, rather than a dense $O(M^2)$ multiplication. We maximize the conditional likelihood continuously in $(\log a,\log b)$ over $[10^{-5},1-10^{-6}]^2$. Starting values are fixed at $(0.025,0.10)$; the first outer iteration also uses the best point in a fixed coarse search. Subsequent iterations start at the previous transition estimate. We scale the log-likelihood by the number of observation times to improve numerical conditioning; this constant scaling leaves the maximizer unchanged. If the gradient-based optimizer fails or returns a large gradient, we retry with a derivative-free optimizer. No empirical adjustment is applied to the transition probabilities.
 
 \subsection{Iteration and convergence}
 
-Steps 1--3 are repeated, with the updated estimate of $p_{\text{off}}$ from Step~3 feeding back into the temporal prior in Step~1. Iteration stops when both transition changes are below $10^{-5}$ and the change in $\hat\mu$ is below $10^{-4}$~kg/h, or after 30 iterations. This outer iteration is a fixed-point procedure and is not guaranteed to increase a joint likelihood or avoid cycles. Non-converged and boundary estimates are retained and reported. For observed campaigns without detections, $\hat\mu=0$ is included in unconditional mean-performance summaries, while component parameters are left missing.
+Steps 1--3 are repeated, with the updated estimate of $p_{\text{off}}$ from Step~3 feeding back into the temporal prior in Step~1. Iteration stops when both transition changes are below $10^{-5}$ and the change in $\hat\mu$ is below $10^{-4}$~kg/h, or after 30 iterations. The outer iteration is not guaranteed to increase a joint likelihood or converge. Non-converged and boundary estimates are retained and reported. For observed campaigns without detections, $\hat\mu=0$ is included in unconditional mean-performance summaries, while component parameters are left missing.
 
 The final estimate combines the activity fraction with the bias-corrected mean:
 \begin{equation}
@@ -407,7 +407,7 @@ Here $\sigma_i$ denotes the effective measurement noise after combination, $\sig
  \mathrm{BF}=\sqrt{\frac{V_{\mathrm{diff}}}{V_{\mathrm{same}}}}
  \exp\!\left[-\frac{d^2}{2}\left(\frac1{V_{\mathrm{same}}}-\frac1{V_{\mathrm{diff}}}\right)\right].
 \end{equation}
-This is an approximate Gaussian linking model, including its centered log-error and exponential temporal-prior assumptions. The linking threshold and measurement-combination steps are unchanged by the persistent-size likelihood repair; the resulting hard assignments are not the event posterior under the full detection-and-measurement model.
+This is an approximate Gaussian linking model, including its centered log-error and exponential temporal-prior assumptions. The score assigns detections to events using this working model; these assignments do not represent the event posterior under the full detection-and-measurement likelihood.
 
 
 %==============================================================================
@@ -572,7 +572,7 @@ per campaign in expectation), $T_{\text{cont}} = 50$~hours, and a continuous
 deliberately set well above the baseline value so that continuous monitoring
 is itself imperfect; if it were near-perfect, no estimator could improve on
 the POD-weighted baseline because there would be no detection bias to
-correct. The same persistent-size likelihood and unit nudge setting are used as at baseline; no empirical transition adjustment is made. All other parameters are at their baseline values
+correct. We use the same persistent-size likelihood as in the baseline design, without an empirical transition adjustment. All other parameters are at their baseline values
 (Table~\ref{tab:params}). The experiment uses the same nested design as
 the baseline analysis ($n_{\text{outer}} = 25$ batches of
 $n_{\text{inner}} = 500$ replicates, $12{,}500$ replicates in total).}
@@ -591,7 +591,7 @@ estimator is visibly biased downward.}}
 \label{fig:sparse_violin}
 \end{figure}
 
-\new{Figure~\ref{fig:sparse_violin} and Table~\ref{tab:sparse_comparison} summarise the results. Estimated biases of POD-weighted and MLE are $+0.073$ and $+0.044$~kg/h ($p=0.105$ and $0.287$); zero bias is not rejected. Naive and MLE-ungrouped have detectable negative biases ($-0.451$ and $-0.102$~kg/h; $p<0.001$ and $p=0.018$). MLE reduces average within-batch variance by $15.4\%$ relative to POD-weighted ($27.01$ versus $31.94$, paired $t=10.32$, $p<0.001$), and by $6.4\%$ relative to MLE-ungrouped ($27.01$ versus $28.86$, $t=6.02$, $p<0.001$). These gains persist despite only about 1.5 snapshots per campaign. All $12{,}500$ mean estimates are retained, including 16 zero-detection campaigns. Among records with detections, 45 reach the outer iteration limit and five have a final optimizer flag; 18 estimates reach a transition bound. These flags delimit numerical and data limitations without removing finite results.}
+\new{Figure~\ref{fig:sparse_violin} and Table~\ref{tab:sparse_comparison} summarise the results. Estimated biases of POD-weighted and MLE are $+0.073$ and $+0.044$~kg/h ($p=0.105$ and $0.287$); zero bias is not rejected. Naive and MLE-ungrouped have detectable negative biases ($-0.451$ and $-0.102$~kg/h; $p<0.001$ and $p=0.018$). MLE reduces average within-batch variance by $15.4\%$ relative to POD-weighted ($27.01$ versus $31.94$, paired $t=10.32$, $p<0.001$), and by $6.4\%$ relative to MLE-ungrouped ($27.01$ versus $28.86$, $t=6.02$, $p<0.001$). These gains persist despite only about 1.5 snapshots per campaign. All $12{,}500$ mean estimates are retained, including 16 zero-detection campaigns. Among records with detections, 45 reach the outer iteration limit and five have a final optimizer flag; 18 estimates reach a transition bound. We report these flags and retain the finite estimates in the comparisons.}
 
 \begin{table}[h]
 \centering
@@ -680,14 +680,14 @@ Figure~\ref{fig:composite_T} provides a comprehensive view of parameter recovery
 
 \new{The window duration $T_{\text{cont}}$ controls how long each monitoring window persists. Holding $p_{\text{cont}}$ fixed preserves the triggering probability per unmonitored step; it does not preserve the number of window onsets per calendar hour. The variance ratio is $1.07$ with no continuous coverage, reaches $1.54$ at $75$ hours, and declines to $1.31$ at $200$ hours.}
 
-\new{With baseline mean event duration $20$ hours, moderate windows can provide repeated measurements while spanning multiple events. Longer windows also change coverage and the number of window onsets within a fixed campaign. The relative gain reflects these interacting effects, rather than grouping alone. Read jointly, the two sweeps show that relative precision is not monotonic in either monitoring parameter. They do not compare schedules matched for total coverage, and therefore do not establish that one window design dominates another at equal monitoring effort.}
+\new{With baseline mean event duration $20$ hours, moderate windows can provide repeated measurements while spanning multiple events. Longer windows also change coverage and the number of window onsets within a fixed campaign. The two sweeps vary coverage as well as the timing of observations, so their variance ratios cannot be attributed to grouping alone. Neither sweep shows a monotonic change in relative precision. Comparisons at equal monitoring effort would require schedules matched for total coverage.}
 
 
 %==============================================================================
 \section{Numerical Sensitivity of Transition Optimization}
 \label{sec:robustness_grid}
 
-The transition step now uses continuous optimization over fixed bounds, rather than a grid centered on generating parameters. Figure~\ref{fig:grid_robustness} varies the optimizer's relative objective tolerance $\mathrm{ftol}\in\{10^{-7},10^{-9},10^{-11},10^{-13}\}$ on the same 500 baseline datasets. All empirical size support points are retained in each calculation. This checks numerical stopping accuracy; it does not assess uncertainty in the empirical rate law or establish asymptotic unbiasedness.
+The transition step uses continuous optimization over fixed bounds. Figure~\ref{fig:grid_robustness} varies the optimizer's relative objective tolerance $\mathrm{ftol}\in\{10^{-7},10^{-9},10^{-11},10^{-13}\}$ on the same 500 baseline datasets. All empirical size support points are retained in each calculation. This experiment checks sensitivity to numerical stopping accuracy with the empirical size distribution held fixed.
 
 \begin{figure}[h]
 \centering
@@ -750,7 +750,7 @@ we report mean squared error,
 which captures both contributions in a single metric.}
 
 \paragraph{Results.}
-\new{Figure~\ref{fig:misspec} reports MSE as a function of $\eta$. Under correct specification ($\eta=0$), MLE MSE is approximately $19.3$~kg$^2$/h$^2$, including sampling variation and residual bias, compared with a POD-weighted reference MSE of $29.9$~kg$^2$/h$^2$. At $\eta=0.3$, MLE MSE is $20.3$, about $5\%$ above its correctly specified value; at $\eta=0.5$, it is $22.9$. At $\eta=0.8$, MLE MSE is $29.7$, close to the POD-weighted reference. The broad Monte Carlo bands at large perturbations do not establish a performance advantage in that regime. The estimated bias at $\eta=0.8$ is $+1.25$~kg/h; its square contributes about $5\%$ of MSE. These results support sensitivity assessment for the baseline design, rather than a guarantee of robustness to large calibration errors. The curve need not be monotone: each setting uses 25 independent calibration draws and separately seeded monitoring records.}
+\new{Figure~\ref{fig:misspec} reports MSE as a function of $\eta$. Under correct specification ($\eta=0$), MLE MSE is approximately $19.3$~kg$^2$/h$^2$, including sampling variation and residual bias, compared with a POD-weighted reference MSE of $29.9$~kg$^2$/h$^2$. At $\eta=0.3$, MLE MSE is $20.3$, about $5\%$ above its correctly specified value; at $\eta=0.5$, it is $22.9$. At $\eta=0.8$, MLE MSE is $29.7$, close to the POD-weighted reference. The broad Monte Carlo bands at large perturbations do not establish a performance advantage in that regime. The estimated bias at $\eta=0.8$ is $+1.25$~kg/h; its square contributes about $5\%$ of MSE. Performance deteriorates as calibration errors increase. Each setting uses 25 independent calibration draws and separately seeded monitoring records, so sampling variation can also produce fluctuations in the curve.}
 
 \begin{figure}[h]
 \centering
@@ -787,7 +787,7 @@ specification, used as a reference baseline. The shaded bands are normal-approxi
 \new{The sampling log is a list of four-tuples $(t_i, j_i, Y_i, D_i)$ recording the time of observation, the technology used, the detection indicator, and the measured emission rate (zero or missing for non-detections). Non-detections — time steps at which a technology was active but did not register a detection — are informative and must be recorded; their omission biases the estimator toward large values.}
 
 \subsection{Workflow}
-\new{The sampling log is first converted into the format described in Section~2 of the main text. Time steps during which no technology was active appear as gaps and are handled automatically by the multi-step transition matrix of Section~\ref{sec:multistep}. The implementation initializes $(\hat p_{\text{on}},\hat p_{\text{off}})=(0.025,0.10)$ and uses the fixed bounds and first-iteration coarse search described in Section~\ref{sec:forward}. Steps~1--3 are iterated until transition changes are below $10^{-5}$ and the mean change is below $10^{-4}$~kg/h, with a limit of 30 iterations. The convergence flag and boundary behavior should be inspected rather than assuming that every record yields a stable estimate.}
+\new{The sampling log is first converted into the format described in Section~2 of the main text. Time steps during which no technology was active appear as gaps and are handled automatically by the multi-step transition matrix of Section~\ref{sec:multistep}. The implementation initializes $(\hat p_{\text{on}},\hat p_{\text{off}})=(0.025,0.10)$ and uses the fixed bounds and first-iteration coarse search described in Section~\ref{sec:forward}. Steps~1--3 are iterated until transition changes are below $10^{-5}$ and the mean change is below $10^{-4}$~kg/h, with a limit of 30 iterations. Check the convergence flag and whether either transition estimate reaches a search bound.}
 
 \new{In our simulation studies, estimator variance is characterized through Monte Carlo replication. For application to real monitoring data, a parametric bootstrap can simulate new emission and detection records under the fitted model while retaining the actual sampling masks, then refit the entire procedure. This preserves model-based temporal dependence and propagates the plug-in fitting steps. Its interval coverage would require separate validation; the Monte Carlo intervals reported here describe repeated-simulation performance, not within-campaign uncertainty.}
 
