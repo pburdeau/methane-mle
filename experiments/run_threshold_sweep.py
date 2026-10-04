@@ -29,6 +29,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 from src import (
     build_baseline_specs,
     simulate_series,
@@ -39,6 +40,10 @@ from src import (
 N_INNER = 500
 N_OUTER = 5
 THRESHOLDS = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+
+
+def _run_one_task(task):
+    return run_one(*task)
 
 
 def run_one(tech_specs, rep, p_on_grid, p_off_grid, threshold):
@@ -54,10 +59,8 @@ def run_one(tech_specs, rep, p_on_grid, p_off_grid, threshold):
         tech_specs=tech_specs,
         snap_mask=snap_mask, cont_mask=cont_mask, rng=emit_rng)
 
-    if obs.n_total_detections() < 2:
-        return dict(mu=np.nan, p_on=np.nan, p_off=np.nan, mu_emit=np.nan)
 
-    res = loop_empirical(obs, tech_specs, cfg.T,
+    res = loop_empirical(obs, tech_specs, cfg.T, **cfg.MLE_OPTIONS,
                          max_gap=cfg.MAX_GAP,
                          decision_threshold=threshold,
                          p_on_grid=p_on_grid, p_off_grid=p_off_grid,
@@ -96,8 +99,8 @@ def main():
         cont_fp_scale=cfg.CONT_FP_SCALE,
     )
 
-    p_on_grid = cfg.build_geom_grid(cfg.P_ON, cfg.P_GEOM_FACTOR, cfg.P_GRID_RES)
-    p_off_grid = cfg.build_geom_grid(cfg.P_OFF, cfg.P_GEOM_FACTOR, cfg.P_GRID_RES)
+    p_on_grid = None  # fixed-bound continuous optimization
+    p_off_grid = None
 
     mu_true = cfg.TRUE_PARAMS["mu"]
     mu_emit_true = cfg.MU_EMIT
@@ -116,9 +119,10 @@ def main():
         for outer in range(N_OUTER):
             ests_mu = []
             ests_me = []
-            for inner in range(N_INNER):
-                rep = outer * N_INNER + inner
-                r = run_one(tech_specs, rep, p_on_grid, p_off_grid, threshold)
+            from experiments.parallel import ordered_map
+            tasks = [(tech_specs,outer*N_INNER+inner,None,None,threshold)
+                     for inner in range(N_INNER)]
+            for r in ordered_map(_run_one_task,tasks):
                 ests_mu.append(r["mu"])
                 ests_me.append(r["mu_emit"])
 
@@ -167,6 +171,8 @@ def make_figure(df, out_fig):
     """Render the original threshold figure from saved summary data."""
     mu_true = cfg.TRUE_PARAMS["mu"]
     mu_emit_true = cfg.MU_EMIT
+    from scipy.stats import t
+    z = float(t.ppf(.975, N_OUTER-1))
     # ── Figure ──
     plt.rcParams.update({
         "font.family": "sans-serif",
@@ -184,18 +190,18 @@ def make_figure(df, out_fig):
     # Relative bias (%)
     b_pct = df["mu_bias"].values / mu_true_val * 100
     bse_pct = df["mu_bias_se"].values / mu_true_val * 100
-    ax1.plot(thrs, b_pct, "o-", color="#2ECC71", markersize=7,
+    ax1.plot(thrs, b_pct, "o-", color=ps.MLE, markersize=7,
              markeredgecolor="white", label=r"$\hat{\mu}$")
-    ax1.fill_between(thrs, b_pct - 1.96 * bse_pct, b_pct + 1.96 * bse_pct,
-                     alpha=0.15, color="#2ECC71")
+    ax1.fill_between(thrs, b_pct - z * bse_pct, b_pct + z * bse_pct,
+                     alpha=0.15, color=ps.MLE)
 
     me_b_pct = df["mu_emit_bias"].values / mu_emit_true * 100
     me_bse_pct = df["mu_emit_bias_se"].values / mu_emit_true * 100
-    ax1.plot(thrs, me_b_pct, "s-", color="#9B59B6", markersize=7,
+    ax1.plot(thrs, me_b_pct, "s-", color=ps.EMISSION_SIZE, markersize=7,
              markeredgecolor="white", label=r"$\hat{\mu}_{\mathrm{emit}}$")
-    ax1.fill_between(thrs, me_b_pct - 1.96 * me_bse_pct,
-                     me_b_pct + 1.96 * me_bse_pct,
-                     alpha=0.15, color="#9B59B6")
+    ax1.fill_between(thrs, me_b_pct - z * me_bse_pct,
+                     me_b_pct + z * me_bse_pct,
+                     alpha=0.15, color=ps.EMISSION_SIZE)
 
     ax1.axhline(0, color="gray", ls="--", lw=1)
     ax1.axvline(0.5, color="gray", ls=":", lw=1, alpha=0.5)
@@ -211,11 +217,11 @@ def make_figure(df, out_fig):
     cv_pct = np.sqrt(df["mu_variance"].values) / mu_true_val * 100
     v = df["mu_variance"].values
     vse = df["mu_variance_se"].values
-    cv_lo = np.sqrt(np.maximum(v - 1.96 * vse, 0)) / mu_true_val * 100
-    cv_hi = np.sqrt(v + 1.96 * vse) / mu_true_val * 100
-    ax2.plot(thrs, cv_pct, "o-", color="#2ECC71", markersize=7,
+    cv_lo = np.sqrt(np.maximum(v - z * vse, 0)) / mu_true_val * 100
+    cv_hi = np.sqrt(v + z * vse) / mu_true_val * 100
+    ax2.plot(thrs, cv_pct, "o-", color=ps.MLE, markersize=7,
              markeredgecolor="white")
-    ax2.fill_between(thrs, cv_lo, cv_hi, alpha=0.15, color="#2ECC71")
+    ax2.fill_between(thrs, cv_lo, cv_hi, alpha=0.15, color=ps.MLE)
 
     ax2.axvline(0.5, color="gray", ls=":", lw=1, alpha=0.5)
     ax2.set_xlabel("Decision threshold")

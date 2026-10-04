@@ -1,0 +1,98 @@
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_pod_curves.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_pod_curves.png
+
+  ── Test 1: Unbiasedness (one-sample t-test on 25 outer batches, H₀: E[μ̂]=μ_true) ──
+  Naive                 t=  -28.10  p<0.001       sig.  (n=25 batches)
+  POD-weighted          t=   +0.27  p=0.7926      n.s.  (n=25 batches)
+  MLE-ungrouped         t=   -0.55  p=0.5888      n.s.  (n=25 batches)
+  MLE                   t=   +2.01  p=0.0555      n.s.  (n=25 batches)
+
+  ── Test 2: |Bias| difference (paired t-test on 25 outer batches, H₀: |bias|_A = |bias|_B) ──
+  Naive vs POD-weighted           t=  +19.70  p<0.001       sig.
+  Naive vs MLE-ungrouped          t=  +24.42  p<0.001       sig.
+  Naive vs MLE                    t=  +19.71  p<0.001       sig.
+  POD-weighted vs MLE-ungrouped   t=   +3.47  p=0.0020      sig.
+  POD-weighted vs MLE             t=   +2.10  p=0.0464      sig.
+  MLE-ungrouped vs MLE            t=   -0.71  p=0.4816      n.s.
+
+  ── Test 3: Variance difference (paired t-test on 25 outer batches, H₀: Var_A = Var_B) ──
+  Naive vs POD-weighted           t=  -31.22  p<0.001       sig.
+  Naive vs MLE-ungrouped          t=  +19.12  p<0.001       sig.
+  Naive vs MLE                    t=  +17.55  p<0.001       sig.
+  POD-weighted vs MLE-ungrouped   t=  +25.63  p<0.001       sig.
+  POD-weighted vs MLE             t=  +23.26  p<0.001       sig.
+  MLE-ungrouped vs MLE            t=   +6.32  p<0.001       sig.
+
+/Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/experiments/run_baseline.py:598: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  fig_a.tight_layout()
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_baseline_violin_v2_wide.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_baseline_violin_v2_wide.png
+/Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/experiments/run_baseline.py:616: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  fig_b.tight_layout()
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_baseline_violin_v2_stacked.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_baseline_violin_v2_stacked.png
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_size_distribution.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_size_distribution.png
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_realizations.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_realizations.png
+
+  ── Test 1: Unbiasedness (one-sample t-test on 25 outer batches, H₀: E[μ̂]=μ_true) ──
+  Naive                 t=  -10.67  p<0.001       sig.  (n=25 batches)
+  POD-weighted          t=   +1.68  p=0.1053      n.s.  (n=25 batches)
+  MLE-ungrouped         t=   -2.55  p=0.0177      sig.  (n=25 batches)
+  MLE                   t=   +1.09  p=0.2869      n.s.  (n=25 batches)
+
+  ── Test 2: |Bias| difference (paired t-test on 25 outer batches, H₀: |bias|_A = |bias|_B) ──
+  Naive vs POD-weighted           t=   +4.52  p<0.001       sig.
+  Naive vs MLE-ungrouped          t=   +8.86  p<0.001       sig.
+  Naive vs MLE                    t=   +5.35  p<0.001       sig.
+  POD-weighted vs MLE-ungrouped   t=   -0.10  p=0.9217      n.s.
+  POD-weighted vs MLE             t=   +0.64  p=0.5283      n.s.
+  MLE-ungrouped vs MLE            t=   +0.56  p=0.5825      n.s.
+
+  ── Test 3: Variance difference (paired t-test on 25 outer batches, H₀: Var_A = Var_B) ──
+  Naive vs POD-weighted           t=  -29.71  p<0.001       sig.
+  Naive vs MLE-ungrouped          t=   +8.03  p<0.001       sig.
+  Naive vs MLE                    t=   +8.16  p<0.001       sig.
+  POD-weighted vs MLE-ungrouped   t=  +12.03  p<0.001       sig.
+  POD-weighted vs MLE             t=  +10.32  p<0.001       sig.
+  MLE-ungrouped vs MLE            t=   +6.02  p<0.001       sig.
+
+/Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/experiments/run_baseline.py:598: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  fig_a.tight_layout()
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/sparse/figure_baseline_violin_v2_wide.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/sparse/figure_baseline_violin_v2_wide.png
+/Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/experiments/run_baseline.py:616: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  fig_b.tight_layout()
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/sparse/figure_baseline_violin_v2_stacked.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/sparse/figure_baseline_violin_v2_stacked.png
+Saved composite: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure1_composite.pdf
+Saved composite: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure1_composite.png
+Saved histograms: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure1_histograms.pdf
+Saved histograms: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure1_histograms.png
+Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure5_precision.pdf
+
+--- Precision summary ---
+mu_true = 10.0
+   POD-weighted: Var = 29.64
+  ±3%: N = 1265
+  ±5%: N = 456
+  ±10%: N = 114
+            MLE: Var = 19.58
+  ±3%: N = 836
+  ±5%: N = 301
+  ±10%: N = 76
+
+Variance reduction: 33.9%
+Sample size reduction: 33.9%
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure4_composite.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_sweeps_cont.pdf
+Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_grid_robustness.pdf
+Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_threshold_sweep.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_misspec_onebyone.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_misspec_onebyone_mse.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_misspec_onebyone_bias.pdf
+  Saved: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures/figure_misspec_thetas_mse.pdf
+
+  MISSPEC (onebyone) DONE
+All 14 manuscript figure assets are available in /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/figures

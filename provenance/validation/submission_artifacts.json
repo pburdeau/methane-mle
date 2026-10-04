@@ -1,0 +1,45 @@
+{
+  "provided_separately_from_repository": true,
+  "artifacts": [
+    {
+      "name": "methane_paper_and_si_persistent_IPW_overleaf.zip",
+      "sha256": "2e4241510e872e39df8075a5a36837d97296f219d903497b9fb906fc8dd24dcd",
+      "bytes": 937795
+    },
+    {
+      "name": "methane_main_figures_persistent_IPW.zip",
+      "sha256": "f5e0d92eb351bcf01d6a8e66437ffff3c1219c9ae283a4efe3ea627e3bbe7a61",
+      "bytes": 545757
+    },
+    {
+      "name": "methane_main_paper_persistent_IPW.pdf",
+      "sha256": "d3acb9cd26ef2815fea5c2597a4c45a35a65b63029dc99de3580879debea557e",
+      "bytes": 745418
+    },
+    {
+      "name": "methane_SI_persistent_IPW.pdf",
+      "sha256": "a90198e0855277f9ab0a5476cc0bfd3a59d8da5f459215c8d74d90dd5e274396",
+      "bytes": 522953
+    },
+    {
+      "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.docx",
+      "sha256": "583edf959ea020a719811f0db7bd8d0a9eaef660d3775252ba7af16216b0e51b",
+      "bytes": 1493813
+    },
+    {
+      "name": "word_submission/methane_main_manuscript_JRSS_A_persistent_IPW.pdf",
+      "sha256": "9d4c50d28d7050cbff6d6617fcd03951a5589bf5234bd4445dc4cf29a7a0db75",
+      "bytes": 1310009
+    }
+  ],
+  "word_pages": 37,
+  "word_native_math_nodes": 300,
+  "word_numbered_equations": 11,
+  "word_editable_tables": 2,
+  "word_figures": 6,
+  "full_captions": true,
+  "continuous_line_numbers": true,
+  "body_justified": true,
+  "visual_review": "All 37 Word pages reviewed after the wording edits. Changed LaTeX pages reviewed; main and SI compile. Full captions, displayed equations, numerical results, and figure assets are preserved.",
+  "last_updated_date": "2026-10-04"
+}

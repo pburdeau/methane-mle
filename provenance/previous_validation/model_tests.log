@@ -1,0 +1,23 @@
+==============================================================
+  RUNNING TESTS
+==============================================================
+  PASS  test_kappa_sc_greater_than_product
+  PASS  test_emission_prob_sum_dual_deployment
+  PASS  test_emission_prob_sum_single_deployment
+  PASS  test_generate_masks_snap_only
+  PASS  test_generate_masks_cont_only
+  PASS  test_generate_masks_cont_window_contiguous
+  PASS  test_generate_masks_renewal_coverage
+  PASS  test_site_observations_basics
+  PASS  test_simulate_series_basic
+  PASS  test_snapshot_only_reduction
+  PASS  test_continuous_only_reduction
+  PASS  test_combined_log_estimate
+  PASS  test_plume_identification_dual_channel
+  PASS  test_run_one_step_kappa_sc
+  PASS  test_parameter_recovery_smoke
+  PASS  test_baselines_dual_channel
+  PASS  test_lognormal_expectation_identity
+
+  17 passed, 0 failed out of 17
+==============================================================

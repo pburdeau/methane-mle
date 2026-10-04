@@ -1,0 +1,160 @@
+{
+  "baseline": {
+    "n_outer": 25,
+    "n_inner": 500,
+    "methods": {
+      "Naive": {
+        "valid_replications": 12500,
+        "nested_mean": 8.722588373432469,
+        "nested_bias": -1.2774116265675304,
+        "nested_variance": 26.48583374730362,
+        "bias_t": -28.104981850272086,
+        "bias_p": 7.064013826643504e-20
+      },
+      "POD-weighted": {
+        "valid_replications": 12500,
+        "nested_mean": 10.013067639293205,
+        "nested_bias": 0.013067639293203542,
+        "nested_variance": 29.635039187082334,
+        "bias_t": 0.2659284597824195,
+        "bias_p": 0.7925654784932684
+      },
+      "MLE-ungrouped": {
+        "valid_replications": 12490,
+        "nested_mean": 9.932298047569443,
+        "nested_bias": -0.06770195243055696,
+        "nested_variance": 19.25206849199218,
+        "bias_t": -1.9521317709410941,
+        "bias_p": 0.06268385786815273
+      },
+      "MLE": {
+        "valid_replications": 12490,
+        "nested_mean": 10.01131336564308,
+        "nested_bias": 0.011313365643078655,
+        "nested_variance": 18.339489825920847,
+        "bias_t": 0.3185156709039492,
+        "bias_p": 0.7528491329094068
+      }
+    },
+    "variance_reduction_percent": 38.11552024565948,
+    "paired_variance_t": 24.211126988206267,
+    "paired_variance_p": 2.2510986853511838e-18,
+    "campaigns_for_relative_precision_at_95_percent": {
+      "0.03": {
+        "MLE": {
+          "exact": 782.8109346139724,
+          "figure_rounded": 783,
+          "minimum_integer": 783
+        },
+        "POD-weighted": {
+          "exact": 1264.95518378995,
+          "figure_rounded": 1265,
+          "minimum_integer": 1265
+        }
+      },
+      "0.05": {
+        "MLE": {
+          "exact": 281.8119364610301,
+          "figure_rounded": 282,
+          "minimum_integer": 282
+        },
+        "POD-weighted": {
+          "exact": 455.38386616438197,
+          "figure_rounded": 455,
+          "minimum_integer": 456
+        }
+      },
+      "0.1": {
+        "MLE": {
+          "exact": 70.45298411525752,
+          "figure_rounded": 70,
+          "minimum_integer": 71
+        },
+        "POD-weighted": {
+          "exact": 113.84596654109549,
+          "figure_rounded": 114,
+          "minimum_integer": 114
+        }
+      }
+    }
+  },
+  "sparse": {
+    "n_outer": 25,
+    "n_inner": 500,
+    "methods": {
+      "Naive": {
+        "valid_replications": 12500,
+        "nested_mean": 9.549443333016656,
+        "nested_bias": -0.45055666698334546,
+        "nested_variance": 30.88430389238704,
+        "bias_t": -10.67470107533685,
+        "bias_p": 1.3528938477505075e-10
+      },
+      "POD-weighted": {
+        "valid_replications": 12500,
+        "nested_mean": 10.07267391243044,
+        "nested_bias": 0.07267391243043975,
+        "nested_variance": 31.940940361085932,
+        "bias_t": 1.6829897254639181,
+        "bias_p": 0.10534299351338426
+      },
+      "MLE-ungrouped": {
+        "valid_replications": 12471,
+        "nested_mean": 9.911454867909407,
+        "nested_bias": -0.08854513209059156,
+        "nested_variance": 27.484070145486804,
+        "bias_t": -2.4134084918198124,
+        "bias_p": 0.0238000467728128
+      },
+      "MLE": {
+        "valid_replications": 12471,
+        "nested_mean": 10.032300854411488,
+        "nested_bias": 0.03230085441148858,
+        "nested_variance": 25.323920807621967,
+        "bias_t": 0.860445804484458,
+        "bias_p": 0.39805779626267707
+      }
+    },
+    "variance_reduction_percent": 20.716420614608978,
+    "paired_variance_t": 14.067738226183899,
+    "paired_variance_p": 4.352919653060529e-13,
+    "campaigns_for_relative_precision_at_95_percent": {
+      "0.03": {
+        "MLE": {
+          "exact": 1080.9374908284506,
+          "figure_rounded": 1081,
+          "minimum_integer": 1081
+        },
+        "POD-weighted": {
+          "exact": 1363.3812943460857,
+          "figure_rounded": 1363,
+          "minimum_integer": 1364
+        }
+      },
+      "0.05": {
+        "MLE": {
+          "exact": 389.13749669824216,
+          "figure_rounded": 389,
+          "minimum_integer": 390
+        },
+        "POD-weighted": {
+          "exact": 490.81726596459083,
+          "figure_rounded": 491,
+          "minimum_integer": 491
+        }
+      },
+      "0.1": {
+        "MLE": {
+          "exact": 97.28437417456054,
+          "figure_rounded": 97,
+          "minimum_integer": 98
+        },
+        "POD-weighted": {
+          "exact": 122.70431649114771,
+          "figure_rounded": 123,
+          "minimum_integer": 123
+        }
+      }
+    }
+  }
+}

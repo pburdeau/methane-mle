@@ -1,0 +1,19 @@
+{
+  "paper": {
+    "success": true,
+    "unresolved_reference_or_layout_warnings": []
+  },
+  "si": {
+    "success": true,
+    "unresolved_reference_or_layout_warnings": []
+  },
+  "combined_main": {
+    "success": true,
+    "unresolved_reference_or_layout_warnings": []
+  },
+  "combined_si": {
+    "success": true,
+    "unresolved_reference_or_layout_warnings": []
+  },
+  "last_wording_update": "2026-10-04"
+}

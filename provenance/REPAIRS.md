@@ -1,30 +1,47 @@
-# Changes made in the curated package
+# Persistent-size IPW revision
 
-The originals under `mle_methane_clean_simultaneous` and the top-level Overleaf
-folders were left unchanged. `source_manifest.json` records the source path,
-SHA-256 checksum, and size of each collected file. `package_manifest.json` records
-the final curated files after the changes below.
+The previous implementation is preserved in Git history at commit `8906acd`.
+`source_manifest.json` remains the original collection record; current hashes
+are in `package_manifest.json`. The original workspace has a separate backup.
 
-1. The paper's external SI reference changed from `\externaldocument{SI}` to
-   `\externaldocument{../si/main}` to match the packaged projects.
-2. Experiment plotting cache paths use a writable temporary directory and honor
-   `MPLCONFIGDIR` instead of unconditionally using `/tmp/mpl_cache`.
-3. `run_grid_robustness.py` accepts `--plot-only` using its existing figure routine.
-4. `run_threshold_sweep.py` separates its existing plot into `make_figure` and
-   accepts `--plot-only`. The simulation and plot equations are unchanged.
-5. `reproduce.py` replaces the legacy master runner for this package. It uses the
-   filenames actually referenced in the current manuscripts, the extended sweep
-   composites, the correct precision-figure name, and the SI sparse comparison.
-   Sparse plots use a separate subdirectory so they cannot replace baseline plots.
-6. The new runner stops on subprocess failures, preserves archived inputs, records
-   the environment, and explicitly distinguishes plotting from fresh simulations.
+The three-step estimator retains hard plume linking, log-space measurement
+combination with the original lognormal correction, event-level backward-recursion
+IPW, and the outer iteration. A frozen original-step fixture checks these outputs
+at unit nudge. The simulator and original model tests are unchanged.
 
-The original `run_all_figures.py` is retained as
-`original_run_all_figures.py` for provenance. It is not a supported entry point:
-its baseline rename expects a file the current plotter does not produce, several
-assembly outputs do not match TeX references, caching/force behavior is
-inconsistent, and it continues after subprocess failures.
+The transition update now conditions on the full weighted empirical rate law,
+with OFF plus one ON state per corrected event size. Within-event persistence and
+stop/restart transitions across observation gaps are represented explicitly.
+The structured forward recursion takes O(observation times × empirical sizes).
+It is exact conditional on the discrete rate law; estimating that law and linking
+events are approximations. The algorithm is neither joint MLE nor exact EM.
 
-The estimator and simulator in `src/`, original configuration, and model tests
-are copied without edits. Diagnostic scripts, exploratory run directories, old
-figures, system metadata, and unrelated literature PDFs were excluded.
+The empirical nudge is removed: a nonunit compatibility argument raises an error.
+The optimizer uses continuous log probabilities on fixed bounds independent of
+simulation truth, with fixed starts and first-iteration coarse search. Constant
+observation-count scaling only conditions the numerical objective. The unscaled
+log likelihood is returned. Outer convergence and final numerical flags are
+reported, and finite flagged estimates are retained. Zero-detection observed
+campaigns contribute mean zero and unavailable component parameters.
+
+The ungrouped comparator uses the same persistent transition likelihood with its
+original per-detection weighted rate law, preserving the contrast with event-level
+weighting, measurement combination and iteration. Legacy optional variants are
+not used in the paper and retain their historical implementation.
+
+Every required simulation uses the original seeds and nested sample counts.
+Parallel workers preserve ordered results and independent campaign seeds.
+Numerical sensitivity now varies optimizer tolerances, rather than a grid centred
+on generating truth. Baseline and linking-threshold Monte Carlo bands use Student
+t intervals. Misspecification MSE uses the actual batch squared errors for its
+Monte Carlo SE and the POD MSE reference. Campaign planning counts use ceilings;
+the bands propagate batch variance percentiles and assume negligible bias.
+
+Manuscript text distinguishes conditional likelihood from the joint likelihood,
+explains the empirical rate representation and computational cost, qualifies
+asymptotic claims, and reports measured bias and numerical limitations. References,
+full captions, figure annotations and the Word manuscript are synchronized with
+the revised simulations. SI cross-reference labels are prefixed to avoid citation
+collisions, and supplementary sections, equations, tables and figures have S
+numbers. Multi-file compilation supports latexmk or Tectonic; the combined
+Overleaf project retains cache-safe main/SI compilation settings.

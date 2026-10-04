@@ -1,0 +1,69 @@
+Figure S1
+File: Drawn directly in LaTeX (TikZ); no separate figure PDF in the project.
+
+Title: Graphical model of intermittent emissions and imperfect detection
+
+Caption: Graphical model for intermittent emissions with imperfect detection. Shaded nodes are observed; unshaded nodes are latent. The emission state Z_t follows a two-state Markov chain. The emission rate E_t is drawn at event onset and persists until the event ends. At each time step, the true rate may produce zero, one, or two pairs of detection/measurement outcomes depending on which technologies are deployed: Y_t^(j) (detection indicator) and D_t^(j) (measured value) for technology j ∈ {s, c}. Here t = 0 illustrates a dual-observation time step, t = 1 a single-technology observation, and t = T an unobserved time step. When both technologies are present their detections are conditionally independent given E_t.
+
+Figure S2
+File: figures/figure_pod_curves.pdf
+
+Title: Probability-of-detection curves for snapshot and continuous sensors
+
+Caption: Probability-of-detection (POD) curves for the two monitoring technologies used in the baseline simulation. The snapshot sensor (solid, θ = 50 kg/h, k = 2) represents aerial or satellite measurements with high detection thresholds. The continuous sensor (dashed, θ = 2.4 kg/h, k = 3) represents ground-based monitoring with much lower thresholds but steeper transition. The large separation between the two curves is the key feature of the dual-technology design: continuous monitors detect small emissions that snapshot sensors miss entirely, while both technologies are reliable for large emissions.
+
+Figure S3
+File: figures/figure_size_distribution.pdf
+
+Title: Emission-rate distribution and sensor detection probabilities
+
+Caption: Emission size distribution and its interaction with detection. (a) The log-normal distribution of emission rates conditional on the source being active (μ_log = 3.787, σ_log = 0.5; mean 50.0 kg/h, median 44.1 kg/h). (b) Cumulative distribution of emission sizes overlaid with the POD curves of both technologies. The continuous sensor (dotted) detects nearly all emissions above 10 kg/h, while the snapshot sensor (dashed) has 50% detection probability at 50 kg/h—close to the distribution’s mean—so a substantial fraction of active emissions go undetected by snapshots alone. This illustrates the detection-selection bias addressed by inverse-probability weighting.
+
+Figure S4
+File: figures/figure_realizations.pdf
+
+Title: Example emission histories and observations under baseline conditions
+
+Caption: Three example site realisations from the baseline simulation (T = 1000, p_snap = 0.125, p_cont = 0.01, T_cont = 50). Yellow bands mark emission events (ON periods). Snapshot detections (blue diamonds) and non-detections (blue crosses) occur throughout the campaign. Continuous detections (red circles) and non-detections (red crosses) appear only during monitoring windows.
+
+Figure S5
+File: figures/figure_baseline_violin_v2_wide_sparse.pdf
+
+Title: Estimator sampling distributions under very sparse monitoring
+
+Caption: Sampling distributions of the four μ̂ estimators in the very-sparse regime (p_snap = 0.0015, p_cont = 0.015, T_cont = 50, θ_c = 15 kg/h, T = 1,000). Violin plots show the distribution of point estimates over 12,500 replicates (25 × 500); the dashed horizontal line marks the true value μ_true = 10.0 kg/h. The MLE concentrates around the truth with lower variance than POD-weighted and MLE-ungrouped; the naive estimator is visibly biased downward.
+
+Figure S6
+File: figures/figure1_composite.pdf
+
+Title: Effect of campaign length on parameter bias and precision
+
+Caption: Relative bias (%, top row) and coefficient of variation (CV %, bottom row) of MLE parameter estimates as a function of campaign length T. From left to right: p̂_on, p̂_off, μ̂_emit, and μ̂ (with POD-weighted for comparison). Shaded bands show normal-approximation 95% Monte Carlo intervals. The sweep evaluates finite-campaign parameter recovery; it does not establish asymptotic unbiasedness of the iterative plug-in estimator. The CV of μ̂_emit and p̂_off decreases substantially with longer campaigns, reflecting the additional data available for disentangling intermittency from detection effects. The rightmost bottom panel also shows the variance ratio (red, right axis).
+
+Figure S7
+File: figures/figure_sweeps_cont.pdf
+
+Title: Sensitivity of estimator variance to continuous-monitoring design
+
+Caption: Sensitivity of estimation variance to the two continuous-monitoring parameters (shaded bands: normal-approximation 95% Monte Carlo intervals over 25 outer batches; ratio bands propagate marginal variance standard errors by the delta method without a covariance term). (a) Sweep over the trigger probability p_cont, holding T_cont at baseline. (b) Sweep over the window duration T_cont, holding p_cont at baseline. Top row: variance of the MLE and POD-weighted estimators. Bottom row: variance ratio (POD-weighted / MLE); values above the dashed line indicate lower MLE variance.
+
+Figure S8
+File: figures/figure_grid_robustness.pdf
+
+Title: Sensitivity of estimates to optimizer stopping tolerance
+
+Caption: Numerical sensitivity of the transition update. Panels show relative bias (%) and coefficient of variation (CV, %) of μ̂ over the same 500 baseline datasets, as the relative objective tolerance is tightened. The horizontal axis is −log₁₀(ftol). The baseline tolerance is 10⁻¹¹. The empirical size distribution and fixed transition bounds are unchanged.
+
+Figure S9
+File: figures/figure_threshold_sweep.pdf
+
+Title: Sensitivity of parameter estimates to the plume-linking threshold
+
+Caption: Sensitivity of MLE estimates to the plume-linking decision threshold δ. (a) Relative bias of μ̂ and μ̂_emit. (b) Coefficient of variation of μ̂. The vertical dotted line marks the baseline value δ = 0.5. Shaded bands are 95% Student-t Monte Carlo intervals from five outer batches (four degrees of freedom). The sweep measures sensitivity to the linking choice; it does not establish unbiasedness.
+
+Figure S10
+File: figures/figure_misspec_thetas_mse.pdf
+
+Title: Robustness to misspecification of the snapshot detection threshold
+
+Caption: Robustness of MLE performance to misspecification of the snapshot 50% detection threshold θ_s. At each outer replicate, θ̃_s is drawn log-normally around θ_s^(true) with standard deviation η in log-space; data are generated under θ_s^(true), while estimation uses θ̃_s. The horizontal dashed line marks the POD-weighted MSE under correct specification, used as a reference baseline. The shaded bands are normal-approximation 95% Monte Carlo bands from 25 outer batches. For MLE, the standard error is computed from the batch mean squared errors; the POD reference uses its directly measured mean squared error at η = 0.

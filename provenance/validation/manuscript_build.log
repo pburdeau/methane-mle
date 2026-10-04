@@ -1,0 +1,195 @@
+note: Running TeX ...
+warning: lineno.sty:296: Invalid UTF-8 byte or sequence at line 296 replaced by U+FFFD.
+note: Running BibTeX on main.aux ...
+note: Rerunning TeX because bibtex was run ...
+warning: lineno.sty:296: Invalid UTF-8 byte or sequence at line 296 replaced by U+FFFD.
+warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.
+note: Running xdvipdfmx ...
+note: Writing `main.out` (7.4912109375 KiB)
+note: Writing `main.blg` (194 B)
+note: Writing `main.log` (23.833984375 KiB)
+note: Writing `main.pdf` (510.6962890625 KiB)
+note: Writing `main.aux` (28.203125 KiB)
+note: Writing `main.bbl` (2.1591796875 KiB)
+note: Writing `main.toc` (4.515625 KiB)
+note: Running TeX ...
+warning: algorithm.sty:11: 
+Invalid UTF-8 byte or sequence at line 11 replaced by U+FFFD.
+warning: oup-authoring-template.cls:3206: 
+runsystem(texcount -total -inc main.tex > wordcount.txt)...disabled.
+warning: lineno.sty:296: Invalid UTF-8 byte or sequence at line 296 replaced by U+FFFD.
+warning: anyfontsize.sty:3: 
+Invalid UTF-8 byte or sequence at line 3 replaced by U+FFFD.
+warning: anyfontsize.sty:3: Invalid UTF-8 byte or sequence at line 3 replaced by U+FFFD.
+warning: main.tex:92: Underfull \hbox (badness 10000) has occurred while \output is active
+warning: main.tex:551: Underfull \hbox (badness 2277) in paragraph at lines 550--551
+warning: main.bbl:160: Underfull \hbox (badness 10000) in paragraph at lines 154--160
+note: Running BibTeX on main.aux ...
+note: Rerunning TeX because bibtex was run ...
+warning: algorithm.sty:11: 
+Invalid UTF-8 byte or sequence at line 11 replaced by U+FFFD.
+warning: oup-authoring-template.cls:3206: 
+runsystem(texcount -total -inc main.tex > wordcount.txt)...disabled.
+warning: lineno.sty:296: Invalid UTF-8 byte or sequence at line 296 replaced by U+FFFD.
+warning: anyfontsize.sty:3: 
+Invalid UTF-8 byte or sequence at line 3 replaced by U+FFFD.
+warning: anyfontsize.sty:3: Invalid UTF-8 byte or sequence at line 3 replaced by U+FFFD.
+warning: main.tex:92: Underfull \hbox (badness 10000) has occurred while \output is active
+warning: main.tex:551: Underfull \hbox (badness 2277) in paragraph at lines 550--551
+warning: main.bbl:160: Underfull \hbox (badness 10000) in paragraph at lines 154--160
+warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.
+note: Running xdvipdfmx ...
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="1" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="2" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="3" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="4" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="5" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="6" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="7" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="8" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="9" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="10" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="11" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="12" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="13" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="14" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="15" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="16" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="17" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="18" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="19" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="20" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+warning: Unknown PDF object type.
+warning: Could not find a valid object in array object.
+warning: Interpreting PS code failed!!! Output might be broken!!!
+warning: Interpreting special command ps: (ps:) failed.
+warning: >> at page="21" position="(72, 625.323)" (in PDF)
+warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
+warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
+note: Writing `main.blg` (198 B)
+note: Writing `main.aux` (36.6865234375 KiB)
+note: Writing `main.log` (30.333984375 KiB)
+note: Writing `main.out` (5.2587890625 KiB)
+note: Writing `main.pdf` (727.947265625 KiB)
+note: Writing `main.bbl` (16.1748046875 KiB)
+Compiled manuscripts: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/paper.pdf and /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/si.pdf

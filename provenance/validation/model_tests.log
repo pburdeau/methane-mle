@@ -21,3 +21,9 @@
 
   17 passed, 0 failed out of 17
 ==============================================================
+PASS test_forward_against_dense_transition_powers
+PASS test_same_event_dependence_is_retained
+PASS test_event_ipw_acceleration_matches_original_recursion
+PASS test_nudge_rejected_and_diagnostics_returned
+PASS test_zero_detections_retained_without_fabricated_parameters
+PASS test_original_linking_and_ipw_unchanged

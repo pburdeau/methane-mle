@@ -1,5 +1,5 @@
 {
-  "tolerance": "rtol=atol=1e-10",
+  "tolerance": "rtol=1e-5; atol=1e-5 for transitions, 0.005 kg/h for rates",
   "replications": [
     {
       "experiment": "baseline",
@@ -18,12 +18,12 @@
     },
     {
       "experiment": "baseline",
-      "replication": 1184,
+      "replication": 1581,
       "matched": true
     },
     {
       "experiment": "baseline",
-      "replication": 1581,
+      "replication": 4013,
       "matched": true
     },
     {

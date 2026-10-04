@@ -36,11 +36,12 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import config as cfg
+from experiments import plot_style as ps
 
-C_POD = "#C39BD3"
-C_MLE = "#2ECC71"
-C_RATIO = "#1A1A1A"
-C_PARAMS = ["#B0B0B0", "#909090", "#C8C8C8", "#2ECC71"]
+C_POD = ps.POD
+C_MLE = ps.MLE
+C_RATIO = ps.RATIO
+C_PARAMS = ps.PARAMETERS
 
 
 def main():
@@ -112,7 +113,9 @@ def main():
             ax.bar(uv, densities, width=widths, color=color, alpha=0.6,
                    edgecolor="none", linewidth=0, zorder=3, align="center")
         else:
-            ax.hist(arr_clean, bins=bins_per_panel[col], color=color,
+            hist_bins = (np.geomspace(arr_clean.min()*.98, min(arr_clean.max()*1.02,1.0),31)
+                         if col < 2 else bins_per_panel[col])
+            ax.hist(arr_clean, bins=hist_bins, color=color,
                     alpha=0.6, edgecolor="none", linewidth=0, density=True,
                     rwidth=1.0, zorder=3)
         lbl_true = "True" if col > 0 else "True value"
@@ -120,6 +123,8 @@ def main():
         ax.axvline(true, color="k", lw=1.5, ls="-", label=lbl_true)
         ax.axvline(float(np.mean(arr_clean)), color="k", lw=1.2, ls="--",
                    label=lbl_mean)
+        if col < 2:
+            ax.set_xscale("log")
         ax.set_xlabel(label + unit)
         if col == 0:
             ax.legend(framealpha=0.9, loc="upper left")
@@ -239,8 +244,11 @@ def main():
     ax.set_title(r"CV of $\hat{\mu}$ + ratio")
     ax.set_xlabel(r"$T$ (time steps)")
     ax.set_ylabel("CV (%)")
-    ax.legend(loc="upper right", framealpha=0.9)
-    ax_r.legend(loc="center right", framealpha=0.9)
+    handles, labels = ax.get_legend_handles_labels()
+    ratio_handles, ratio_labels = ax_r.get_legend_handles_labels()
+    ax_r.legend(handles + ratio_handles, labels + ratio_labels,
+                loc="center right", bbox_to_anchor=(1.0, 0.65),
+                fontsize=6.3, framealpha=1.0)
     ax.spines["top"].set_visible(False)
     ax.grid(alpha=0.2, ls=":", lw=0.5)
 
@@ -269,7 +277,9 @@ def main():
             ax.bar(uv, densities, width=widths, color=color, alpha=0.6,
                    edgecolor="none", linewidth=0, zorder=3, align="center")
         else:
-            ax.hist(arr_clean, bins=bins_per_panel[idx], color=color,
+            hist_bins = (np.geomspace(arr_clean.min()*.98, min(arr_clean.max()*1.02,1.0),31)
+                         if idx < 2 else bins_per_panel[idx])
+            ax.hist(arr_clean, bins=hist_bins, color=color,
                     alpha=0.6, edgecolor="none", linewidth=0, density=True,
                     rwidth=1.0, zorder=3)
         est_mean = float(np.mean(arr_clean))
@@ -280,6 +290,8 @@ def main():
         panel_label = chr(97 + idx)  # a, b, c, d
         ax.set_title(f"({panel_label})", loc="left", fontsize=9,
                      fontweight="bold")
+        if idx < 2:
+            ax.set_xscale("log")
         ax.set_xlabel(label + unit)
         ax.legend(framealpha=0.9, fontsize=5)
         ax.spines["top"].set_visible(False)
@@ -296,18 +308,6 @@ def main():
     print(f"Saved histograms: {hist_out}")
     print(f"Saved histograms: {hist_out.with_suffix('.png')}")
 
-    # ── Auto-copy to paper directories ────────────────────────
-    import shutil
-    paper_fig = PROJECT_ROOT / "mle_methane_paper" / "figures"
-    si_fig = PROJECT_ROOT / "Supplementary Methane MLE" / "figures"
-
-    if paper_fig.exists():
-        shutil.copy2(hist_out, paper_fig / "figure1_histograms.pdf")
-        print(f"  -> Copied to paper: figure1_histograms.pdf")
-
-    if si_fig.exists():
-        shutil.copy2(out, si_fig / "figure1_composite.pdf")
-        print(f"  -> Copied to SI: figure1_composite.pdf")
 
 
 if __name__ == "__main__":

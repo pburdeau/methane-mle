@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-04",
+  "replacements_main": 7,
+  "replacements_si": 6,
+  "remaining_phrase_matches": 0,
+  "full_captions_preserved": true,
+  "displayed_equations_preserved": true,
+  "numerical_results_and_figures_unchanged": true,
+  "word_pages": 37,
+  "all_word_pages_visually_reviewed": true,
+  "main_pdf_pages": 21,
+  "si_pdf_pages": 25,
+  "changed_latex_pages_visually_reviewed": true,
+  "both_manuscripts_compile": true
+}
