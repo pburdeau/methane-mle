@@ -227,7 +227,7 @@ The full paths contain all $T$ time steps, including unobserved gaps. The condit
 
 Marginal detection probabilities $\kappa_j=\E[q_j(E)]$ are useful summaries, but they do not characterize the joint detection sequence when size persists within an event. Conditional on two observations sharing an event, their joint snapshot detection probability is $\E[q_s(E)^2]$, whereas replacing size by a single average POD would give $\E[q_s(E)]^2$. The latter corresponds to discarding temporal dependence through the shared rate.
 
-Plume identification and event-level IPW give the estimated size distribution $\hat f=\sum_{m=1}^M\tilde w_m\delta_{\hat e_m}$. The transition likelihood uses an OFF state and $M$ ON states, one for each estimated event size. It is exact conditional on this discrete distribution, whose sizes and weights are estimated from noisy detections and inferred event assignments. The procedure uses conditional maximum-likelihood updates, rather than joint maximization of equation~\eqref{eq:full_likelihood_SI} or an exact EM algorithm. The size support consists of the estimated plume sizes and is not restricted to a fixed grid of bins.
+Plume identification and event-level IPW give the estimated size distribution $\hat f=\sum_{m=1}^M\tilde w_m\delta_{\hat e_m}$. The transition likelihood uses an OFF state and $M$ ON states, one for each estimated event size. It is exact conditional on this discrete distribution, whose sizes and weights are estimated from noisy detections and inferred event assignments. The procedure uses conditional maximum-likelihood updates. It does not jointly maximize equation~\eqref{eq:full_likelihood_SI} or implement an exact EM algorithm. The size support consists of the estimated plume sizes and is not restricted to a fixed grid of bins.
 
 %==============================================================================
 \section{Alternative Estimation Approaches}
@@ -319,7 +319,7 @@ For observed detection vector $\mathbf Y_{t_i}$, let
  b_i(m)=\prod_{j\in\mathcal J_{t_i}}q_j(\hat e_m)^{Y_{j,t_i}}
                   [1-q_j(\hat e_m)]^{1-Y_{j,t_i}},\qquad m\ge1.
 \end{equation}
-For OFF, replace $q_j(\hat e_m)$ by the false-positive probability; all such probabilities are zero in the reported simulations. These conditional products preserve simultaneous sensor dependence after summing over size states. Measured rates enter through plume linking and $\hat f$, rather than a joint measurement-density term in this conditional likelihood.
+For OFF, replace $q_j(\hat e_m)$ by the false-positive probability; all such probabilities are zero in the reported simulations. These conditional products preserve simultaneous sensor dependence after summing over size states. Measured rates enter this conditional likelihood through plume linking and $\hat f$. The forward recursion uses detection probabilities and contains no measurement-density factor.
 
 Define $\alpha_i(m)=P(\mathbf Y_{t_1},\ldots,\mathbf Y_{t_i},H_{t_i}=m\mid\hat f)$. The forward recursion is
 \begin{equation}
@@ -328,7 +328,7 @@ Define $\alpha_i(m)=P(\mathbf Y_{t_1},\ldots,\mathbf Y_{t_i},H_{t_i}=m\mid\hat f
 \end{equation}
 It begins with stationary masses $\pi_0=b/(a+b)$ and $\pi_m=a\tilde w_m/(a+b)$. The likelihood is $\mathcal L(a,b\mid\hat f)=\sum_{m=0}^{M}\alpha_N(m)$; probabilities are rescaled at every step to prevent underflow.
 
-The structured multi-step transition below permits $O(M)$ work per observation, rather than a dense $O(M^2)$ multiplication. We maximize the conditional likelihood continuously in $(\log a,\log b)$ over $[10^{-5},1-10^{-6}]^2$. Starting values are fixed at $(0.025,0.10)$; the first outer iteration also uses the best point in a fixed coarse search. Subsequent iterations start at the previous transition estimate. We scale the log-likelihood by the number of observation times to improve numerical conditioning; this constant scaling leaves the maximizer unchanged. If the gradient-based optimizer fails or returns a large gradient, we retry with a derivative-free optimizer. No empirical adjustment is applied to the transition probabilities.
+The structured multi-step transition below requires $O(M)$ work per observation; dense matrix multiplication would require $O(M^2)$. We maximize the conditional likelihood continuously in $(\log a,\log b)$ over $[10^{-5},1-10^{-6}]^2$. Starting values are fixed at $(0.025,0.10)$; the first outer iteration also uses the best point in a fixed coarse search. Subsequent iterations start at the previous transition estimate. We scale the log-likelihood by the number of observation times to improve numerical conditioning; this constant scaling leaves the maximizer unchanged. If the gradient-based optimizer fails or returns a large gradient, we retry with a derivative-free optimizer. No empirical adjustment is applied to the transition probabilities.
 
 \subsection{Iteration and convergence}
 
@@ -723,7 +723,7 @@ from the test environment. This section characterises the sensitivity of
 the estimator to this additional source of uncertainty.}
 
 \paragraph{Choice of perturbed parameter.}
-\new{We perturb each of the six calibration parameters $\boldsymbol\psi=(\theta_s,k_s,\sigma_s,\theta_c,k_c,\sigma_c)$ separately; the complete results are supplied in the reproduction repository. Figure~\ref{fig:misspec} focuses on the snapshot 50\% detection threshold $\theta_s$, which sits near the bulk of the baseline active-rate distribution ($\theta_s=50$~kg/h; median emission rate about $44$~kg/h). Its calibration directly changes which events are considered detectable. The continuous threshold is much lower ($2.4$~kg/h), so the baseline continuous channel detects most active emissions. Sensitivity depends on this sensor and rate configuration rather than a universal ranking of calibration parameters.}
+\new{We perturb each of the six calibration parameters $\boldsymbol\psi=(\theta_s,k_s,\sigma_s,\theta_c,k_c,\sigma_c)$ separately; the complete results are supplied in the reproduction repository. Figure~\ref{fig:misspec} focuses on the snapshot 50\% detection threshold $\theta_s$, which sits near the bulk of the baseline active-rate distribution ($\theta_s=50$~kg/h; median emission rate about $44$~kg/h). Its calibration directly changes which events are considered detectable. The continuous threshold is much lower ($2.4$~kg/h), so the baseline continuous channel detects most active emissions. The ranking of calibration sensitivities is specific to this sensor and rate configuration.}
 
 \paragraph{Experimental design.}
 \new{We perturb $\theta_s$ on the log scale,
@@ -738,8 +738,7 @@ at their true values. At each outer replicate we (i) draw a fresh
 $\tilde\theta_s$, (ii) simulate data under $\theta_s^{\text{true}}$, and
 (iii) run the MLE using $\tilde\theta_s$. This separates the data-generating
 truth from the parameters used in estimation, mimicking real deployment in
-which the analyst plugs in calibration estimates rather than the unknown
-truth. We sweep $\eta \in \{0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8\}$
+which the analyst uses estimated sensor-calibration parameters. We sweep $\eta \in \{0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8\}$
 with $25$ outer replicates and $500$ inner data replicates per outer
 batch. Because random misspecification can produce both random shifts in
 $\hat\mu$ and a systematic shift,
@@ -792,7 +791,7 @@ specification, used as a reference baseline. The shaded bands are normal-approxi
 \new{In our simulation studies, estimator variance is characterized through Monte Carlo replication. For application to real monitoring data, a parametric bootstrap can simulate new emission and detection records under the fitted model while retaining the actual sampling masks, then refit the entire procedure. This preserves model-based temporal dependence and propagates the plug-in fitting steps. Its interval coverage would require separate validation; the Monte Carlo intervals reported here describe repeated-simulation performance, not within-campaign uncertainty.}
 
 \subsection{Practical considerations}
-\new{Several issues arise when applying the framework to real monitoring records. The HMM likelihood can become flat in $p_{\text{on}}$ when a facility produces fewer than roughly five detected events over the campaign; in such cases the estimate is unstable, and remedies include extending the campaign, pooling across similar facilities, or using the POD-weighted estimator instead. Continuous monitors typically have visibility windows governed by wind direction (main text, Section~2), so the sampling log should reflect visibility rather than instrument uptime — a sensor operating with no plume in its field of view contributes no information. Published POD curves are valid under the conditions in which they were measured; deployment under substantially different conditions (offshore, at night, or in high winds) calls for re-estimation of the curve or wider misspecification analysis. Finally, the MLE output $\hat\mu$ is already a time-average and should not be multiplied by a separately estimated persistence fraction.}
+\new{Several issues arise when applying the framework to real monitoring records. The HMM likelihood can become flat in $p_{\text{on}}$ when a facility produces fewer than roughly five detected events over the campaign; in such cases the estimate is unstable, and remedies include extending the campaign, pooling across similar facilities, or using the POD-weighted estimator instead. Continuous monitors typically have visibility windows governed by wind direction (main text, Section~2), so the sampling log should record periods of plume visibility — a sensor operating with no plume in its field of view contributes no information. Published POD curves are valid under the conditions in which they were measured; deployment under substantially different conditions (offshore, at night, or in high winds) calls for re-estimation of the curve or wider misspecification analysis. Finally, the MLE output $\hat\mu$ is already a time-average and should not be multiplied by a separately estimated persistence fraction.}
 
 \subsection{What to report}
 \new{For each facility, the recommended quantities to report are the point estimate $\hat\mu$ in kg/h, the estimated activity fraction $\hat\pi_{\text{on}}$ and mean event duration $1/\hat p_{\text{off}}$, the number of detected events and total observation time, and any assumed deviations from published sensor parameters together with sensitivity to these deviations as characterized in Section~\ref{sec:misspec_SI}. Reporting the latter supports future meta-analyses and enables downstream propagation of misspecification uncertainty.}
