@@ -5,13 +5,13 @@ note: Rerunning TeX because bibtex was run ...
 warning: lineno.sty:296: Invalid UTF-8 byte or sequence at line 296 replaced by U+FFFD.
 warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.
 note: Running xdvipdfmx ...
+note: Writing `main.log` (23.8359375 KiB)
+note: Writing `main.bbl` (2.1591796875 KiB)
+note: Writing `main.out` (7.4912109375 KiB)
+note: Writing `main.aux` (28.189453125 KiB)
 note: Writing `main.blg` (194 B)
 note: Writing `main.toc` (4.515625 KiB)
-note: Writing `main.out` (7.4912109375 KiB)
-note: Writing `main.bbl` (2.1591796875 KiB)
-note: Writing `main.aux` (28.189453125 KiB)
-note: Writing `main.pdf` (511.2978515625 KiB)
-note: Writing `main.log` (23.8359375 KiB)
+note: Writing `main.pdf` (511.30078125 KiB)
 note: Running TeX ...
 warning: algorithm.sty:11: 
 Invalid UTF-8 byte or sequence at line 11 replaced by U+FFFD.
@@ -189,10 +189,10 @@ warning: Interpreting special command ps: (ps:) failed.
 warning: >> at page="21" position="(72, 625.323)" (in PDF)
 warning: >> xxx "ps: [{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PU..."
 warning: >> Reading special command stopped around >>[{ThisPage} << /CropBox [0 0 536.07838 697.43394] >> /PUT pd...<<
-note: Writing `main.pdf` (728.8173828125 KiB)
-note: Writing `main.bbl` (16.1748046875 KiB)
-note: Writing `main.aux` (36.783203125 KiB)
-note: Writing `main.blg` (198 B)
 note: Writing `main.out` (5.2587890625 KiB)
+note: Writing `main.pdf` (728.7490234375 KiB)
+note: Writing `main.aux` (36.783203125 KiB)
 note: Writing `main.log` (30.3330078125 KiB)
+note: Writing `main.bbl` (16.1748046875 KiB)
+note: Writing `main.blg` (198 B)
 Compiled manuscripts: /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/paper.pdf and /Users/pburdeau/Desktop/mle_methane/methane_mle_reproducibility/build/si.pdf

@@ -224,8 +224,8 @@
     },
     {
       "path": "paper/main.tex",
-      "sha256": "0ef21ae8053f0570c561a3c39c26c7fdf5afb41510b58ddd6e50fd67abff60e0",
-      "bytes": 84765
+      "sha256": "87001b3b735819f4987831f99074ac16f7592ef7ee0c9691dfbf54d3e0291599",
+      "bytes": 84824
     },
     {
       "path": "paper/oup-abbrvnat.bst",
@@ -439,8 +439,8 @@
     },
     {
       "path": "provenance/validation/compile_checks.json",
-      "sha256": "b87417c0793ee1127fe0d4f9ae1fd6b69d89340bb5f5759c4e2acf1691388e01",
-      "bytes": 268
+      "sha256": "8bca5c9c3afcb03af456de5569e75f0fb305af24a2911e1c63ea9bf822895eb3",
+      "bytes": 307
     },
     {
       "path": "provenance/validation/figure_build.log",
@@ -459,12 +459,12 @@
     },
     {
       "path": "provenance/validation/manuscript_build.log",
-      "sha256": "29ab16d4af00c57ae3cd3205ad02c276d459527dcfda2be97b8fa2952af9203c",
-      "bytes": 13058
+      "sha256": "4143b6a2a675bcccfd490d61a5e86f3dd6a6729fb6c949528942e1b593850630",
+      "bytes": 13056
     },
     {
       "path": "provenance/validation/manuscripts_run.json",
-      "sha256": "d60a0030939b520d85e3e7e43ff548bc8541f7cbf65cf3a47d8bd39505118b54",
+      "sha256": "31c79b43f206423d7e8dd4218635ca09df8769f06da02b9a809eb1b888c4dd37",
       "bytes": 325
     },
     {
@@ -499,8 +499,8 @@
     },
     {
       "path": "provenance/validation/submission_artifacts.json",
-      "sha256": "6e61d8300c4e89fc9ba70aed06c5665e31927ebf76990a7de2fd14a2f24a8a44",
-      "bytes": 1547
+      "sha256": "e442b1e229a412b3934bac157fc9e462744f676c887d00ad12e7871ea476665d",
+      "bytes": 1682
     },
     {
       "path": "provenance/validation/tests_run.json",
@@ -637,5 +637,6 @@
       "sha256": "57d59f5a06326cbf5a03ca226bdf7fb6553f40528c7ed5d18f4257fdc70158ea",
       "bytes": 4210
     }
-  ]
+  ],
+  "last_updated_date": "2026-10-04"
 }
